@@ -1,14 +1,14 @@
 Windows
     Technic
-        Modpacks: C:\Users\timo8\AppData\Roaming\.technic\modpacks\
-        Root: C:\Users\timo8\AppData\Roaming\.technic\
+        Modpacks: C:\Users\[username]\AppData\Roaming\.technic\modpacks\
+        Root: C:\Users\[username]\AppData\Roaming\.technic\
 Linux
     Technic
-        Modpacks: ~/qaz/.technic/modpacks/
-        Root: ~/qaz/.technic/
+        Modpacks: ~/[username]/.technic/modpacks/
+        Root: ~/[username]/.technic/
     MultiMC
-        Modpacks: /home/qaz/.local/share/multimc/instances/
-        Root: /home/qaz/.local/share/multimc/
+        Modpacks: /home/[username]/.local/share/multimc/instances/
+        Root: /home/[username]/.local/share/multimc/
     Vanilla
         Modpacks: None
-        Root: /home/qaz/.minecraft/astralsorcery_persistent
+        Root: /home/[username]/.minecraft/astralsorcery_persistent

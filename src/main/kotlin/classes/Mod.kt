@@ -52,7 +52,7 @@ class Mod(val path: String) {
                     }
                     //Finds the license
                     if (entry.name == "LICENSE") {
-                        if (license == null) license = String(zipFile.getInputStream(entry).readAllBytes())
+                        if (license == null) license = String(zipFile.getInputStream(entry).readBytes())
                     }
                 }
             }
@@ -62,7 +62,7 @@ class Mod(val path: String) {
             }
         } else throw Exception("Invalid mod: Not a jar")
 
-        //sets modtype to unknown for the time being, todo change it
+        //sets ModType to unknown for the time being, todo change it
         type = ModType.UNKNOWN
 
         //Assigns the temporary arrays to the final lists

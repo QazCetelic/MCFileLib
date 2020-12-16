@@ -1,6 +1,7 @@
-package main.classes.classes
+package classes
 
 import com.google.gson.JsonObject
+import main.classes.classes.ResourcePack
 import main.util.JsonLoader
 import main.util.LauncherType
 import main.util.VersionConverter

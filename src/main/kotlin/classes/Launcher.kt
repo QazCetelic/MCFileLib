@@ -1,5 +1,6 @@
 package main.classes.classes
 
+import classes.Instance
 import main.util.LauncherType
 import main.util.Launchers
 import main.util.Util.mayAppendSlash

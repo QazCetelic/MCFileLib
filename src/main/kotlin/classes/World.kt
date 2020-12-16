@@ -1,5 +1,6 @@
 package main.classes.classes
 
+import classes.DataPack
 import main.util.Util.mayAppendSlash
 import java.io.File
 import javax.imageio.ImageIO

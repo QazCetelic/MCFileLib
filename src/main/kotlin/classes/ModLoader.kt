@@ -1,4 +1,4 @@
-package main.classes.classes
+package classes
 
 class ModLoader(
     name: String,

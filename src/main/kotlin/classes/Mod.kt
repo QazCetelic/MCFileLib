@@ -1,4 +1,4 @@
-package main.classes.classes
+package classes
 
 import java.awt.Image
 import java.io.File

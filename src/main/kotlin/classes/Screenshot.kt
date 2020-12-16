@@ -1,4 +1,4 @@
-package main.classes.classes
+package classes
 
 import main.util.Time
 import java.awt.image.BufferedImage

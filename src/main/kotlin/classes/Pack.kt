@@ -1,4 +1,4 @@
-package main.classes.classes
+package classes
 
 import main.util.VersionConverter
 import main.util.PackData

@@ -1,12 +1,13 @@
 package classes
 
 import main.util.VersionConverter
+import util.FileEditable
 import util.PackData
 import java.awt.image.BufferedImage
 import java.io.File
 import java.nio.file.Path
 
-abstract class Pack(val path: Path, isResourcePack: Boolean) {
+abstract class Pack(path: Path, isResourcePack: Boolean): FileEditable(path) {
     val name: String = path.toFile().nameWithoutExtension
     val format: Int
     val description: String

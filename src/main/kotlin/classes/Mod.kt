@@ -4,19 +4,15 @@ import com.google.gson.Gson
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import json.FabricContactData
-import util.FileInteractable
+import util.FileEditable
 import java.awt.Image
-import java.nio.file.Files
 import java.nio.file.Path
 import java.util.*
 import java.util.zip.ZipFile
 import javax.imageio.ImageIO
 import java.util.ArrayList
 
-
-
-
-class Mod(val path: Path): FileInteractable {
+class Mod(path: Path): FileEditable(path) {
     lateinit var name: String
         private set
     lateinit var description: String
@@ -143,9 +139,5 @@ class Mod(val path: Path): FileInteractable {
     class ModDependency(input: MutableMap.MutableEntry<String, JsonElement>) {
         val name = input.key
         val requiredVersion = input.value.toString().removeSurrounding("\"")
-    }
-
-    override fun delete() {
-        Files.delete(path)
     }
 }

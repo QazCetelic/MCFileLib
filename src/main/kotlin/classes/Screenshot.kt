@@ -1,12 +1,13 @@
 package classes
 
 import main.util.Time
+import util.FileEditable
 import java.awt.image.BufferedImage
 import java.io.File
 import java.nio.file.Path
 import javax.imageio.ImageIO
 
-class Screenshot(val path: Path) {
+class Screenshot(path: Path): FileEditable(path) {
     val time: Time
     val image: BufferedImage
     init {

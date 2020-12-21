@@ -4,10 +4,11 @@ import classes.Instance
 import main.util.LauncherType
 import main.util.Launchers
 import main.util.Util.mayAppendSlash
+import util.FileEditable
 import java.io.File
 import java.nio.file.Path
 
-class Launcher(val path: Path) {
+class Launcher(path: Path): FileEditable(path) {
     val launcherType = Launchers().fromPath(path.toString())
     val instances: List<Instance>
     init {

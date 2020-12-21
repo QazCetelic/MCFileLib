@@ -1,11 +1,12 @@
 package classes
 
 import main.util.Util.mayAppendSlash
+import util.FileEditable
 import java.io.File
 import java.nio.file.Path
 import javax.imageio.ImageIO
 
-class World(val path: Path) {
+class World(path: Path): FileEditable(path) {
     val name = path.toFile().nameWithoutExtension
     //Uses lazy initialization because the images may be quite large which could become problematic when working with lots of Worlds
     val icon by lazy {

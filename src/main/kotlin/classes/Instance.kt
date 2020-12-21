@@ -5,11 +5,12 @@ import main.classes.classes.ResourcePack
 import main.util.JsonLoader
 import main.util.LauncherType
 import main.util.VersionConverter
+import util.FileEditable
 import java.io.File
 import java.nio.file.Path
 import kotlin.collections.ArrayList
 
-class Instance(val path: Path, launcher: LauncherType) {
+class Instance(path: Path, launcher: LauncherType): FileEditable(path) {
     //Read from Json file
     val version: String
     val modloaders: List<ModLoader>

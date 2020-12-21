@@ -1,7 +1,7 @@
-package main.json
+package json
 
 import com.google.gson.annotations.SerializedName
 
-data class Base (
+data class ResourcePackData (
     @SerializedName("pack") val pack : Pack
 )

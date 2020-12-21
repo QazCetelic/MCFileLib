@@ -1,13 +1,14 @@
-package main.util
+package util
 
-import main.json.Base
+import json.ResourcePackData
 import com.google.gson.Gson
 import java.awt.image.BufferedImage
 import java.io.File
+import java.nio.file.Path
 import java.util.zip.ZipFile
 import javax.imageio.ImageIO
 
-internal class PackData(path: String) {
+internal class PackData(path: Path) {
     /**
      Is used for both Resource & Data Packs
     */
@@ -15,9 +16,10 @@ internal class PackData(path: String) {
     val description: String
     val image: BufferedImage?
     init {
+        val file  = path.toFile()
         val data =
-            if (File(path).extension == "zip") {
-                val zipFile = ZipFile(path)
+            if (file.extension == "zip") {
+                val zipFile = ZipFile(file)
                 image = ImageIO.read(zipFile.getInputStream(zipFile.getEntry("pack.png")))
                 //Returns pack data
                 getPackJson(String(zipFile.getInputStream(
@@ -49,7 +51,7 @@ internal class PackData(path: String) {
         }
     }
 
-    private fun getPackJson(string: String?): Base? = if (string != null && string.isNotEmpty()) {
-        Gson().fromJson(string, Base::class.java)
+    private fun getPackJson(string: String?): ResourcePackData? = if (string != null && string.isNotEmpty()) {
+        Gson().fromJson(string, ResourcePackData::class.java)
     } else null
 }

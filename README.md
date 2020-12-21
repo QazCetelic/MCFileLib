@@ -2,7 +2,7 @@
 
 ### A library written in Kotlin to interact with Minecraft files
 
-Useable objects:
+Usable objects:
 - ModPacks (or Instances)
 - Mods
 - DataPacks

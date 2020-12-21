@@ -1,4 +1,4 @@
-package main.json
+package json
 
 import com.google.gson.annotations.SerializedName
 data class Pack (

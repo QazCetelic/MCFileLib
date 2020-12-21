@@ -1,79 +1,151 @@
 package classes
 
+import com.google.gson.Gson
+import com.google.gson.JsonElement
+import com.google.gson.JsonObject
+import json.FabricContactData
+import util.FileInteractable
 import java.awt.Image
-import java.io.File
+import java.nio.file.Files
+import java.nio.file.Path
+import java.util.*
 import java.util.zip.ZipFile
 import javax.imageio.ImageIO
+import java.util.ArrayList
 
-class Mod(val path: String) {
-    var license: String? = null
-    val disabled: Boolean
-    val name: String
-    val dependencies: List<String>
-    val icons: List<Image>
-    val type: ModType
+
+
+
+class Mod(val path: Path): FileInteractable {
+    lateinit var name: String
+        private set
+    lateinit var description: String
+        private set
+    lateinit var version: String
+        private set
+    lateinit var id: String
+        private set
+    lateinit var license: String
+        private set
+    lateinit var email: String
+        private set
+    lateinit var issues: String
+        private set
+    lateinit var sources: String
+        private set
+    lateinit var iconLocation: String
+        private set
+
+    var authors: MutableList<String> = ArrayList<String>()
+        private set
+    var dependencies: MutableList<ModDependency> = ArrayList<ModDependency>()
+        private set
+
+    var type = ModType.Unknown
+        private set
+    var icon: Image?
+        private set
+    var disabled: Boolean
+        private set
+    var clientSide: Boolean? = null
+        private set
+
     init {
-        val file = File(path)
+        val file = path.toFile()
         if (!file.exists()) throw Exception("Invalid mod: File doesn't exist")
 
-        //Temporary arrays so that the final result can be list so that it won't be
-        val foundDependencies = ArrayList<String>()
-        val foundIcons = ArrayList<Image>()
+        disabled = file.extension == "disabled"
 
-        if (path.contains(".jar")) {
-            if (path.contains(".")) {
-                //Process the name
-                var foundName = path.split(".")[0]
-                if (foundName.endsWith("-1")) foundName = foundName.removeSuffix("1")
-                if (foundName.endsWith("mc1")) foundName
-                foundName = foundName.removeSurrounding("-")
-                name = foundName
+        //Checks if it's actually in a mod file format (".jar")
+        if (file.extension == "jar" || file.name.endsWith(".jar.disabled")) {
+            //Looks through the data of the mod itself
+            val zipFile = ZipFile(file)
+            for (entry in zipFile.entries()) {
+                //Finds the license..
+                if (entry.name == "LICENSE") {
+                    //..but only assigns it if it's not assigned already
+                    if (!this::license.isInitialized) license = String(zipFile.getInputStream(entry).readBytes())
+                }
 
-                disabled = file.name.endsWith(".disabled")
-
-                //Looks through the data of the mod itself
-                //todo: process more data than just dependency's and logos
-                val zipFile = ZipFile(path)
-                for (entry in zipFile.entries()) {
-                    //Finds dependencies by going through the jars
-                    if (entry.name.startsWith("META-INF/jars/") && entry.name.endsWith(".jar")) {
-                        //Removes the "META-INF/jars/" and ".jar" parts
-                        var name = entry.name.drop(14).dropLast(4)
-                        //Removes the plus and 11 random characters
-                        if ("\\+([0-9]|[A-z]){10}".toRegex().containsMatchIn(name)) name = name.dropLast(12)
-                        //Removes the dot at the end that sometimes exists between the version and random characters
-                        if (name.endsWith('.')) name = name.dropLast(1)
-                        //And then adds it to the temporary array
-                        foundDependencies += name
-                    }
-                    //Finds all possible icons
-                    if (entry.name.endsWith("icon.png")) {
-                        foundIcons += ImageIO.read(zipFile.getInputStream(entry))
-                    }
-                    //Finds the license
-                    if (entry.name == "LICENSE") {
-                        if (license == null) license = String(zipFile.getInputStream(entry).readBytes())
-                    }
+                //Gets Fabric mod data
+                if (entry.name == "fabric.mod.json") {
+                    type = ModType.Fabric
+                    val text = String(zipFile.getInputStream(entry).readBytes())
+                    val data = Gson().fromJson(text, JsonObject::class.java)
+                    //Im doing it like this because the json data is different in some mods and I don't know why.
+                    if (data.has("schemaVersion") && data["schemaVersion"].asInt == 1) {
+                        if (data.has("name")) name = data["name"].asString
+                        if (data.has("description")) description = data["description"].asString
+                        if (data.has("id")) id = data["id"].asString
+                        if (data.has("version")) version = data["version"].asString
+                        if (data.has("authors")) {
+                            val jsonArray = data["authors"].asJsonArray.toList()
+                            jsonArray.forEach {
+                                authors.add(it.asString)
+                            }
+                        }
+                        if (data.has("contact")) {
+                            val contactJson = data["contact"].toString()
+                            val contactData = Gson().fromJson(contactJson, FabricContactData::class.java)
+                            email = contactData.email
+                            issues = contactData.issues
+                            sources = contactData.sources
+                        }
+                        if (data.has("icon")) iconLocation = data["icon"].asString
+                        if (data.has("depends")) {
+                            val dependsData = data["depends"].asJsonObject
+                            val entries = ArrayList<ModDependency>()
+                            dependsData.entrySet().forEach {
+                                //Don't get the depend as value as string
+                                entries.add(ModDependency(it))
+                            }
+                            dependencies = entries
+                        }
+                        if (data.has("custom") && data["custom"].asJsonObject.has("modmenu:clientsideOnly")) {
+                            clientSide = data["custom"].asJsonObject["modmenu:clientsideOnly"].asBoolean
+                        }
+                    } else throw Exception("Invalid schema version") //In case it changes in the future
                 }
             }
-            else {
-                name = "Error"
-                disabled = false
-            }
-        } else throw Exception("Invalid mod: Not a jar")
+            icon = if (this::iconLocation.isInitialized) {
+                ImageIO.read(
+                    zipFile.getInputStream(
+                        zipFile.getEntry(iconLocation)
+                    )
+                )
+            } else null
+            
+        } else {
+            throw Exception("Invalid mod: Not a jar")
+        }
 
-        //sets ModType to unknown for the time being, todo change it
-        type = ModType.UNKNOWN
+        //Makes the ArrayLists read-only
+        dependencies = Collections.unmodifiableList(dependencies)
+        authors = Collections.unmodifiableList(authors)
 
-        //Assigns the temporary arrays to the final lists
-        dependencies = foundDependencies
-        icons = foundIcons
+        //check if late init vars are initialized and if not set error message
+        if (!this::name.isInitialized)          name = "Unable to load name"
+        if (!this::description.isInitialized)   description = "Unable to load description"
+        if (!this::version.isInitialized)       version = "Unable to load version"
+        if (!this::id.isInitialized)            id = "Unable to load id"
+        if (!this::license.isInitialized)       license = "Unable to load license"
+        if (!this::email.isInitialized)         email = "Unable to load contact email"
+        if (!this::issues.isInitialized)        issues = "Unable to load contact information for issues"
+        if (!this::sources.isInitialized)       sources = "Unable to load source code location"
     }
 
-    //todo implement type checking
     enum class ModType {
-        FABRIC,
-        FORGE,
-        UNKNOWN
+        Fabric,
+        Forge,
+        Unknown;
+    }
+
+    class ModDependency(input: MutableMap.MutableEntry<String, JsonElement>) {
+        val name = input.key
+        val requiredVersion = input.value.toString().removeSurrounding("\"")
+    }
+
+    override fun delete() {
+        Files.delete(path)
     }
 }

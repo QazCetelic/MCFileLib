@@ -6,16 +6,18 @@ import main.util.JsonLoader
 import main.util.LauncherType
 import main.util.VersionConverter
 import java.io.File
+import java.nio.file.Path
 import kotlin.collections.ArrayList
 
-class Instance(val path: String, launcher: LauncherType) {
+class Instance(val path: Path, launcher: LauncherType) {
     //Read from Json file
     val version: String
     val modloaders: List<ModLoader>
     val resourceFormat: Int
 
     init {
-        if (!File(path).exists()) throw Exception("Files don't exist")
+        val file = path.toFile()
+        if (!file.exists()) throw Exception("Files don't exist")
 
         val foundModloaders = ArrayList<ModLoader>()
         var foundVersion = "Unknown version"
@@ -23,7 +25,7 @@ class Instance(val path: String, launcher: LauncherType) {
 
         //The data that can be extracted without reading Json
         val name = run {
-            var name = File(path).name
+            var name = file.name
             if (launcher == LauncherType.MULTIMC) {
                 //Gets name from "instance.cfg" instead of file name because renaming instance in MultiMC doesn't seem te rename folder
                 File("$path/instance.cfg").forEachLine {
@@ -53,9 +55,9 @@ class Instance(val path: String, launcher: LauncherType) {
                     val modloaderJsonArray = jsonData["modloader"].asJsonArray
                     if (modloaderJsonArray.size() == 3)
                         foundModloaders += (ModLoader(
-                                //Modloader name
+                                //ModLoader name
                                 modloaderJsonArray[0].asString,
-                                //Modloader version
+                                //ModLoader version
                                 modloaderJsonArray[2].asString
                         ))
                     foundVersion = modloaderJsonArray[1].asString
@@ -121,7 +123,7 @@ class Instance(val path: String, launcher: LauncherType) {
         val resourcePackFolderFiles = File("$path/resourcepacks").listFiles()
         val foundResourcePacks = ArrayList<ResourcePack>()
         resourcePackFolderFiles?.forEach {
-            foundResourcePacks += ResourcePack(it.path)
+            foundResourcePacks += ResourcePack(it.toPath())
         }
         foundResourcePacks.toList()
     }
@@ -133,7 +135,7 @@ class Instance(val path: String, launcher: LauncherType) {
         }screenshots").listFiles()
         val foundScreenshots = ArrayList<Screenshot>()
         screenshotFiles?.forEach {
-            foundScreenshots += Screenshot(it.path)
+            foundScreenshots += Screenshot(it.toPath())
         }
         foundScreenshots.toList()
     }
@@ -145,13 +147,13 @@ class Instance(val path: String, launcher: LauncherType) {
         }mods").listFiles()
         val foundMods = ArrayList<Mod>()
         modFiles?.forEach {
-            foundMods += Mod(it.path)
+            if (it.extension == "jar" || it.extension == "disabled") foundMods += Mod(it.toPath())
         }
         foundMods.toList()
     }
 
     private fun fetchJsonData(jsonLocation: String): JsonObject {
-        val jsonFile = File(path + jsonLocation)
+        val jsonFile = path.resolveSibling(jsonLocation).toFile()
         return if (jsonFile.exists()) {
             JsonLoader(jsonFile.path)
         }

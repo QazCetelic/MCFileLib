@@ -3,13 +3,14 @@ package classes
 import main.util.Time
 import java.awt.image.BufferedImage
 import java.io.File
+import java.nio.file.Path
 import javax.imageio.ImageIO
 
-class Screenshot(val path: String) {
+class Screenshot(val path: Path) {
     val time: Time
     val image: BufferedImage
     init {
-        val file = File(path)
+        val file = path.toFile()
         val name = file.nameWithoutExtension
         //Check regex for the screenshot name format
         time = if ("[0-9]{4}-[0-9]{2}-[0-9]{2}_[0-9]{2}\\.[0-9]{2}\\.[0-9]{2}".toRegex().containsMatchIn(name)) {

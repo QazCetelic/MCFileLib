@@ -1,12 +1,13 @@
 package classes
 
 import main.util.VersionConverter
-import main.util.PackData
+import util.PackData
 import java.awt.image.BufferedImage
 import java.io.File
+import java.nio.file.Path
 
-abstract class Pack(val path: String, isResourcePack: Boolean) {
-    val name: String = File(path).nameWithoutExtension
+abstract class Pack(val path: Path, isResourcePack: Boolean) {
+    val name: String = path.toFile().nameWithoutExtension
     val format: Int
     val description: String
     val icon: BufferedImage?

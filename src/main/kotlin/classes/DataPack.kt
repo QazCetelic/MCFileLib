@@ -1,3 +1,5 @@
 package classes
 
-class DataPack(path: String) : Pack(path, false)
+import java.nio.file.Path
+
+class DataPack(path: Path) : Pack(path, false)

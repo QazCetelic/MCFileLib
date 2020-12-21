@@ -5,14 +5,16 @@ import main.util.LauncherType
 import main.util.Launchers
 import main.util.Util.mayAppendSlash
 import java.io.File
+import java.nio.file.Path
 
-class Launcher(path: String) {
-    val path = mayAppendSlash(path)
-    val launcherType = Launchers().fromPath(this.path)
+class Launcher(val path: Path) {
+    val launcherType = Launchers().fromPath(path.toString())
     val instances: List<Instance>
     init {
+        val file = path.toFile()
+
         //Verify
-        if (!File(this.path).exists()) throw Exception("Invalid Launcher: Directory doesn't exist")
+        if (file.exists()) throw Exception("Invalid Launcher: Directory doesn't exist")
         if (launcherType == LauncherType.UNKNOWN) throw Exception("Invalid Launcher: Unknown launcherType")
 
         val foundInstances = ArrayList<Instance>()
@@ -22,9 +24,9 @@ class Launcher(path: String) {
             foundInstances[0] = Instance(this.path, LauncherType.VANILLA)
         }
         else {
-            val instancesFolderFiles = File(instancesPath).listFiles()
+            val instancesFolderFiles = file.listFiles()
             instancesFolderFiles?.forEach {
-                if (it.name != "_MMC_TEMP" && it.isDirectory) foundInstances += Instance(it.path, launcherType)
+                if (it.name != "_MMC_TEMP" && it.isDirectory) foundInstances += Instance(it.toPath(), launcherType)
             }
         }
         instances = foundInstances

@@ -2,6 +2,8 @@ package main.util
 
 import main.util.Util.mayAppendSlash
 import java.io.File
+import java.nio.file.Path
+import java.nio.file.Paths
 
 class Launchers {
     //Returns null if path is invalid
@@ -25,7 +27,7 @@ class Launchers {
         } else LauncherType.UNKNOWN
     }
 
-    fun fromType(type: LauncherType): String? = when (OSInfo.os) {
+    fun fromType(type: LauncherType): Path? = when (OSInfo.os) {
         //todo: This isn't done yet
         OSInfo.OS.LINUX -> {
             val userHome = mayAppendSlash(System.getProperty("user.home"))
@@ -39,5 +41,5 @@ class Launchers {
         else -> null
     }
 
-    private fun ifExists(string: String) = if (File(string).exists()) string else null
+    private fun ifExists(string: String) = if (File(string).exists()) Paths.get(string) else null
 }

@@ -1,5 +1,6 @@
 package main.util
 
+import classes.used.VersionRange
 import com.vdurmont.semver4j.Semver
 
 class VersionConverter {

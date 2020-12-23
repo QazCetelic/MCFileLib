@@ -1,15 +1,16 @@
 package classes
 
-import main.util.Time
+import classes.used.Time
 import util.FileEditable
 import java.awt.image.BufferedImage
-import java.io.File
 import java.nio.file.Path
 import javax.imageio.ImageIO
 
 class Screenshot(path: Path): FileEditable(path) {
     val time: Time
-    val image: BufferedImage
+    val image: BufferedImage by lazy {
+        ImageIO.read(path.toFile())
+    }
     init {
         val file = path.toFile()
         val name = file.nameWithoutExtension
@@ -28,7 +29,6 @@ class Screenshot(path: Path): FileEditable(path) {
                 )
             } else throw Exception("Invalid screenshot: Invalid file format")
         } else throw Exception("Invalid screenshot: Invalid time format")
-        image = ImageIO.read(file)
     }
 
     override fun toString() = "main.classes.main.classes.Screenshot: $time"

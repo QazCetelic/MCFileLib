@@ -1,5 +1,8 @@
 package classes
 
+import classes.used.config.Config
+import classes.used.config.ConfigDirectory
+import classes.used.config.ConfigEntry
 import com.google.gson.JsonObject
 import main.classes.classes.ResourcePack
 import main.util.JsonLoader
@@ -8,21 +11,23 @@ import main.util.VersionConverter
 import util.FileEditable
 import java.io.File
 import java.nio.file.Path
+import java.util.*
 import kotlin.collections.ArrayList
 
 class Instance(path: Path, launcher: LauncherType): FileEditable(path) {
     //Read from Json file
-    val version: String
-    val modloaders: List<ModLoader>
-    val resourceFormat: Int
+    var version = "Unable to load version"
+        private set
+    var resourceFormat = -1
+        private set
+    var modloaders: List<ModLoader> = ArrayList()
+        private set
+    var configs = mutableMapOf<String, ConfigEntry>()
+        private set
 
     init {
         val file = path.toFile()
         if (!file.exists()) throw Exception("Files don't exist")
-
-        val foundModloaders = ArrayList<ModLoader>()
-        var foundVersion = "Unknown version"
-        var foundResourceFormat = -1
 
         //The data that can be extracted without reading Json
         val name = run {
@@ -41,13 +46,13 @@ class Instance(path: Path, launcher: LauncherType): FileEditable(path) {
             //GDLauncher Next is the modern version, this is for compatibility and only supports the forge dataclasses.readonly.main.classes.main.classes.ModLoader
             LauncherType.GDLAUNCHER -> {
                 val jsonData = fetchJsonData("/config.main.json")
-                foundVersion = jsonData["version"].asString
+                version = jsonData["version"].asString
                 if (jsonData.has("forgeVersion"))
-                    foundModloaders += (ModLoader(
+                    modloaders += (ModLoader(
                             "Forge",
                             jsonData["forgeVersion"].asString.replace("forge-", "")
                     ))
-                foundResourceFormat = VersionConverter().fromVersionToFormat(foundVersion)
+                resourceFormat = VersionConverter().fromVersionToFormat(version)
             }
             LauncherType.GDLAUNCHER_NEXT -> {
                 val jsonData = fetchJsonData("/config.main.json")
@@ -55,35 +60,35 @@ class Instance(path: Path, launcher: LauncherType): FileEditable(path) {
                     //todo find better way to extract data, this is stupid and unreliable
                     val modloaderJsonArray = jsonData["modloader"].asJsonArray
                     if (modloaderJsonArray.size() == 3)
-                        foundModloaders += (ModLoader(
+                        modloaders += (ModLoader(
                                 //ModLoader name
                                 modloaderJsonArray[0].asString,
                                 //ModLoader version
                                 modloaderJsonArray[2].asString
                         ))
-                    foundVersion = modloaderJsonArray[1].asString
+                    version = modloaderJsonArray[1].asString
                 }
-                foundResourceFormat = VersionConverter().fromVersionToFormat(foundVersion)
+                resourceFormat = VersionConverter().fromVersionToFormat(version)
             }
             LauncherType.VANILLA -> {
                 //Checks if it contains a dot because names like "1.16.2" do and names like "20w27a" (Snapshots) don't
                 if (name.contains(".")) {
                     //Only take the first part if the name has 2 parts
                     if (name.contains("-")) {
-                        foundVersion = name.split("-")[0]
-                        foundResourceFormat = VersionConverter().fromVersionToFormat(foundVersion)
+                        version = name.split("-")[0]
+                        resourceFormat = VersionConverter().fromVersionToFormat(version)
                     }
                     else {
-                        foundVersion = name
-                        foundResourceFormat = VersionConverter().fromVersionToFormat(foundVersion)
+                        version = name
+                        resourceFormat = VersionConverter().fromVersionToFormat(version)
                     }
                 }
                 //In case it's a weird name, like snapshots
                 else {
                     val jsonData = fetchJsonData("/$name.main.json")
                     if (jsonData.has("assets")) {
-                        foundVersion = name
-                        foundResourceFormat = VersionConverter().fromVersionToFormat(jsonData["assets"].asString)
+                        version = name
+                        resourceFormat = VersionConverter().fromVersionToFormat(jsonData["assets"].asString)
                     }
                 }
             }
@@ -97,26 +102,31 @@ class Instance(path: Path, launcher: LauncherType): FileEditable(path) {
                         when (it.asJsonObject["cachedName"].asString) {
                             //Gets Minecraft version
                             "Minecraft" -> {
-                                foundVersion = it.asJsonObject["version"].asString
+                                version = it.asJsonObject["version"].asString
                             }
 
                             //Gets modloader versions
                             "Fabric Loader" -> {
-                                foundModloaders += (ModLoader("Fabric", it.asJsonObject["version"].asString))
+                                modloaders += (ModLoader("Fabric", it.asJsonObject["version"].asString))
                             }
                             "Forge" -> {
-                                foundModloaders += (ModLoader("Forge", it.asJsonObject["version"].asString))
+                                modloaders += (ModLoader("Forge", it.asJsonObject["version"].asString))
                             }
                         }
                     }
                 }
-                foundResourceFormat = VersionConverter().fromVersionToFormat(foundVersion)
+                resourceFormat = VersionConverter().fromVersionToFormat(version)
             }
             else -> throw Exception("Unsupported launcher")
         }
-        version = foundVersion
-        modloaders = foundModloaders
-        resourceFormat = foundResourceFormat
+        version = version
+
+        path.toFile().listFiles()?.forEach {
+            if (it.isDirectory) configs[it.name] = ConfigDirectory(it.toPath())
+            else configs[it.name] = Config(it.toPath())
+        }
+        configs = Collections.unmodifiableMap(configs)
+        modloaders = Collections.unmodifiableList(modloaders)
     }
 
     val resourcepacks = run {

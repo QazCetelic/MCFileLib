@@ -1,4 +1,4 @@
-package main.util
+package classes.used
 
 import com.vdurmont.semver4j.Semver
 

@@ -1,4 +1,4 @@
-package main.util
+package classes.used
 
 data class Time(val year: Int,
                 val month: Int,

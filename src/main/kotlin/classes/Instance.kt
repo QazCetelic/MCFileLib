@@ -15,14 +15,13 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 class Instance(path: Path, launcher: LauncherType): FileEditable(path) {
-    //Read from Json file
-    var version = "Unable to load version"
+    lateinit var version: String
         private set
+
+    val modloaders: List<ModLoader>
+    val configs: Map<String, ConfigEntry>
+
     var resourceFormat = -1
-        private set
-    var modloaders: List<ModLoader> = ArrayList()
-        private set
-    var configs = mutableMapOf<String, ConfigEntry>()
         private set
 
     init {
@@ -41,12 +40,13 @@ class Instance(path: Path, launcher: LauncherType): FileEditable(path) {
             name
         }
 
+        val foundModloaders = ArrayList<ModLoader>()
+        val foundConfigs = mutableMapOf<String, ConfigEntry>()
+
         path.toFile().listFiles()?.forEach {
-            if (it.isDirectory) configs[it.name] = ConfigDirectory(it.toPath())
-            else configs[it.name] = Config(it.toPath())
+            if (it.isDirectory) foundConfigs[it.name] = ConfigDirectory(it.toPath())
+            else foundConfigs[it.name] = Config(it.toPath())
         }
-        configs = Collections.unmodifiableMap(configs)
-        modloaders = Collections.unmodifiableList(modloaders)
 
         //Uses hardcoded methods of data extraction because every launcher does it different
         when(launcher) {
@@ -55,7 +55,7 @@ class Instance(path: Path, launcher: LauncherType): FileEditable(path) {
                 val jsonData = fetchJsonData("/config.main.json")
                 version = jsonData["version"].asString
                 if (jsonData.has("forgeVersion"))
-                    modloaders += (ModLoader(
+                    foundModloaders.add(ModLoader(
                             "Forge",
                             jsonData["forgeVersion"].asString.replace("forge-", "")
                     ))
@@ -67,7 +67,7 @@ class Instance(path: Path, launcher: LauncherType): FileEditable(path) {
                     //todo find better way to extract data, this is stupid and unreliable
                     val modloaderJsonArray = jsonData["modloader"].asJsonArray
                     if (modloaderJsonArray.size() == 3)
-                        modloaders += (ModLoader(
+                        foundModloaders.add(ModLoader(
                                 //ModLoader name
                                 modloaderJsonArray[0].asString,
                                 //ModLoader version
@@ -114,10 +114,10 @@ class Instance(path: Path, launcher: LauncherType): FileEditable(path) {
 
                             //Gets modloader versions
                             "Fabric Loader" -> {
-                                modloaders += (ModLoader("Fabric", it.asJsonObject["version"].asString))
+                                foundModloaders.add(ModLoader("Fabric", it.asJsonObject["version"].asString))
                             }
                             "Forge" -> {
-                                modloaders += (ModLoader("Forge", it.asJsonObject["version"].asString))
+                                foundModloaders.add(ModLoader("Forge", it.asJsonObject["version"].asString))
                             }
                         }
                     }
@@ -126,7 +126,10 @@ class Instance(path: Path, launcher: LauncherType): FileEditable(path) {
             }
             else -> throw Exception("Unsupported launcher")
         }
-        version = version
+        modloaders = foundModloaders
+        configs = foundConfigs
+
+        if (!this::version.isInitialized) version = "Unable to load version"
     }
 
     val resourcepacks = run {
@@ -158,7 +161,7 @@ class Instance(path: Path, launcher: LauncherType): FileEditable(path) {
         }mods").listFiles()
         val foundMods = ArrayList<Mod>()
         modFiles?.forEach {
-            if (it.extension == "jar" || it.extension == "disabled") foundMods += Mod(it.toPath())
+            if (it.extension == "jar" || it.name.endsWith(".jar.disabled")) foundMods += Mod(it.toPath())
         }
         foundMods.toList()
     }

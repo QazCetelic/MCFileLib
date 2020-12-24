@@ -41,6 +41,13 @@ class Instance(path: Path, launcher: LauncherType): FileEditable(path) {
             name
         }
 
+        path.toFile().listFiles()?.forEach {
+            if (it.isDirectory) configs[it.name] = ConfigDirectory(it.toPath())
+            else configs[it.name] = Config(it.toPath())
+        }
+        configs = Collections.unmodifiableMap(configs)
+        modloaders = Collections.unmodifiableList(modloaders)
+
         //Uses hardcoded methods of data extraction because every launcher does it different
         when(launcher) {
             //GDLauncher Next is the modern version, this is for compatibility and only supports the forge dataclasses.readonly.main.classes.main.classes.ModLoader
@@ -120,13 +127,6 @@ class Instance(path: Path, launcher: LauncherType): FileEditable(path) {
             else -> throw Exception("Unsupported launcher")
         }
         version = version
-
-        path.toFile().listFiles()?.forEach {
-            if (it.isDirectory) configs[it.name] = ConfigDirectory(it.toPath())
-            else configs[it.name] = Config(it.toPath())
-        }
-        configs = Collections.unmodifiableMap(configs)
-        modloaders = Collections.unmodifiableList(modloaders)
     }
 
     val resourcepacks = run {

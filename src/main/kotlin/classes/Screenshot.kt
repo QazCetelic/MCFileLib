@@ -19,17 +19,17 @@ class Screenshot(path: Path): FileEditable(path) {
             if (file.extension.toLowerCase() == "png") {
                 //Replace custom class with already existing class
                 Time (
-                        //Gets the time from the string
-                        name.substring(0..3).toInt(),
-                        name.substring(5..6).toInt(),
-                        name.substring(8..9).toInt(),
-                        name.substring(11..12).toByte(),
-                        name.substring(14..15).toByte(),
-                        name.substring(17..18).toByte()
+                    //Gets the time from the string
+                    name.substring(0..3).toInt(),
+                    name.substring(5..6).toInt(),
+                    name.substring(8..9).toInt(),
+                    name.substring(11..12).toByte(),
+                    name.substring(14..15).toByte(),
+                    name.substring(17..18).toByte()
                 )
             } else throw Exception("Invalid screenshot: Invalid file format")
         } else throw Exception("Invalid screenshot: Invalid time format")
     }
 
-    override fun toString() = "main.classes.main.classes.Screenshot: $time"
+    override fun toString() = "Screenshot: $time"
 }

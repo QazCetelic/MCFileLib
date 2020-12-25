@@ -1,6 +1,5 @@
 package classes
 
-import main.util.Util.mayAppendSlash
 import util.FileEditable
 import java.io.File
 import java.nio.file.Path

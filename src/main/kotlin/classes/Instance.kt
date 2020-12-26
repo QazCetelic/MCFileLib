@@ -1,8 +1,8 @@
 package classes
 
-import classes.used.config.Config
-import classes.used.config.ConfigDirectory
-import classes.used.config.ConfigEntry
+import classes.used.file_entry.ConfigEntry
+import classes.used.file_entry.DirectoryEntry
+import classes.used.file_entry.GenericEntry
 import com.google.gson.JsonObject
 import main.classes.classes.ResourcePack
 import main.util.JsonLoader
@@ -19,7 +19,7 @@ class Instance(path: Path, launcher: LauncherType): FileEditable(path) {
         private set
 
     val modloaders: List<ModLoader>
-    val configs: Map<String, ConfigEntry>
+    val configs: Map<String, GenericEntry>
 
     var resourceFormat = -1
         private set
@@ -41,18 +41,18 @@ class Instance(path: Path, launcher: LauncherType): FileEditable(path) {
         }
 
         val foundModloaders = ArrayList<ModLoader>()
-        val foundConfigs = mutableMapOf<String, ConfigEntry>()
+        val foundConfigs = mutableMapOf<String, GenericEntry>()
 
         path.toFile().listFiles()?.forEach {
-            if (it.isDirectory) foundConfigs[it.name] = ConfigDirectory(it.toPath())
-            else foundConfigs[it.name] = Config(it.toPath())
+            if (it.isDirectory) foundConfigs[it.name] = DirectoryEntry(it.toPath())
+            else foundConfigs[it.name] = ConfigEntry(it.toPath())
         }
 
         //Uses hardcoded methods of data extraction because every launcher does it different
         when(launcher) {
             //GDLauncher Next is the modern version, this is for compatibility and only supports the forge dataclasses.readonly.main.classes.main.classes.ModLoader
             LauncherType.GDLAUNCHER -> {
-                val jsonData = fetchJsonData("/config.main.json")
+                val jsonData = fetchJsonData("/file_entry.main.json")
                 version = jsonData["version"].asString
                 if (jsonData.has("forgeVersion"))
                     foundModloaders.add(ModLoader(
@@ -62,7 +62,7 @@ class Instance(path: Path, launcher: LauncherType): FileEditable(path) {
                 resourceFormat = VersionConverter().fromVersionToFormat(version)
             }
             LauncherType.GDLAUNCHER_NEXT -> {
-                val jsonData = fetchJsonData("/config.main.json")
+                val jsonData = fetchJsonData("/file_entry.main.json")
                 if (jsonData.has("modloader")) {
                     //todo find better way to extract data, this is stupid and unreliable
                     val modloaderJsonArray = jsonData["modloader"].asJsonArray

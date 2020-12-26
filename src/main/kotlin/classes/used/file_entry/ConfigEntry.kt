@@ -1,10 +1,10 @@
-package classes.used.config
+package classes.used.file_entry
 
 import com.google.gson.Gson
 import java.nio.file.Path
 import java.util.*
 
-class Config(path: Path): ConfigEntry(path) {
+class ConfigEntry(path: Path): FileEntry(path) {
     val type = this.path.toFile().extension
     val data: Any? by lazy {
         when (type) {

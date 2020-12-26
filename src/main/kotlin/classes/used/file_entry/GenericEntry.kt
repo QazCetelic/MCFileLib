@@ -1,9 +1,9 @@
-package classes.used.config
+package classes.used.file_entry
 
 import util.FileEditable
 import java.nio.file.Path
 
-abstract class ConfigEntry(path: Path): FileEditable(path) {
+abstract class GenericEntry(path: Path): FileEditable(path) {
     val name: String
     init {
         val file = path.toFile()

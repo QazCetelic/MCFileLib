@@ -1,6 +1,7 @@
 package main.util
 
 import main.util.Util.mayAppendSlash
+import util.LauncherType
 import java.io.File
 import java.nio.file.Path
 import java.nio.file.Paths

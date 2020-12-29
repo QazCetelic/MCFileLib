@@ -1,11 +1,9 @@
 package main.classes.classes
 
 import classes.Instance
-import main.util.LauncherType
+import util.LauncherType
 import main.util.Launchers
-import main.util.Util.mayAppendSlash
 import util.FileEditable
-import java.io.File
 import java.nio.file.Path
 
 class Launcher(path: Path): FileEditable(path) {
@@ -33,5 +31,5 @@ class Launcher(path: Path): FileEditable(path) {
         instances = foundInstances
     }
 
-    override fun toString(): String = "(${launcherType.normalName}: ${this.path})"
+    override fun toString(): String = "(${launcherType.displayName}: ${this.path})"
 }

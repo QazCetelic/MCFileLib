@@ -1,25 +1,24 @@
 package classes
 
-import classes.used.file_entry.ConfigEntry
-import classes.used.file_entry.DirectoryEntry
-import classes.used.file_entry.GenericEntry
+import classes.used.file_entry.config.Config
+import classes.used.file_entry.config.ConfigDirectory
+import classes.used.file_entry.config.ConfigEntry
 import com.google.gson.JsonObject
 import main.classes.classes.ResourcePack
 import main.util.JsonLoader
-import main.util.LauncherType
+import util.LauncherType
 import main.util.VersionConverter
 import util.FileEditable
 import java.io.File
 import java.nio.file.Path
-import java.util.*
 import kotlin.collections.ArrayList
 
 class Instance(path: Path, launcher: LauncherType): FileEditable(path) {
-    lateinit var version: String
+    var version = "Unable to load version"
         private set
 
     val modloaders: List<ModLoader>
-    val configs: Map<String, GenericEntry>
+    val configs: Map<String, ConfigEntry>
 
     var resourceFormat = -1
         private set
@@ -41,11 +40,15 @@ class Instance(path: Path, launcher: LauncherType): FileEditable(path) {
         }
 
         val foundModloaders = ArrayList<ModLoader>()
-        val foundConfigs = mutableMapOf<String, GenericEntry>()
+        val foundConfigs = mutableMapOf<String, ConfigEntry>()
 
+        val minecraftDataFile = File("$path/${
+            if (launcher == LauncherType.MULTIMC) ".minecraft/"
+            else ""
+        }config")
         path.toFile().listFiles()?.forEach {
-            if (it.isDirectory) foundConfigs[it.name] = DirectoryEntry(it.toPath())
-            else foundConfigs[it.name] = ConfigEntry(it.toPath())
+            if (it.isDirectory) foundConfigs[it.name] = ConfigDirectory(it.toPath())
+            else foundConfigs[it.name] = Config(it.toPath())
         }
 
         //Uses hardcoded methods of data extraction because every launcher does it different
@@ -128,8 +131,6 @@ class Instance(path: Path, launcher: LauncherType): FileEditable(path) {
         }
         modloaders = foundModloaders
         configs = foundConfigs
-
-        if (!this::version.isInitialized) version = "Unable to load version"
     }
 
     val resourcepacks = run {
@@ -155,10 +156,7 @@ class Instance(path: Path, launcher: LauncherType): FileEditable(path) {
     }
 
     val mods = run {
-        val modFiles = File("$path/${
-            if (launcher == LauncherType.MULTIMC) ".minecraft/"
-            else ""
-        }mods").listFiles()
+        val modFiles = File("$path/${launcher.subfolder}mods").listFiles()
         val foundMods = ArrayList<Mod>()
         modFiles?.forEach {
             if (it.extension == "jar" || it.name.endsWith(".jar.disabled")) foundMods += Mod(it.toPath())

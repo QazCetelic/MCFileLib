@@ -4,15 +4,16 @@ import com.google.gson.Gson
 import com.google.gson.JsonObject
 import java.io.File
 import java.io.IOException
+import java.nio.file.Path
 
 //todo: Reconsider using singleton
 //Fetches main.json file from path and returns a JsonObject
 object JsonLoader {
-    operator fun invoke(path: String): JsonObject {
+    operator fun invoke(path: Path): JsonObject {
         //JSON to return
         var json = JsonObject()
         //File containing JSON
-        val jsonFile = File(path)
+        val jsonFile = path.toFile()
 
         //Extract JSON
         if (!jsonFile.isDirectory) {

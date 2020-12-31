@@ -154,9 +154,10 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
     }
 
     private fun fetchJsonData(jsonLocation: String): JsonObject {
-        val jsonFile = path.resolveSibling(jsonLocation).toFile()
-        return if (jsonFile.exists()) {
-            JsonLoader(jsonFile.path)
+        val jsonPath = path.resolveSibling(jsonLocation)
+        val file = jsonPath.toFile()
+        return if (file.exists() && file.isFile) {
+            JsonLoader(jsonPath)
         }
         else JsonObject()
     }

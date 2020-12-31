@@ -12,7 +12,7 @@ class ConfigDirectory(path: Path): ConfigEntry(path) {
         result.toMap()
     }
 
-    fun allContents(): MutableMap<String, ConfigEntry> {
+    fun allContents(): Map<String, ConfigEntry> {
         val completeContents = mutableMapOf<String, ConfigEntry>()
         contents.values.forEach {
             if (it::class == ConfigDirectory::class) {
@@ -22,7 +22,7 @@ class ConfigDirectory(path: Path): ConfigEntry(path) {
             }
             else completeContents[pathInConfigDir(it)] = it
         }
-        return completeContents
+        return completeContents.toMap()
     }
 
     private fun pathInConfigDir(input: ConfigEntry) = input.path.toString().removePrefix(path.toString()).removePrefix("/")

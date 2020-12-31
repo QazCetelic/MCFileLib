@@ -15,10 +15,15 @@ class ConfigDirectory(path: Path): ConfigEntry(path) {
     fun allContents(): MutableMap<String, ConfigEntry> {
         val completeContents = mutableMapOf<String, ConfigEntry>()
         contents.values.forEach {
-            //Maybe not the best way to do it, but I couldn't find another way
-            if (it::class == ConfigDirectory::class) ConfigDirectory(it.path).allContents()
-            else completeContents[it.path.toString().removePrefix(path.toString()).removePrefix("/")] = it
+            if (it::class == ConfigDirectory::class) {
+                ConfigDirectory(it.path).allContents().forEach { directoryContent ->
+                    completeContents[pathInConfigDir(directoryContent.value)] = directoryContent.value
+                }
+            }
+            else completeContents[pathInConfigDir(it)] = it
         }
         return completeContents
     }
+
+    private fun pathInConfigDir(input: ConfigEntry) = input.path.toString().removePrefix(path.toString()).removePrefix("/")
 }

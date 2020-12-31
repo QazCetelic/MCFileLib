@@ -13,12 +13,11 @@ import java.io.File
 import java.nio.file.Path
 import kotlin.collections.ArrayList
 
-class Instance(path: Path, launcher: LauncherType): FileEditable(path) {
+class Instance(path: Path, type: LauncherType): FileEditable(path) {
     var version = "Unable to load version"
         private set
 
     val modloaders: List<ModLoader>
-    val configs: Map<String, ConfigEntry>
 
     var resourceFormat = -1
         private set
@@ -27,32 +26,10 @@ class Instance(path: Path, launcher: LauncherType): FileEditable(path) {
         val file = path.toFile()
         if (!file.exists()) throw Exception("Files don't exist")
 
-        //The data that can be extracted without reading Json
-        val name = run {
-            var name = file.name
-            if (launcher == LauncherType.MULTIMC) {
-                //Gets name from "instance.cfg" instead of file name because renaming instance in MultiMC doesn't seem te rename folder
-                File("$path/instance.cfg").forEachLine {
-                    if (it.startsWith("name=")) name = it.removePrefix("name=")
-                }
-            }
-            name
-        }
-
         val foundModloaders = ArrayList<ModLoader>()
-        val foundConfigs = mutableMapOf<String, ConfigEntry>()
-
-        val minecraftDataFile = File("$path/${
-            if (launcher == LauncherType.MULTIMC) ".minecraft/"
-            else ""
-        }config")
-        path.toFile().listFiles()?.forEach {
-            if (it.isDirectory) foundConfigs[it.name] = ConfigDirectory(it.toPath())
-            else foundConfigs[it.name] = Config(it.toPath())
-        }
 
         //Uses hardcoded methods of data extraction because every launcher does it different
-        when(launcher) {
+        when(type) {
             //GDLauncher Next is the modern version, this is for compatibility and only supports the forge dataclasses.readonly.main.classes.main.classes.ModLoader
             LauncherType.GDLAUNCHER -> {
                 val jsonData = fetchJsonData("/file_entry.main.json")
@@ -82,22 +59,22 @@ class Instance(path: Path, launcher: LauncherType): FileEditable(path) {
             }
             LauncherType.VANILLA -> {
                 //Checks if it contains a dot because names like "1.16.2" do and names like "20w27a" (Snapshots) don't
-                if (name.contains(".")) {
+                if (file.name.contains(".")) {
                     //Only take the first part if the name has 2 parts
-                    if (name.contains("-")) {
-                        version = name.split("-")[0]
+                    if (file.name.contains("-")) {
+                        version = file.name.split("-")[0]
                         resourceFormat = VersionConverter().fromVersionToFormat(version)
                     }
                     else {
-                        version = name
+                        version = file.name
                         resourceFormat = VersionConverter().fromVersionToFormat(version)
                     }
                 }
                 //In case it's a weird name, like snapshots
                 else {
-                    val jsonData = fetchJsonData("/$name.main.json")
+                    val jsonData = fetchJsonData("/${file.name}.main.json")
                     if (jsonData.has("assets")) {
-                        version = name
+                        version = file.name
                         resourceFormat = VersionConverter().fromVersionToFormat(jsonData["assets"].asString)
                     }
                 }
@@ -130,12 +107,24 @@ class Instance(path: Path, launcher: LauncherType): FileEditable(path) {
             else -> throw Exception("Unsupported launcher")
         }
         modloaders = foundModloaders
-        configs = foundConfigs
+    }
+
+    val configs = ConfigDirectory(path.resolve(".minecraft").resolve("config"))
+
+    val name = run {
+        var name = path.toFile().name
+        if (type == LauncherType.MULTIMC) {
+            //Gets name from "instance.cfg" instead of file name because renaming instance in MultiMC doesn't seem te rename folder
+            path.resolve("instance.cfg").toFile().forEachLine {
+                if (it.startsWith("name=")) name = it.removePrefix("name=")
+            }
+        }
+        name
     }
 
     val resourcepacks = run {
         //Create path to the folder containing the ResourcePacks
-        val resourcePackFolderFiles = File("$path/resourcepacks").listFiles()
+        val resourcePackFolderFiles = path.resolve("resourcepacks").toFile().listFiles()
         val foundResourcePacks = ArrayList<ResourcePack>()
         resourcePackFolderFiles?.forEach {
             foundResourcePacks += ResourcePack(it.toPath())
@@ -144,10 +133,10 @@ class Instance(path: Path, launcher: LauncherType): FileEditable(path) {
     }
 
     val screenshots = run {
-        val screenshotFiles = File("$path/${
-            if (launcher == LauncherType.MULTIMC) ".minecraft/"
+        val screenshotFiles = path.resolve("${
+            if (type == LauncherType.MULTIMC) ".minecraft/"
             else ""
-        }screenshots").listFiles()
+        }screenshots").toFile().listFiles()
         val foundScreenshots = ArrayList<Screenshot>()
         screenshotFiles?.forEach {
             foundScreenshots += Screenshot(it.toPath())
@@ -156,7 +145,7 @@ class Instance(path: Path, launcher: LauncherType): FileEditable(path) {
     }
 
     val mods = run {
-        val modFiles = File("$path/${launcher.subfolder}mods").listFiles()
+        val modFiles = path.resolve("${type.subfolder}mods").toFile().listFiles()
         val foundMods = ArrayList<Mod>()
         modFiles?.forEach {
             if (it.extension == "jar" || it.name.endsWith(".jar.disabled")) foundMods += Mod(it.toPath())

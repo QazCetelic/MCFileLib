@@ -17,7 +17,7 @@ enum class LauncherType(val displayName: String, val instanceFolder: String, val
     MULTIMC(
         displayName = "MultiMC",
         instanceFolder = "instances/",
-        subfolder = "/.minecraft/"
+        subfolder = ".minecraft/"
     ),
     TECHNIC(
         displayName = "Technic",

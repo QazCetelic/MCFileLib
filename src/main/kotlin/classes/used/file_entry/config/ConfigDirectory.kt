@@ -11,4 +11,14 @@ class ConfigDirectory(path: Path): ConfigEntry(path) {
         }
         result.toMap()
     }
+
+    fun allContents(): MutableMap<String, ConfigEntry> {
+        val completeContents = mutableMapOf<String, ConfigEntry>()
+        contents.values.forEach {
+            //Maybe not the best way to do it, but I couldn't find another way
+            if (it::class == ConfigDirectory::class) ConfigDirectory(it.path).allContents()
+            else completeContents[it.path.toString().removePrefix(path.toString()).removePrefix("/")] = it
+        }
+        return completeContents
+    }
 }

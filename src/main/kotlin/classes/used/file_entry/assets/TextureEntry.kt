@@ -1,4 +1,7 @@
 package classes.used.file_entry.assets
 
-class TextureEntry {
+import util.FileEditable
+import java.nio.file.Path
+
+class TextureEntry(path: Path): FileEditable(path) {
 }

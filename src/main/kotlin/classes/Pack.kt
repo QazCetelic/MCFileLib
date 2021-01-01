@@ -1,10 +1,10 @@
 package classes
 
+import classes.used.file_entry.assets.ContentGroupEntry
 import main.util.VersionConverter
 import util.FileEditable
 import util.PackData
 import java.awt.image.BufferedImage
-import java.io.File
 import java.nio.file.Path
 
 abstract class Pack(path: Path, isResourcePack: Boolean): FileEditable(path) {
@@ -12,7 +12,9 @@ abstract class Pack(path: Path, isResourcePack: Boolean): FileEditable(path) {
     val format: Int
     val description: String
     val icon: BufferedImage?
-    val modSupport: Boolean
+    val modSupport: Boolean?
+    val contentGroupEntries: Map<String, ContentGroupEntry>
+
     init {
         //Gets metadata from main.json file
         val packData = PackData(path)
@@ -20,16 +22,29 @@ abstract class Pack(path: Path, isResourcePack: Boolean): FileEditable(path) {
         description = packData.description
         icon = packData.image
 
-        //Checks if the assets folder contains unusual folders indicating mod support
-        val assetsFiles = File("$path/assets").listFiles()
-        var foundModSupport = false
-        assetsFiles?.forEach {
-            //Checks if entry is not normal
-            if (!(it.name == "minecraft" || it.name == "realms")) {
-                foundModSupport = true
+        val file = path.toFile()
+        if (file.extension == "zip") {
+            modSupport = null
+            contentGroupEntries = mapOf()
+        }
+        else {
+            val files = path.resolve("assets").toFile().listFiles()
+            if (files != null) {
+                val foundContentGroupEntries = mutableMapOf<String, ContentGroupEntry>()
+                files.forEach {
+                    foundContentGroupEntries[it.name] = ContentGroupEntry(it.toPath())
+                }
+                var foundModSupport = false
+                foundContentGroupEntries.values.forEach {
+                    if (!it.vanilla || it.includesOptifine) foundModSupport = true
+                }
+                contentGroupEntries = foundContentGroupEntries.toMap()
+                modSupport = foundModSupport
+            } else {
+                contentGroupEntries = mapOf()
+                modSupport = null
             }
         }
-        modSupport = foundModSupport
     }
     open val versionRange = VersionConverter().fromFormatToRange(format, isResourcePack)
     override fun toString() = "(name=$name, path=$path, format=$format${

@@ -124,7 +124,12 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
 
     val resourcepacks = run {
         //Create path to the folder containing the ResourcePacks
-        val resourcePackFolderFiles = path.resolve("resourcepacks").toFile().listFiles()
+        val resourcePackFolderFiles = if (type == LauncherType.MULTIMC) {
+            path.resolve(".minecraft").resolve("resourcepacks").toFile().listFiles()
+        }
+        else {
+            path.resolve("resourcepacks").toFile().listFiles()
+        }
         val foundResourcePacks = ArrayList<ResourcePack>()
         resourcePackFolderFiles?.forEach {
             foundResourcePacks += ResourcePack(it.toPath())

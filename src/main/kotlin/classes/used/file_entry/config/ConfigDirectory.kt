@@ -33,5 +33,5 @@ class ConfigDirectory(path: Path): ConfigEntry(path) {
         return completeContents.toMap()
     }
 
-    private fun pathInConfigDir(input: ConfigEntry) = input.path.toString().removePrefix(path.toString()).removePrefix("/")
+    private fun pathInConfigDir(input: ConfigEntry) = input.path.toFile().toRelativeString(path.toFile())
 }

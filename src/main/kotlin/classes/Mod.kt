@@ -121,7 +121,7 @@ class Mod(path: Path): FileEditable(path) {
 
         //check if late init vars are initialized and if not set error message
         if (!this::name.isInitialized)          name = "Unable to load name"
-        if (!this::description.isInitialized)   description = "Unable to load description"
+        if (!this::description.isInitialized)   description = ""
         if (!this::version.isInitialized)       version = "Unable to load version"
         if (!this::id.isInitialized)            id = "Unable to load id"
         if (!this::license.isInitialized)       license = "Unable to load license"

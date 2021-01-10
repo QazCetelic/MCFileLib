@@ -1,6 +1,5 @@
 package classes.used.file_entry.config
 
-import com.google.gson.JsonObject
 import main.util.JsonLoader
 import java.nio.file.Path
 import java.util.*
@@ -14,8 +13,10 @@ class Config(path: Path): ConfigEntry(path) {
         else -> ConfigTypes.OTHER
     }
 
-    fun asJsonObject(): JsonObject = JsonLoader(path)
-    fun asProperties() = Properties().load(path.toFile().inputStream())
+    val asJsonObject
+        get() = JsonLoader(path)
+    val asProperties
+        get() = Properties().load(path.toFile().inputStream())
     //TODO: add asTOML()
     //TODO: add asNBT()
 

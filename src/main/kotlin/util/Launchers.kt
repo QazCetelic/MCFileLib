@@ -1,19 +1,17 @@
-package main.util
+package util
 
+import classes.Launcher
+import main.util.OSInfo
 import main.util.Util.mayAppendSlash
-import util.LauncherType
 import java.io.File
-import java.nio.file.Path
 import java.nio.file.Paths
 
-class Launchers {
-    //Returns null if path is invalid
+object Launchers {
     fun fromPath(path: String): LauncherType {
         val file = File(path)
         return if (file.isDirectory) {
             when (file.name) {
                 "gdlauncher" -> {
-                    //Checks if it's not the second folder in the GDLauncher folder ("../GDLauncher/GDLauncher/" instead of "../GDLauncher/")
                     //todo fix caps, it might be gdlauncer instead of GDLauncher
                     if (file.path.removeSuffix("/GDLauncher").endsWith("GDLauncher")) LauncherType.UNKNOWN
                     else LauncherType.GDLAUNCHER
@@ -28,19 +26,39 @@ class Launchers {
         } else LauncherType.UNKNOWN
     }
 
-    fun fromType(type: LauncherType): Path? = when (OSInfo.os) {
+    fun fromType(type: LauncherType): Launcher? = when (OSInfo.os) {
         //todo: This isn't done yet
         OSInfo.OS.LINUX -> {
             val userHome = mayAppendSlash(System.getProperty("user.home"))
             when (type) {
-                LauncherType.VANILLA -> ifExists("$userHome/.minecraft/")
-                LauncherType.MULTIMC -> ifExists("$userHome/.local/share/multimc/")
-                LauncherType.TECHNIC -> ifExists("$userHome/.technic/")
+                LauncherType.VANILLA -> toLauncherIfExists("$userHome/.minecraft/")
+                LauncherType.MULTIMC -> toLauncherIfExists("$userHome/.local/share/multimc/")
+                LauncherType.TECHNIC -> toLauncherIfExists("$userHome/.technic/")
                 else -> null
             }
         }
         else -> null
     }
 
-    private fun ifExists(string: String) = if (File(string).exists()) Paths.get(string) else null
+    private fun toLauncherIfExists(string: String): Launcher? {
+        return if (File(string).exists()) {
+            Launcher(Paths.get(string))
+        } else null
+    }
+
+    fun getAll(): List<Launcher> {
+        val launchers = ArrayList<Launcher>()
+        listOf (
+            LauncherType.VANILLA,
+            LauncherType.MULTIMC,
+            //LauncherType.TECHNIC,
+        ).forEach {
+            val result = fromType(it)
+            if (result != null) {
+                println("Adding ${result.path} as $it")
+                launchers.add(result)
+            }
+        }
+        return launchers.toList()
+    }
 }

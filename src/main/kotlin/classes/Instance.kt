@@ -104,7 +104,10 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
                 }
                 resourceFormat = VersionConverter().fromVersionToFormat(version)
             }
-            else -> throw Exception("Unsupported launcher")
+            LauncherType.TECHNIC -> {
+                //todo add technic support
+            }
+            else -> throw Exception("${type.displayName} is unsupported")
         }
         modloaders = foundModloaders
     }

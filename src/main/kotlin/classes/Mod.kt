@@ -12,40 +12,40 @@ import java.util.zip.ZipFile
 import javax.imageio.ImageIO
 
 class Mod(path: Path): FileEditable(path) {
-    lateinit var name: String
+    var name: String? = null
         private set
-    lateinit var description: String
+    var description: String? = null
         private set
     //I forgot if this is for the mc version or mod itself
-    lateinit var version: String
+    var version: String? = null
         private set
-    lateinit var id: String
+    var id: String? = null
         private set
-    lateinit var license: String
+    var license: String? = null
         private set
-    lateinit var email: String
+    var email: String? = null
         private set
-    lateinit var issues: String
+    var issues: String? = null
         private set
-    lateinit var sources: String
+    var sources: String? = null
         private set
-    lateinit var site: String
+    var site: String? = null
         private set
-    lateinit var iconLocation: String
+    var iconLocation: String? = null
+        private set
+    var clientSide: Boolean? = null
+        private set
+    var icon: Image?
+        private set
+
+    var type = ModType.Unknown
+        private set
+    var disabled: Boolean
         private set
 
     var authors: MutableList<String> = ArrayList<String>()
         private set
     var dependencies: MutableList<ModDependency> = ArrayList<ModDependency>()
-        private set
-
-    var type = ModType.Unknown
-        private set
-    var icon: Image?
-        private set
-    var disabled: Boolean
-        private set
-    var clientSide: Boolean? = null
         private set
 
     init {
@@ -62,7 +62,7 @@ class Mod(path: Path): FileEditable(path) {
                 //Finds the license..
                 if (entry.name == "LICENSE") {
                     //..but only assigns it if it's not assigned already
-                    if (!this::license.isInitialized) license = String(zipFile.getInputStream(entry).readBytes())
+                    if (license == null) license = String(zipFile.getInputStream(entry).readBytes())
                 }
 
                 //Gets Fabric mod data
@@ -126,7 +126,7 @@ class Mod(path: Path): FileEditable(path) {
                     */
                 }
             }
-            icon = if (this::iconLocation.isInitialized) {
+            icon = if (iconLocation != null) {
                 ImageIO.read(
                     zipFile.getInputStream(
                         zipFile.getEntry(iconLocation)
@@ -141,18 +141,6 @@ class Mod(path: Path): FileEditable(path) {
         //Makes the ArrayLists read-only
         dependencies = Collections.unmodifiableList(dependencies)
         authors = Collections.unmodifiableList(authors)
-
-        //check if late init vars are initialized and if not set error message
-        //todo consider using less lateinit vars
-        if (!this::name.isInitialized)          name = "Unable to load name"
-        if (!this::description.isInitialized)   description = ""
-        if (!this::version.isInitialized)       version = "Unable to load version"
-        if (!this::id.isInitialized)            id = "Unable to load id"
-        if (!this::license.isInitialized)       license = "Unable to load license"
-        if (!this::email.isInitialized)         email = "Unable to load contact email"
-        if (!this::issues.isInitialized)        issues = "Unable to load contact information for issues"
-        if (!this::sources.isInitialized)       sources = "Unable to load source code location"
-        if (!this::site.isInitialized)          site = "Unable to load site url"
     }
 
     private fun processForgeModJSON(jsonObject: JsonObject) {

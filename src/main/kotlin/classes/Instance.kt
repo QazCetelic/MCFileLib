@@ -11,7 +11,7 @@ import util.Util.div
 import java.nio.file.Path
 
 class Instance(path: Path, type: LauncherType): FileEditable(path) {
-    var version = "Unable to load version"
+    var version: String? = null
         private set
 
     val modloaders: List<ModLoader>

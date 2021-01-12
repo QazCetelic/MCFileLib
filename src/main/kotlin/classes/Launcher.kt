@@ -3,6 +3,7 @@ package classes
 import util.LauncherType
 import util.Launchers
 import util.FileEditable
+import util.Util.div
 import java.nio.file.Path
 
 class Launcher(path: Path): FileEditable(path) {
@@ -16,7 +17,7 @@ class Launcher(path: Path): FileEditable(path) {
         if (type == LauncherType.UNKNOWN) throw Exception("Invalid Launcher: Unknown launcherType")
 
         val foundInstances = ArrayList<Instance>()
-        val instancesPath = this.path.resolve(type.instanceFolder)
+        val instancesPath = this.path/type.instanceFolder
         //Vanilla is structured as ONE instance, that's why the Launcher object uses it's own path to create an Instance object
         if (type == LauncherType.VANILLA) {
             foundInstances.add(Instance(this.path, LauncherType.VANILLA))

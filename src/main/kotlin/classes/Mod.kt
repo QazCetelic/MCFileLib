@@ -10,13 +10,13 @@ import java.nio.file.Path
 import java.util.*
 import java.util.zip.ZipFile
 import javax.imageio.ImageIO
-import java.util.ArrayList
 
 class Mod(path: Path): FileEditable(path) {
     lateinit var name: String
         private set
     lateinit var description: String
         private set
+    //I forgot if this is for the mc version or mod itself
     lateinit var version: String
         private set
     lateinit var id: String
@@ -28,6 +28,8 @@ class Mod(path: Path): FileEditable(path) {
     lateinit var issues: String
         private set
     lateinit var sources: String
+        private set
+    lateinit var site: String
         private set
     lateinit var iconLocation: String
         private set
@@ -68,7 +70,7 @@ class Mod(path: Path): FileEditable(path) {
                     type = ModType.Fabric
                     val text = String(zipFile.getInputStream(entry).readBytes())
                     val data = Gson().fromJson(text, JsonObject::class.java)
-                    //Im doing it like this because the json data is different in some mods and I don't know why.
+                    //Im doing it like this because the json data is different in some mods and I don't know why, this seems the most reliable option
                     if (data.has("schemaVersion") && data["schemaVersion"].asInt == 1) {
                         if (data.has("name")) name = data["name"].asString
                         if (data.has("description")) description = data["description"].asString
@@ -102,6 +104,27 @@ class Mod(path: Path): FileEditable(path) {
                         }
                     } else throw Exception("Invalid schema version") //In case it changes in the future
                 }
+
+                if (entry.name == "mcmod.info") {
+                    type = ModType.Forge
+                    val text = String(zipFile.getInputStream(entry).readBytes())
+                    val data = Gson().fromJson(text, JsonElement::class.java)
+                    when {
+                        data.isJsonObject -> {
+                            val jsonObject = data.asJsonObject
+                            processForgeModJSON(jsonObject)
+                        }
+                        data.isJsonArray -> {
+                            val jsonArray = data.asJsonArray
+                            //it currently only takes the first entry, todo maybe process more
+                            if (jsonArray.size() > 0) {
+                                processForgeModJSON(jsonArray[0].asJsonObject)
+                            }
+                        }
+                    }
+                    /*
+                    */
+                }
             }
             icon = if (this::iconLocation.isInitialized) {
                 ImageIO.read(
@@ -120,6 +143,7 @@ class Mod(path: Path): FileEditable(path) {
         authors = Collections.unmodifiableList(authors)
 
         //check if late init vars are initialized and if not set error message
+        //todo consider using less lateinit vars
         if (!this::name.isInitialized)          name = "Unable to load name"
         if (!this::description.isInitialized)   description = ""
         if (!this::version.isInitialized)       version = "Unable to load version"
@@ -128,6 +152,31 @@ class Mod(path: Path): FileEditable(path) {
         if (!this::email.isInitialized)         email = "Unable to load contact email"
         if (!this::issues.isInitialized)        issues = "Unable to load contact information for issues"
         if (!this::sources.isInitialized)       sources = "Unable to load source code location"
+        if (!this::site.isInitialized)          site = "Unable to load site url"
+    }
+
+    private fun processForgeModJSON(jsonObject: JsonObject) {
+        fun processForgeModListEntry(modListEntry: JsonObject) {
+            if (modListEntry.has("modid"))          id = modListEntry["modid"].asString
+            if (modListEntry.has("name"))           name = modListEntry["name"].asString
+            if (modListEntry.has("description"))    description = modListEntry["description"].asString
+            if (modListEntry.has("url"))            site = modListEntry["url"].asString
+            if (modListEntry.has("authorList"))     modListEntry["authorList"].asJsonArray.forEach {
+                                                                    authors.add(it.asString)
+                                                                }
+        }
+
+        // The modinfo file is different for several mods, todo this could use a rework
+        if (jsonObject.has("modinfoversion")) {
+            //todo add support for other modinfoversions
+            if (jsonObject["modinfoversion"].asInt != 2) throw Exception(jsonObject["modinfoversion"].asString + " is not supported!")
+        }
+        if (jsonObject.has("modlist")) {
+            // only takes the first entry currently, todo reconsideration required
+            processForgeModListEntry(jsonObject["modlist"].asJsonArray[0].asJsonObject)
+        } else {
+            processForgeModListEntry(jsonObject)
+        }
     }
 
     enum class ModType {

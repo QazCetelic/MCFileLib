@@ -1,17 +1,14 @@
 package classes
 
-import classes.used.file_entry.config.Config
 import classes.used.file_entry.config.ConfigDirectory
-import classes.used.file_entry.config.ConfigEntry
 import com.google.gson.JsonObject
 import main.classes.classes.ResourcePack
 import main.util.JsonLoader
-import util.LauncherType
 import main.util.VersionConverter
 import util.FileEditable
-import java.io.File
+import util.LauncherType
+import util.Util.div
 import java.nio.file.Path
-import kotlin.collections.ArrayList
 
 class Instance(path: Path, type: LauncherType): FileEditable(path) {
     var version = "Unable to load version"
@@ -32,7 +29,7 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
         when(type) {
             //GDLauncher Next is the modern version, this is for compatibility and only supports the forge dataclasses.readonly.main.classes.main.classes.ModLoader
             LauncherType.GDLAUNCHER -> {
-                val jsonData = fetchJsonData("/file_entry.main.json")
+                val jsonData = fetchJsonData(path/"config.json")
                 version = jsonData["version"].asString
                 if (jsonData.has("forgeVersion"))
                     foundModloaders.add(ModLoader(
@@ -42,7 +39,7 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
                 resourceFormat = VersionConverter().fromVersionToFormat(version)
             }
             LauncherType.GDLAUNCHER_NEXT -> {
-                val jsonData = fetchJsonData("/file_entry.main.json")
+                val jsonData = fetchJsonData(path/"config.json")
                 if (jsonData.has("modloader")) {
                     //todo find better way to extract data, this is stupid and unreliable
                     val modloaderJsonArray = jsonData["modloader"].asJsonArray
@@ -72,7 +69,7 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
                 }
                 //In case it's a weird name, like snapshots
                 else {
-                    val jsonData = fetchJsonData("/${file.name}.main.json")
+                    val jsonData = fetchJsonData(path/".main.json")
                     if (jsonData.has("assets")) {
                         version = file.name
                         resourceFormat = VersionConverter().fromVersionToFormat(jsonData["assets"].asString)
@@ -81,7 +78,7 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
             }
             LauncherType.MULTIMC -> {
                 //Gets version from jsonData
-                val jsonData = fetchJsonData("/mmc-pack.main.json")
+                val jsonData = fetchJsonData(path/"mmc-pack.main.json")
                 //Checks if the "components" array exists and if so, extracts the array
                 if (jsonData.has("components")) {
                     jsonData["components"].asJsonArray.forEach {
@@ -105,20 +102,29 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
                 resourceFormat = VersionConverter().fromVersionToFormat(version)
             }
             LauncherType.TECHNIC -> {
-                //todo add technic support
+                val data = fetchJsonData((path/"bin"/"version.json"))
+                if (data.has("id")) {
+                    val string = data["id"].asString
+                    if (string.contains("-")) {
+                        val splitString = string.split("-")
+                        version = splitString[0]
+                        if (splitString[1].startsWith("Forge")) foundModloaders.add(ModLoader("Forge", splitString[1].removePrefix("Forge")))
+                    }
+                }
+                //todo add support to get description and other data
             }
             else -> throw Exception("${type.displayName} is unsupported")
         }
         modloaders = foundModloaders
     }
 
-    val configs = ConfigDirectory(path.resolve(".minecraft").resolve("config"))
+    val configs = ConfigDirectory(path/".minecraft"/"config")
 
     val name = run {
         var name = path.toFile().name
         if (type == LauncherType.MULTIMC) {
             //Gets name from "instance.cfg" instead of file name because renaming instance in MultiMC doesn't seem te rename folder
-            path.resolve("instance.cfg").toFile().forEachLine {
+            (path/"instance.cfg").toFile().forEachLine {
                 if (it.startsWith("name=")) name = it.removePrefix("name=")
             }
         }
@@ -128,10 +134,10 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
     val resourcepacks = run {
         //Create path to the folder containing the ResourcePacks
         val resourcePackFolderFiles = if (type == LauncherType.MULTIMC) {
-            path.resolve(".minecraft").resolve("resourcepacks").toFile().listFiles()
+            (path/".minecraft"/"resourcepacks").toFile().listFiles()
         }
         else {
-            path.resolve("resourcepacks").toFile().listFiles()
+            (path/"resourcepacks").toFile().listFiles()
         }
         val foundResourcePacks = ArrayList<ResourcePack>()
         resourcePackFolderFiles?.forEach {
@@ -141,7 +147,7 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
     }
 
     val screenshots = run {
-        val screenshotFiles = path.resolve("${
+        val screenshotFiles = (path/"${
             if (type == LauncherType.MULTIMC) ".minecraft/"
             else ""
         }screenshots").toFile().listFiles()
@@ -153,7 +159,7 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
     }
 
     val mods = run {
-        val modFiles = path.resolve("${type.subfolder}mods").toFile().listFiles()
+        val modFiles = (path/"${type.subfolder}mods").toFile().listFiles()
         val foundMods = ArrayList<Mod>()
         modFiles?.forEach {
             if (it.extension == "jar" || it.name.endsWith(".jar.disabled")) foundMods += Mod(it.toPath())
@@ -161,11 +167,11 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
         foundMods.toList()
     }
 
-    private fun fetchJsonData(jsonLocation: String): JsonObject {
-        val jsonPath = path.resolveSibling(jsonLocation)
-        val file = jsonPath.toFile()
+    private fun fetchJsonData(jsonLocation: Path): JsonObject {
+        //todo consider merging this function with JsonLoader()
+        val file = jsonLocation.toFile()
         return if (file.exists() && file.isFile) {
-            JsonLoader(jsonPath)
+            JsonLoader(jsonLocation)
         }
         else JsonObject()
     }

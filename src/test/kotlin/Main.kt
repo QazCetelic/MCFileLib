@@ -18,7 +18,7 @@ fun main() {
                 }
             }
             instance.mods.forEach { mod ->
-                println("The mod ${mod.name}'s description is: ${mod.description}")
+                println("The mod ${mod.name}'s description is: ${mod.description}, ${mod.path}")
             }
         }
     }

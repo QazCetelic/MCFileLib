@@ -3,7 +3,7 @@ package classes
 import util.LauncherType
 import util.Launchers
 import util.FileEditable
-import util.Util.div
+import util.div
 import java.nio.file.Path
 
 class Launcher(path: Path): FileEditable(path) {

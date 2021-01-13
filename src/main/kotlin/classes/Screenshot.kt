@@ -6,11 +6,22 @@ import java.awt.image.BufferedImage
 import java.nio.file.Path
 import javax.imageio.ImageIO
 
+/**
+ * Object for managing screenshots in an instance, the image is not stored in the object itself to reduce memory usage.
+ * You can get the time the screenshot was taken from the time val.
+ * It includes a path to the file on disk, for special actions.
+ */
 class Screenshot(path: Path): FileEditable(path) {
+    /**
+     * Time in YEAR-MONTH-DAY-HOUR-MINUTE-SECOND
+     */
     val time: Time
-    val image: BufferedImage by lazy {
-        ImageIO.read(path.toFile())
-    }
+
+    /**
+     * The getter directly gets the Image from disk, it is not stored in the object
+     */
+    val image
+        get() = ImageIO.read(path.toFile())
     init {
         val file = path.toFile()
         val name = file.nameWithoutExtension
@@ -31,5 +42,8 @@ class Screenshot(path: Path): FileEditable(path) {
         } else throw Exception("Invalid screenshot: Invalid time format")
     }
 
+    /**
+     * Returns "Screenshot: $time"
+     */
     override fun toString() = "Screenshot: $time"
 }

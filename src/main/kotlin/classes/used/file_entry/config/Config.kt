@@ -1,6 +1,6 @@
 package classes.used.file_entry.config
 
-import main.util.JsonLoader
+import util.loadJson
 import java.nio.file.Path
 import java.util.*
 
@@ -14,7 +14,7 @@ class Config(path: Path): ConfigEntry(path) {
     }
 
     val asJsonObject
-        get() = JsonLoader(path)
+        get() = loadJson(path)
     val asProperties
         get() = Properties().load(path.toFile().inputStream())
     //TODO: add asTOML()

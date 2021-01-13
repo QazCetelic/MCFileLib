@@ -11,6 +11,9 @@ import java.util.*
 import java.util.zip.ZipFile
 import javax.imageio.ImageIO
 
+/**
+ * Object for viewing mod meta-data such as: name, description, version, dependancies, icon etc.
+ */
 class Mod(path: Path): FileEditable(path) {
     var name: String? = null
         private set
@@ -170,6 +173,9 @@ class Mod(path: Path): FileEditable(path) {
     enum class ModType {
         Fabric,
         Forge,
+        // LiteLoader and Rift aren't implemented yet.
+        LiteLoader,
+        Rift,
         Unknown;
     }
 

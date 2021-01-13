@@ -2,12 +2,11 @@ package classes
 
 import classes.used.file_entry.config.ConfigDirectory
 import com.google.gson.JsonObject
-import main.classes.classes.ResourcePack
-import main.util.JsonLoader
 import main.util.VersionConverter
 import util.FileEditable
 import util.LauncherType
-import util.Util.div
+import util.div
+import util.loadJson
 import java.nio.file.Path
 
 class Instance(path: Path, type: LauncherType): FileEditable(path) {
@@ -171,7 +170,7 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
         //todo consider merging this function with JsonLoader()
         val file = jsonLocation.toFile()
         return if (file.exists() && file.isFile) {
-            JsonLoader(jsonLocation)
+            loadJson(jsonLocation)
         }
         else JsonObject()
     }

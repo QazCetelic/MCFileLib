@@ -1,4 +1,4 @@
-package main.classes.classes
+package classes
 
 import classes.Pack
 import java.nio.file.Path

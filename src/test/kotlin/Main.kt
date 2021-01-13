@@ -1,6 +1,5 @@
 package testing
 
-import util.LauncherType
 import util.Launchers
 
 //This is used for testing stuff
@@ -16,9 +15,6 @@ fun main() {
                         else "doesn't"
                     } include Optifine support.")
                 }
-            }
-            instance.mods.forEach { mod ->
-                println("The mod ${mod.name}'s description is: ${mod.description}, ${mod.path}")
             }
         }
     }

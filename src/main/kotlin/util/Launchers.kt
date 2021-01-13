@@ -52,6 +52,7 @@ object Launchers {
             LauncherType.TECHNIC,
         ).forEach {
             val result = fromType(it)
+            //result is null when the launcher doesn't exist
             if (result != null) launchers.add(result)
         }
         return launchers.toList()

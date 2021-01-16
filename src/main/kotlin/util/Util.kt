@@ -1,6 +1,7 @@
 package util
 
 import com.google.gson.Gson
+import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import java.io.IOException
 import java.nio.file.Path
@@ -29,4 +30,11 @@ fun loadJson(path: Path): JsonObject {
         catch (e: IOException) {e.printStackTrace()}
     }
     return json
+}
+
+/**
+ * A function to reduce the code needed for getting values from json, because it's quite common
+ */
+fun JsonObject.ifKey(key: String, lambda: (json: JsonElement) -> Unit) {
+    if (this.has(key)) lambda(this[key])
 }

@@ -5,6 +5,7 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import json.FabricContactData
 import util.FileEditable
+import util.ifKey
 import java.awt.Image
 import java.nio.file.Path
 import java.util.*
@@ -72,38 +73,39 @@ class Mod(path: Path): FileEditable(path) {
                 if (entry.name == "fabric.mod.json") {
                     type = ModType.Fabric
                     val text = String(zipFile.getInputStream(entry).readBytes())
-                    val data = Gson().fromJson(text, JsonObject::class.java)
+                    val json = Gson().fromJson(text, JsonObject::class.java)
                     //Im doing it like this because the json data is different in some mods and I don't know why, this seems the most reliable option
-                    if (data.has("schemaVersion") && data["schemaVersion"].asInt == 1) {
-                        if (data.has("name")) name = data["name"].asString
-                        if (data.has("description")) description = data["description"].asString
-                        if (data.has("id")) id = data["id"].asString
-                        if (data.has("version")) version = data["version"].asString
-                        if (data.has("authors")) {
-                            val jsonArray = data["authors"].asJsonArray.toList()
-                            jsonArray.forEach {
-                                authors.add(it.asString)
+                    if (json.has("schemaVersion") && json["schemaVersion"].asInt == 1) {
+                        json.ifKey("name") { name = it.asString }
+                        json.ifKey("description") { description = it.asString }
+                        json.ifKey("id") { id = it.asString }
+                        json.ifKey("version") { version = it.asString }
+                        json.ifKey("authors") {
+                            val authorList = it.asJsonArray.toList()
+                            authorList.forEach { author ->
+                                authors.add(author.asString)
                             }
                         }
-                        if (data.has("contact")) {
-                            val contactJson = data["contact"].toString()
-                            val contactData = Gson().fromJson(contactJson, FabricContactData::class.java)
+                        json.ifKey("contact") { contactJson ->
+                            //TODO reconsider having a special class for extracting the JSON, I could also use .ifKey(){}
+                            val contactData = Gson().fromJson(contactJson.toString(), FabricContactData::class.java)
                             email = contactData.email
                             issues = contactData.issues
                             sources = contactData.sources
                         }
-                        if (data.has("icon")) iconLocation = data["icon"].asString
-                        if (data.has("depends")) {
-                            val dependsData = data["depends"].asJsonObject
-                            val entries = ArrayList<ModDependency>()
-                            dependsData.entrySet().forEach {
+                        json.ifKey("icon") { iconLocation = json["icon"].asString }
+                        json.ifKey("depends") {
+                            val entries = mutableListOf<ModDependency>()
+                            it.asJsonObject.entrySet().forEach { entry ->
                                 //Don't get the depend as value as string
-                                entries.add(ModDependency(it))
+                                entries.add(ModDependency(entry))
                             }
                             dependencies = entries
                         }
-                        if (data.has("custom") && data["custom"].asJsonObject.has("modmenu:clientsideOnly")) {
-                            clientSide = data["custom"].asJsonObject["modmenu:clientsideOnly"].asBoolean
+                        json.ifKey("custom") {
+                            it.asJsonObject.ifKey("modmenu:clientsideOnly") { clientSideEntry ->
+                                clientSide = clientSideEntry.asBoolean
+                            }
                         }
                     } else throw Exception("Invalid schema version") //In case it changes in the future
                 }
@@ -125,23 +127,20 @@ class Mod(path: Path): FileEditable(path) {
                             }
                         }
                     }
-                    /*
-                    */
                 }
             }
             icon = if (iconLocation != null) {
                 ImageIO.read(
                     zipFile.getInputStream(
-                        zipFile.getEntry(iconLocation)
+                        zipFile.getEntry(iconLocation!!)
                     )
                 )
             } else null
-            
         } else {
             throw Exception("Invalid mod: Not a jar")
         }
 
-        //Makes the ArrayLists read-only
+        //Makes the lists read-only
         dependencies = Collections.unmodifiableList(dependencies)
         authors = Collections.unmodifiableList(authors)
     }
@@ -170,6 +169,9 @@ class Mod(path: Path): FileEditable(path) {
         }
     }
 
+    /**
+     * Enums for the different types of mods
+     */
     enum class ModType {
         Fabric,
         Forge,
@@ -179,6 +181,9 @@ class Mod(path: Path): FileEditable(path) {
         Unknown;
     }
 
+    /**
+     * Class that is used to more easily work with mod dependencies, basically a data class except for the fact that it cleans the input.
+     */
     class ModDependency(input: MutableMap.MutableEntry<String, JsonElement>) {
         val name = input.key
         val requiredVersion = input.value.toString().removeSurrounding("\"")

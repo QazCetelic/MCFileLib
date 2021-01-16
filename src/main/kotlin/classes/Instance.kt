@@ -3,10 +3,7 @@ package classes
 import classes.used.file_entry.config.ConfigDirectory
 import com.google.gson.JsonObject
 import main.util.VersionConverter
-import util.FileEditable
-import util.LauncherType
-import util.div
-import util.loadJson
+import util.*
 import java.nio.file.Path
 
 class Instance(path: Path, type: LauncherType): FileEditable(path) {
@@ -22,36 +19,36 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
         val file = path.toFile()
         if (!file.exists()) throw Exception("Files don't exist")
 
-        val foundModloaders = ArrayList<ModLoader>()
+        val foundModLoaders = ArrayList<ModLoader>()
 
         //Uses hardcoded methods of data extraction because every launcher does it different
         when(type) {
             //GDLauncher Next is the modern version, this is for compatibility and only supports the forge dataclasses.readonly.main.classes.main.classes.ModLoader
             LauncherType.GDLAUNCHER -> {
-                val jsonData = fetchJsonData(path/"config.json")
-                version = jsonData["version"].asString
-                if (jsonData.has("forgeVersion"))
-                    foundModloaders.add(ModLoader(
-                            "Forge",
-                            jsonData["forgeVersion"].asString.replace("forge-", "")
+                val json = fetchJsonData(path/"config.json")
+                version = json["version"].asString
+                json.ifKey("forgeVersion") {
+                    foundModLoaders.add(ModLoader(
+                        "Forge",
+                        json["forgeVersion"].asString.replace("forge-", "")
                     ))
+                }
                 resourceFormat = VersionConverter().fromVersionToFormat(version)
             }
             LauncherType.GDLAUNCHER_NEXT -> {
-                val jsonData = fetchJsonData(path/"config.json")
-                if (jsonData.has("modloader")) {
-                    //todo find better way to extract data, this is stupid and unreliable
-                    val modloaderJsonArray = jsonData["modloader"].asJsonArray
-                    if (modloaderJsonArray.size() == 3)
-                        foundModloaders.add(ModLoader(
-                                //ModLoader name
-                                modloaderJsonArray[0].asString,
-                                //ModLoader version
-                                modloaderJsonArray[2].asString
+                fetchJsonData(path/"config.json").ifKey("modloader") { modLoader ->
+                    //TODO find better way to extract data, this is stupid and unreliable
+                    val modLoaderJsonArray = modLoader.asJsonArray
+                    if (modLoaderJsonArray.size() == 3)
+                        foundModLoaders.add(ModLoader(
+                            //ModLoader name
+                            modLoaderJsonArray[0].asString,
+                            //ModLoader version
+                            modLoaderJsonArray[2].asString
                         ))
-                    version = modloaderJsonArray[1].asString
+                    version = modLoaderJsonArray[1].asString
+                    resourceFormat = VersionConverter().fromVersionToFormat(version)
                 }
-                resourceFormat = VersionConverter().fromVersionToFormat(version)
             }
             LauncherType.VANILLA -> {
                 //Checks if it contains a dot because names like "1.16.2" do and names like "20w27a" (Snapshots) don't
@@ -67,33 +64,29 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
                     }
                 }
                 //In case it's a weird name, like snapshots
-                else {
-                    val jsonData = fetchJsonData(path/".main.json")
-                    if (jsonData.has("assets")) {
-                        version = file.name
-                        resourceFormat = VersionConverter().fromVersionToFormat(jsonData["assets"].asString)
-                    }
+                else fetchJsonData(path/".main.json").ifKey("assets") {
+                    version = file.name
+                    resourceFormat = VersionConverter().fromVersionToFormat(it.asString)
                 }
             }
             LauncherType.MULTIMC -> {
                 //Gets version from jsonData
-                val jsonData = fetchJsonData(path/"mmc-pack.main.json")
+                val json = fetchJsonData(path/"mmc-pack.main.json")
                 //Checks if the "components" array exists and if so, extracts the array
-                if (jsonData.has("components")) {
-                    jsonData["components"].asJsonArray.forEach {
+                json.ifKey("components") {
+                    it.asJsonArray.forEach { entry ->
                         //Each "component" object has a name, this loops through the array and checks if the name matches to something that is needed
-                        when (it.asJsonObject["cachedName"].asString) {
+                        when (entry.asJsonObject["cachedName"].asString) {
                             //Gets Minecraft version
                             "Minecraft" -> {
-                                version = it.asJsonObject["version"].asString
+                                version = entry.asJsonObject["version"].asString
                             }
-
                             //Gets modloader versions
                             "Fabric Loader" -> {
-                                foundModloaders.add(ModLoader("Fabric", it.asJsonObject["version"].asString))
+                                foundModLoaders.add(ModLoader("Fabric", entry.asJsonObject["version"].asString))
                             }
                             "Forge" -> {
-                                foundModloaders.add(ModLoader("Forge", it.asJsonObject["version"].asString))
+                                foundModLoaders.add(ModLoader("Forge", entry.asJsonObject["version"].asString))
                             }
                         }
                     }
@@ -101,20 +94,20 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
                 resourceFormat = VersionConverter().fromVersionToFormat(version)
             }
             LauncherType.TECHNIC -> {
-                val data = fetchJsonData((path/"bin"/"version.json"))
-                if (data.has("id")) {
-                    val string = data["id"].asString
+                val json = fetchJsonData((path/"bin"/"version.json"))
+                json.ifKey("id") {
+                    val string = it.asString
                     if (string.contains("-")) {
                         val splitString = string.split("-")
                         version = splitString[0]
-                        if (splitString[1].startsWith("Forge")) foundModloaders.add(ModLoader("Forge", splitString[1].removePrefix("Forge")))
+                        if (splitString[1].startsWith("Forge")) foundModLoaders.add(ModLoader("Forge", splitString[1].removePrefix("Forge")))
                     }
                 }
-                //todo add support to get description and other data
+                //TODO add support to get description and other data
             }
             else -> throw Exception("${type.displayName} is unsupported")
         }
-        modloaders = foundModloaders
+        modloaders = foundModLoaders
     }
 
     val configs = ConfigDirectory(path/".minecraft"/"config")
@@ -135,9 +128,7 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
         val resourcePackFolderFiles = if (type == LauncherType.MULTIMC) {
             (path/".minecraft"/"resourcepacks").toFile().listFiles()
         }
-        else {
-            (path/"resourcepacks").toFile().listFiles()
-        }
+        else (path/"resourcepacks").toFile().listFiles()
         val foundResourcePacks = ArrayList<ResourcePack>()
         resourcePackFolderFiles?.forEach {
             foundResourcePacks += ResourcePack(it.toPath())
@@ -150,28 +141,26 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
             if (type == LauncherType.MULTIMC) ".minecraft/"
             else ""
         }screenshots").toFile().listFiles()
-        val foundScreenshots = ArrayList<Screenshot>()
+        val foundScreenshots = mutableListOf<Screenshot>()
         screenshotFiles?.forEach {
             foundScreenshots += Screenshot(it.toPath())
         }
         foundScreenshots.toList()
     }
 
+    //TODO consider using map with mod id as key instead
     val mods = run {
-        val modFiles = (path/"${type.subfolder}mods").toFile().listFiles()
-        val foundMods = ArrayList<Mod>()
-        modFiles?.forEach {
+        val foundMods = mutableListOf<Mod>()
+        (path/"${type.subfolder}mods").toFile().listFiles()?.forEach {
             if (it.extension == "jar" || it.name.endsWith(".jar.disabled")) foundMods += Mod(it.toPath())
         }
         foundMods.toList()
     }
 
     private fun fetchJsonData(jsonLocation: Path): JsonObject {
-        //todo consider merging this function with JsonLoader()
+        //TODO consider merging this function with JsonLoader()
         val file = jsonLocation.toFile()
-        return if (file.exists() && file.isFile) {
-            loadJson(jsonLocation)
-        }
+        return if (file.exists() && file.isFile) loadJson(jsonLocation)
         else JsonObject()
     }
 }

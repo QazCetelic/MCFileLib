@@ -13,16 +13,22 @@ import java.util.zip.ZipFile
 import javax.imageio.ImageIO
 
 /**
- * Object for viewing mod meta-data such as: name, description, version, dependancies, icon etc.
+ * Object for viewing mod meta-data such as: name, description, version, dependencies, icon etc.
  */
 class Mod(path: Path): FileEditable(path) {
     var name: String? = null
         private set
     var description: String? = null
         private set
-    //I forgot if this is for the mc version or mod itself
-    var version: String? = null
+    //I forgot if this is for the mc version or mod itself todo make sure modVersion and MCVersion don't get confused
+    var modVersion: String? = null
         private set
+    var mcVersion: String? = null
+        private set
+
+    /**
+     * Name without capitals or spaces
+     */
     var id: String? = null
         private set
     var license: String? = null
@@ -33,10 +39,21 @@ class Mod(path: Path): FileEditable(path) {
         private set
     var sources: String? = null
         private set
+
+    /**
+     * Mod's web site, forum thread, info/support page or anything on the web that's like that.
+     * The mod users can click on this link in-game and it will take them to the specified link.
+     */
     var site: String? = null
         private set
-    var iconLocation: String? = null
+    /**
+     * This is only used by older mods, new ones don't have it anymore (not confirmed yet)
+     */
+    var updateURL: String? = null
         private set
+    var iconPath: String? = null
+        private set
+
     var clientSide: Boolean? = null
         private set
     var icon: Image?
@@ -49,6 +66,7 @@ class Mod(path: Path): FileEditable(path) {
 
     var authors: MutableList<String> = ArrayList<String>()
         private set
+    //TODO Split hard and soft dependencies
     var dependencies: MutableList<ModDependency> = ArrayList<ModDependency>()
         private set
 
@@ -79,7 +97,7 @@ class Mod(path: Path): FileEditable(path) {
                         json.ifKey("name") { name = it.asString }
                         json.ifKey("description") { description = it.asString }
                         json.ifKey("id") { id = it.asString }
-                        json.ifKey("version") { version = it.asString }
+                        json.ifKey("version") { modVersion = it.asString }
                         json.ifKey("authors") {
                             val authorList = it.asJsonArray.toList()
                             authorList.forEach { author ->
@@ -93,12 +111,12 @@ class Mod(path: Path): FileEditable(path) {
                             issues = contactData.issues
                             sources = contactData.sources
                         }
-                        json.ifKey("icon") { iconLocation = json["icon"].asString }
+                        json.ifKey("icon") { iconPath = it.asString }
                         json.ifKey("depends") {
                             val entries = mutableListOf<ModDependency>()
                             it.asJsonObject.entrySet().forEach { entry ->
                                 //Don't get the depend as value as string
-                                entries.add(ModDependency(entry))
+                                //todo fix this: entries.add(ModDependency(entry.key, entry.value.asString))
                             }
                             dependencies = entries
                         }
@@ -112,16 +130,15 @@ class Mod(path: Path): FileEditable(path) {
 
                 if (entry.name == "mcmod.info") {
                     type = ModType.Forge
-                    val text = String(zipFile.getInputStream(entry).readBytes())
-                    val data = Gson().fromJson(text, JsonElement::class.java)
+                    val data = Gson().fromJson(
+                        String(zipFile.getInputStream(entry).readBytes()),
+                        JsonElement::class.java
+                    )
                     when {
-                        data.isJsonObject -> {
-                            val jsonObject = data.asJsonObject
-                            processForgeModJSON(jsonObject)
-                        }
+                        data.isJsonObject -> processForgeModJSON(data.asJsonObject)
                         data.isJsonArray -> {
                             val jsonArray = data.asJsonArray
-                            //it currently only takes the first entry, todo maybe process more
+                            //it currently only takes the first entry, TODO maybe process more
                             if (jsonArray.size() > 0) {
                                 processForgeModJSON(jsonArray[0].asJsonObject)
                             }
@@ -129,44 +146,84 @@ class Mod(path: Path): FileEditable(path) {
                     }
                 }
             }
-            icon = if (iconLocation != null) {
-                ImageIO.read(
-                    zipFile.getInputStream(
-                        zipFile.getEntry(iconLocation!!)
-                    )
-                )
-            } else null
-        } else {
-            throw Exception("Invalid mod: Not a jar")
-        }
+            icon =  if (iconPath != null) {
+                        val entry = zipFile.getEntry(iconPath)
+                        if (entry != null) ImageIO.read(zipFile.getInputStream(entry))
+                        else null
+                    } else null
+        } else throw Exception("Invalid mod: Not a jar")
 
         //Makes the lists read-only
         dependencies = Collections.unmodifiableList(dependencies)
         authors = Collections.unmodifiableList(authors)
     }
 
-    private fun processForgeModJSON(jsonObject: JsonObject) {
+    private fun processForgeModJSON(JSON: JsonObject) {
         fun processForgeModListEntry(modListEntry: JsonObject) {
-            if (modListEntry.has("modid"))          id = modListEntry["modid"].asString
-            if (modListEntry.has("name"))           name = modListEntry["name"].asString
-            if (modListEntry.has("description"))    description = modListEntry["description"].asString
-            if (modListEntry.has("url"))            site = modListEntry["url"].asString
-            if (modListEntry.has("authorList"))     modListEntry["authorList"].asJsonArray.forEach {
-                                                                    authors.add(it.asString)
-                                                                }
-        }
+            // Credits to mcpcfanc at https://www.minecraftforum.net/forums/mapping-and-modding-java-edition/minecraft-mods/modification-development/2405990-mcmod-info-file-guide-and-help
+            modListEntry.ifKey("modid") { id = it.asString}
+            modListEntry.ifKey("name") { name = it.asString}
+            modListEntry.ifKey("description") { description = it.asString }
+            modListEntry.ifKey("url") { site = it.asString }
+            modListEntry.ifKey("version") { modVersion = it.asString }
+            modListEntry.ifKey("mcversion") { mcVersion = it.asString }
 
-        // The modinfo file is different for several mods, todo this could use a rework
-        if (jsonObject.has("modinfoversion")) {
-            //todo add support for other modinfoversions
-            if (jsonObject["modinfoversion"].asInt != 2) throw Exception(jsonObject["modinfoversion"].asString + " is not supported!")
+            // Version specific
+            // updateUrl only works on older versions
+            modListEntry.ifKey("updateUrl") { updateURL = it.asString }
+            // "authorList" is for 1.7+
+            modListEntry.ifKey("authorList") {
+                it.asJsonArray.forEach { author ->
+                    authors.add(author.asString)
+                }
+            }
+            // "authors" is for below 1.7
+            modListEntry.ifKey("authors") {
+                it.asJsonArray.forEach { author ->
+                    authors.add(author.asString)
+                }
+            }
+            modListEntry.ifKey("logoFile") { iconPath = it.asString }
+            modListEntry.ifKey("dependencies") {
+                it.asJsonArray.forEach { dependency ->
+                    //TODO parse mod dependencies correctly
+                    dependencies.add(ModDependency(dependency.asString, "Unknown version"))
+                }
+            }
+            /*
+
+                Unsure if I should implement this
+
+            modListEntry.ifKey("dependants") {
+                it.asJsonArray.forEach {
+                    dependants.add(it.asString)
+                }
+            }
+            modListEntry.ifKey("requiredMods") {
+                it.asJsonArray.forEach {
+                    hardDependencies.add(it.asString)
+                }
+            }
+
+            "requiredMods, useDependencyInformation, and requiredMods are not included in most MCMOD.INFO files, so they are not in the example above. They can be manually added and will still be functional."
+
+                It's unknown if these are actually functional
+
+            modListEntry.ifKey("credits") { credits = it.asString }
+            modListEntry.ifKey("parent") { parent = it.asString } //This might only be useful when processing submods
+            modListEntry.ifKey("screenshots") {
+                it.asJsonArray.forEach {
+                    authors.add(it.asString)
+                }
+            }
+            */
         }
-        if (jsonObject.has("modlist")) {
-            // only takes the first entry currently, todo reconsideration required
-            processForgeModListEntry(jsonObject["modlist"].asJsonArray[0].asJsonObject)
-        } else {
-            processForgeModListEntry(jsonObject)
+        JSON.ifKey("modinfoversion") {
+            //TODO support more different modinfo versions
+            if (it.asInt != 2) throw Exception(it.asString + " is not supported!")
         }
+        if (JSON.isJsonArray) processForgeModListEntry(JSON["modlist"].asJsonArray[0].asJsonObject)
+        else processForgeModListEntry(JSON)
     }
 
     /**
@@ -182,10 +239,10 @@ class Mod(path: Path): FileEditable(path) {
     }
 
     /**
-     * Class that is used to more easily work with mod dependencies, basically a data class except for the fact that it cleans the input.
+     * Class that is used to more easily work with mod dependencies
      */
-    class ModDependency(input: MutableMap.MutableEntry<String, JsonElement>) {
-        val name = input.key
-        val requiredVersion = input.value.toString().removeSurrounding("\"")
-    }
+    data class ModDependency(
+        val name: String,
+        val version: String
+    )
 }

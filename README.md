@@ -1,13 +1,13 @@
 # MCFileLib
 
-### A WIP library written in Kotlin to interact with Minecraft files
+### A WIP library written in Kotlin to get meta-data from Minecraft related files
 
 - ModPacks (or Instances)
 - Mods
   + Fabric Mods
-  + Forge Mods (modinfo format 2 only now)
+  + Forge Mods (modify format 2 only now)
 - DataPacks
-  + PackData, for extracting meta data from (zipped) folders
+  + PackData, for extracting metadata from (zipped) folders
 - Packs
   + ResourcePacks
   + DataPacks

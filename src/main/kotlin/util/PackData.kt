@@ -8,10 +8,11 @@ import java.nio.file.Path
 import java.util.zip.ZipFile
 import javax.imageio.ImageIO
 
+//TODO Consider this with Pack.kt
+/**
+ * Is used for extracting data from packs
+ */
 internal class PackData(path: Path) {
-    /**
-     Is used for both Resource & Data Packs
-    */
     val format: Int
     val description: String
     val image: BufferedImage?

@@ -25,7 +25,7 @@ fun loadJson(path: Path): JsonObject {
         try {
             //Takes main.json text from file and turns it into an object
             val jsonText = jsonFile.readText()
-            json = Gson().fromJson(jsonText, JsonObject::class.java)
+            if (!jsonText.isNullOrBlank()) json = Gson().fromJson(jsonText, JsonObject::class.java)
         }
         catch (e: IOException) {e.printStackTrace()}
     }

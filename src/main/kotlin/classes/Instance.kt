@@ -5,6 +5,7 @@ import com.google.gson.JsonObject
 import main.util.VersionConverter
 import util.*
 import java.nio.file.Path
+import java.util.*
 
 class Instance(path: Path, type: LauncherType): FileEditable(path) {
     var version: String? = null
@@ -19,7 +20,7 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
         val file = path.toFile()
         if (!file.exists()) throw Exception("Files don't exist")
 
-        val foundModLoaders = ArrayList<ModLoader>()
+        val foundModLoaders = mutableListOf<ModLoader>()
 
         //Uses hardcoded methods of data extraction because every launcher does it different
         when(type) {
@@ -30,7 +31,7 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
                 json.ifKey("forgeVersion") {
                     foundModLoaders.add(ModLoader(
                         "Forge",
-                        json["forgeVersion"].asString.replace("forge-", "")
+                        it.asString.replace("forge-", "")
                     ))
                 }
                 resourceFormat = VersionConverter().fromVersionToFormat(version)
@@ -96,9 +97,8 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
             LauncherType.TECHNIC -> {
                 val json = fetchJsonData((path/"bin"/"version.json"))
                 json.ifKey("id") {
-                    val string = it.asString
-                    if (string.contains("-")) {
-                        val splitString = string.split("-")
+                    if (it.asString.contains("-")) {
+                        val splitString = it.asString.split("-")
                         version = splitString[0]
                         if (splitString[1].startsWith("Forge")) foundModLoaders.add(ModLoader("Forge", splitString[1].removePrefix("Forge")))
                     }
@@ -125,11 +125,11 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
 
     val resourcepacks = run {
         //Create path to the folder containing the ResourcePacks
-        val resourcePackFolderFiles = if (type == LauncherType.MULTIMC) {
-            (path/".minecraft"/"resourcepacks").toFile().listFiles()
-        }
-        else (path/"resourcepacks").toFile().listFiles()
-        val foundResourcePacks = ArrayList<ResourcePack>()
+        val resourcePackFolderFiles =
+            if (type == LauncherType.MULTIMC) (path/".minecraft"/"resourcepacks").toFile().listFiles()
+            else (path/"resourcepacks").toFile().listFiles()
+
+        val foundResourcePacks = mutableListOf<ResourcePack>()
         resourcePackFolderFiles?.forEach {
             foundResourcePacks += ResourcePack(it.toPath())
         }
@@ -148,14 +148,26 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
         foundScreenshots.toList()
     }
 
-    //TODO consider using map with mod id as key instead
+    // TODO consider using map with mod id as key instead
     val mods = run {
-        val foundMods = mutableListOf<Mod>()
+        var unknownIDNameGeneratorNumber = 1
+        val foundMods = mutableMapOf<String, Mod>()
         (path/"${type.subfolder}mods").toFile().listFiles()?.forEach {
-            if (it.extension == "jar" || it.name.endsWith(".jar.disabled")) foundMods += Mod(it.toPath())
+            if (it.extension == "jar" || it.name.endsWith(".jar.disabled")) {
+                val mod = Mod(it.toPath())
+                // In case that the mod id is unknown
+                if (mod.id == null) {
+                    if (mod.name != null) foundMods[mod.name!!.replace(" ", "_")] = mod
+                    else foundMods["unknownMod$unknownIDNameGeneratorNumber"] = mod
+                    unknownIDNameGeneratorNumber++
+                } else foundMods[mod.id!!] = mod
+            }
         }
-        foundMods.toList()
+        Collections.unmodifiableMap(foundMods)
     }
+
+    // Special getter to make code more readable when people don't want to use the map
+    val allMods get() = mods.values
 
     private fun fetchJsonData(jsonLocation: Path): JsonObject {
         //TODO consider merging this function with JsonLoader()

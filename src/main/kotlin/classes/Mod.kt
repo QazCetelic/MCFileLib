@@ -64,15 +64,86 @@ class Mod(path: Path): FileEditable(path) {
     var disabled: Boolean
         private set
 
-    var authors: MutableList<String> = ArrayList<String>()
+    var authors: List<String>
         private set
     //TODO Split hard and soft dependencies
-    var dependencies: MutableList<ModDependency> = ArrayList<ModDependency>()
+    var dependencies: List<ModDependency>
         private set
 
     init {
         val file = path.toFile()
         if (!file.exists()) throw Exception("Invalid mod: File doesn't exist")
+
+        val foundAuthors = mutableListOf<String>()
+        val foundDependencies = mutableListOf<ModDependency>()
+
+        fun processForgeModJSON(JSON: JsonObject) {
+            fun processForgeModListEntry(modListEntry: JsonObject) {
+                // Credits to mcpcfanc at https://www.minecraftforum.net/forums/mapping-and-modding-java-edition/minecraft-mods/modification-development/2405990-mcmod-info-file-guide-and-help
+                modListEntry.ifKey("modid") { id = it.asString}
+                modListEntry.ifKey("name") { name = it.asString}
+                modListEntry.ifKey("description") { description = it.asString }
+                modListEntry.ifKey("url") { site = it.asString }
+                modListEntry.ifKey("version") { modVersion = it.asString }
+                modListEntry.ifKey("mcversion") { mcVersion = it.asString }
+
+                // Version specific
+                // updateUrl only works on older versions
+                modListEntry.ifKey("updateUrl") { updateURL = it.asString }
+                // "authorList" is for 1.7+
+                modListEntry.ifKey("authorList") {
+                    it.asJsonArray.forEach { author ->
+                        foundAuthors.add(author.asString)
+                    }
+                }
+                // "authors" is for below 1.7
+                modListEntry.ifKey("authors") {
+                    it.asJsonArray.forEach { author ->
+                        foundAuthors.add(author.asString)
+                    }
+                }
+                modListEntry.ifKey("logoFile") { iconPath = it.asString }
+                modListEntry.ifKey("dependencies") {
+                    it.asJsonArray.forEach { dependency ->
+                        //TODO parse mod dependencies correctly
+                        foundDependencies.add(ModDependency(dependency.asString, "Unknown version"))
+                    }
+                }
+                /*
+
+                    Unsure if I should implement this
+
+                modListEntry.ifKey("dependants") {
+                    it.asJsonArray.forEach {
+                        dependants.add(it.asString)
+                    }
+                }
+                modListEntry.ifKey("requiredMods") {
+                    it.asJsonArray.forEach {
+                        hardDependencies.add(it.asString)
+                    }
+                }
+
+                "requiredMods, useDependencyInformation, and requiredMods are not included in most MCMOD.INFO files, so they are not in the example above. They can be manually added and will still be functional."
+
+                    It's unknown if these are actually functional
+
+                modListEntry.ifKey("credits") { credits = it.asString }
+                modListEntry.ifKey("parent") { parent = it.asString } //This might only be useful when processing submods
+                modListEntry.ifKey("screenshots") {
+                    it.asJsonArray.forEach {
+                        authors.add(it.asString)
+                    }
+                }
+                */
+            }
+            JSON.ifKey("modinfoversion") {
+                //TODO support more different modinfo versions
+                if (it.asInt != 2) throw Exception(it.asString + " is not supported!")
+            }
+            if (JSON.isJsonArray) processForgeModListEntry(JSON["modlist"].asJsonArray[0].asJsonObject)
+            else processForgeModListEntry(JSON)
+        }
 
         disabled = file.extension == "disabled"
 
@@ -101,7 +172,7 @@ class Mod(path: Path): FileEditable(path) {
                         json.ifKey("authors") {
                             val authorList = it.asJsonArray.toList()
                             authorList.forEach { author ->
-                                authors.add(author.asString)
+                                foundAuthors.add(author.asString)
                             }
                         }
                         json.ifKey("contact") { contactJson ->
@@ -153,77 +224,8 @@ class Mod(path: Path): FileEditable(path) {
                     } else null
         } else throw Exception("Invalid mod: Not a jar")
 
-        //Makes the lists read-only
-        dependencies = Collections.unmodifiableList(dependencies)
-        authors = Collections.unmodifiableList(authors)
-    }
-
-    private fun processForgeModJSON(JSON: JsonObject) {
-        fun processForgeModListEntry(modListEntry: JsonObject) {
-            // Credits to mcpcfanc at https://www.minecraftforum.net/forums/mapping-and-modding-java-edition/minecraft-mods/modification-development/2405990-mcmod-info-file-guide-and-help
-            modListEntry.ifKey("modid") { id = it.asString}
-            modListEntry.ifKey("name") { name = it.asString}
-            modListEntry.ifKey("description") { description = it.asString }
-            modListEntry.ifKey("url") { site = it.asString }
-            modListEntry.ifKey("version") { modVersion = it.asString }
-            modListEntry.ifKey("mcversion") { mcVersion = it.asString }
-
-            // Version specific
-            // updateUrl only works on older versions
-            modListEntry.ifKey("updateUrl") { updateURL = it.asString }
-            // "authorList" is for 1.7+
-            modListEntry.ifKey("authorList") {
-                it.asJsonArray.forEach { author ->
-                    authors.add(author.asString)
-                }
-            }
-            // "authors" is for below 1.7
-            modListEntry.ifKey("authors") {
-                it.asJsonArray.forEach { author ->
-                    authors.add(author.asString)
-                }
-            }
-            modListEntry.ifKey("logoFile") { iconPath = it.asString }
-            modListEntry.ifKey("dependencies") {
-                it.asJsonArray.forEach { dependency ->
-                    //TODO parse mod dependencies correctly
-                    dependencies.add(ModDependency(dependency.asString, "Unknown version"))
-                }
-            }
-            /*
-
-                Unsure if I should implement this
-
-            modListEntry.ifKey("dependants") {
-                it.asJsonArray.forEach {
-                    dependants.add(it.asString)
-                }
-            }
-            modListEntry.ifKey("requiredMods") {
-                it.asJsonArray.forEach {
-                    hardDependencies.add(it.asString)
-                }
-            }
-
-            "requiredMods, useDependencyInformation, and requiredMods are not included in most MCMOD.INFO files, so they are not in the example above. They can be manually added and will still be functional."
-
-                It's unknown if these are actually functional
-
-            modListEntry.ifKey("credits") { credits = it.asString }
-            modListEntry.ifKey("parent") { parent = it.asString } //This might only be useful when processing submods
-            modListEntry.ifKey("screenshots") {
-                it.asJsonArray.forEach {
-                    authors.add(it.asString)
-                }
-            }
-            */
-        }
-        JSON.ifKey("modinfoversion") {
-            //TODO support more different modinfo versions
-            if (it.asInt != 2) throw Exception(it.asString + " is not supported!")
-        }
-        if (JSON.isJsonArray) processForgeModListEntry(JSON["modlist"].asJsonArray[0].asJsonObject)
-        else processForgeModListEntry(JSON)
+        dependencies = Collections.unmodifiableList(foundDependencies)
+        authors = Collections.unmodifiableList(foundAuthors)
     }
 
     /**

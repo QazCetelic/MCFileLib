@@ -1,6 +1,7 @@
 # MCFileLib
 
-### A WIP library written in Kotlin to get meta-data from Minecraft related files
+### A library written in Kotlin to get meta-data from Minecraft related files
+Currently in Alpha
 
 - ModPacks (or Instances)
 - Mods

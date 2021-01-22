@@ -5,7 +5,7 @@
 - ModPacks (or Instances)
 - Mods
   + Fabric Mods
-  + Forge Mods (modify format 2 only now)
+  + Forge Mods (Modern format only)
 - DataPacks
   + PackData, for extracting metadata from (zipped) folders
 - Packs

@@ -4,9 +4,9 @@ import mcfilelib.util.Launchers
 
 //This is used for testing stuff
 fun main() {
-    var occurrences = mutableMapOf<String, Int>()
+    val occurrences = mutableMapOf<String, Int>()
 
-    val launchers = Launchers.getAll()
+    val launchers = Launchers.getAllInstalled()
     launchers.forEach { launcher ->
         launcher.instances.forEach { instance ->
             instance.allMods.forEach { mod ->

@@ -3,6 +3,8 @@ package mcfilelib.classes
 import com.google.gson.Gson
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
+import com.google.gson.JsonParser
+import com.google.gson.stream.JsonReader
 import mcfilelib.json.FabricContactData
 import mcfilelib.util.FileEditable
 import mcfilelib.util.ifKey
@@ -207,18 +209,30 @@ class Mod(path: Path): FileEditable(path) {
                     }
 
                     type = ModType.Forge
-                    val data = Gson().fromJson(
-                        String(zipFile.getInputStream(entry).readBytes()),
-                        JsonElement::class.java
-                    )
-                    when {
-                        data.isJsonObject -> processEntry(data.asJsonObject)
-                        data.isJsonArray -> {
-                            val jsonArray = data.asJsonArray
-                            //it currently only takes the first entry, TODO maybe process more
-                            if (jsonArray.size() > 0) {
-                                processEntry(jsonArray[0].asJsonObject)
+
+                    //Only converts to json if the file is not blank
+                    var text = String(zipFile.getInputStream(entry).readBytes())
+                    if (text.isNotBlank()) {
+                        //Try catch block in case the json is invalid (Yes, these things actually occur, looking at you F5 Fix!)
+                        try {
+                            val data = Gson().fromJson(
+                                text,
+                                JsonElement::class.java
+                            )
+                            when {
+                                data == null -> {/* Do nothing */}
+                                data.isJsonObject -> processEntry(data.asJsonObject)
+                                data.isJsonArray -> {
+                                    val jsonArray = data.asJsonArray
+                                    //it currently only takes the first entry, TODO maybe process more
+                                    if (jsonArray.size() > 0) {
+                                        processEntry(jsonArray[0].asJsonObject)
+                                    }
+                                }
                             }
+                        }
+                        catch (e: Exception) {
+                            //Ignore it and move on
                         }
                     }
                 }

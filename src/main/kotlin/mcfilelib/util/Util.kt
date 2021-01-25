@@ -25,7 +25,7 @@ fun loadJson(path: Path): JsonObject {
         try {
             //Takes main.json text from file and turns it into an object
             val jsonText = jsonFile.readText()
-            if (!jsonText.isNullOrBlank()) json = Gson().fromJson(jsonText, JsonObject::class.java)
+            if (jsonText.isNotBlank()) json = Gson().fromJson(jsonText, JsonObject::class.java)
         }
         catch (e: IOException) {e.printStackTrace()}
     }
@@ -37,4 +37,21 @@ fun loadJson(path: Path): JsonObject {
  */
 fun JsonObject.ifKey(key: String, lambda: (json: JsonElement) -> Unit) {
     if (this.has(key)) lambda(this[key])
+}
+
+fun fancierText(string: String): String {
+    val chars = string.toCharArray()
+    if (chars.size > 1) {
+        var isDivided = false
+        for (i in chars.indices) {
+            if (chars[i] == '-' && chars[i] == '_') {
+                chars[i] = ' '
+                isDivided = true
+            }
+            if (isDivided && chars[i] == ' ' && chars[i+1].isLetter()) {
+                 chars[i+1] = chars[i+1].toUpperCase()
+            }
+        }
+    }
+    return chars.toString()
 }

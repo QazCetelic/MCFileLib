@@ -1,13 +1,10 @@
 package mcfilelib.classes
 
-import mcfilelib.util.file_entry.config.ConfigDirectory
 import com.google.gson.JsonObject
-import mcfilelib.util.VersionConverter
 import mcfilelib.util.*
-import java.awt.image.BufferedImage
+import mcfilelib.util.file_entry.config.ConfigDirectory
 import java.nio.file.Path
 import java.util.*
-import javax.imageio.ImageIO
 
 class Instance(path: Path, type: LauncherType): FileEditable(path) {
     var version: String? = null
@@ -29,13 +26,13 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
             //GDLauncher Next is the modern version, this is for compatibility and only supports the forge dataclasses.readonly.main.classes.main.mcfilelib.classes.ModLoader
             LauncherType.GDLAUNCHER -> {
                 val json = fetchJsonData(path/"config.json")
-                version = json["version"].asString
+                json.ifKey("version") { version = it.asString }
                 json.ifKey("forgeVersion") {
                     foundModLoaders.add(
                         ModLoader(
-                        "Forge",
-                        it.asString.replace("forge-", "")
-                    )
+                            "Forge",
+                            it.asString.replace("forge-", "")
+                        )
                     )
                 }
                 resourceFormat = VersionConverter().fromVersionToFormat(version)
@@ -119,11 +116,14 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
     val configs = ConfigDirectory(path/".minecraft"/"config")
 
     val name = run {
-        var name = path.toFile().name
-        if (type == LauncherType.MULTIMC) {
-            //Gets name from "instance.cfg" instead of file name because renaming instance in MultiMC doesn't seem te rename folder
-            (path/"instance.cfg").toFile().forEachLine {
-                if (it.startsWith("name=")) name = it.removePrefix("name=")
+        var name = fancierText(path.toFile().name)
+        when(type) {
+            LauncherType.VANILLA -> name = "Default Instance"
+            LauncherType.MULTIMC -> {
+                //Gets name from "instance.cfg" instead of file name because renaming instance in MultiMC doesn't seem te rename folder
+                (path/"instance.cfg").toFile().forEachLine {
+                    if (it.startsWith("name=")) name = it.removePrefix("name=")
+                }
             }
         }
         name
@@ -157,12 +157,14 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
     /**
      * The icon of the Instance, uses icon.png or background.png if not found
      */
-    val icon = run {
-        var result: BufferedImage? = null
+    val iconPath = run {
+        var result: Path? = null
         for (image in listOf("icon", "background")) {
-            val file = (path/"$image.png").toFile()
+            val file = if (type.subfolder != "") {
+                (path/type.subfolder/"$image.png").toFile()
+            } else (path/"$image.png").toFile()
             if (file.exists()) {
-                result = ImageIO.read(file)
+                result = file.toPath()
                 break
             }
         }

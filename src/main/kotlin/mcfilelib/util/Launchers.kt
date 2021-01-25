@@ -29,6 +29,7 @@ object Launchers {
                 LauncherType.VANILLA -> toLauncherIfExists(userHome/".minecraft")
                 LauncherType.MULTIMC -> toLauncherIfExists(userHome/".local"/"share"/"multimc")
                 LauncherType.TECHNIC -> toLauncherIfExists(userHome/".technic")
+                LauncherType.GDLAUNCHER -> toLauncherIfExists(userHome/".config"/"GDLauncher")
                 LauncherType.GDLAUNCHER_NEXT -> toLauncherIfExists(userHome/".config"/"gdlauncher_next")
                 else -> null
             }
@@ -43,12 +44,14 @@ object Launchers {
         } else null
     }
 
-    fun getAll(): List<Launcher> {
+    fun getAllInstalled(): List<Launcher> {
         val launchers = ArrayList<Launcher>()
         listOf (
             LauncherType.VANILLA,
             LauncherType.MULTIMC,
             LauncherType.TECHNIC,
+            //LauncherType.GDLAUNCHER,
+            //LauncherType.GDLAUNCHER_NEXT  todo fix GDLauncher detection
         ).forEach {
             val result = fromType(it)
             //result is null when the launcher doesn't exist

@@ -149,7 +149,11 @@ class Mod(path: Path): FileEditable(path) {
                             if (it.asInt != 2) throw Exception(it.asString + " is not supported!")
                         }
 
-                        // Credits to mcpcfanc at https://www.minecraftforum.net/forums/mapping-and-modding-java-edition/minecraft-mods/modification-development/2405990-mcmod-info-file-guide-and-help
+                        /*
+                            Credits to mcpcfanc at https://www.minecraftforum.net/forums/mapping-and-modding-java-edition/minecraft-mods/modification-development/2405990-mcmod-info-file-guide-and-help
+                            https://forums.minecraftforge.net/topic/6811-mcmodinfo/
+                         */
+
                         modListEntry.ifKey("modid") { id = it.asString}
                         modListEntry.ifKey("name") { name = it.asString}
                         modListEntry.ifKey("description") { description = it.asString }

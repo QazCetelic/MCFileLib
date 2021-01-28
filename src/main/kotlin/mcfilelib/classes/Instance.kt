@@ -25,7 +25,7 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
         when(type) {
             //GDLauncher Next is the modern version, this is for compatibility and only supports the forge dataclasses.readonly.main.classes.main.mcfilelib.classes.ModLoader
             LauncherType.GDLAUNCHER -> {
-                val json = fetchJsonData(path/"config.json")
+                val json = loadJson(path/"config.json")
                 json.ifKey("version") { version = it.asString }
                 json.ifKey("forgeVersion") {
                     foundModLoaders.add(
@@ -38,7 +38,7 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
                 resourceFormat = VersionConverter().fromVersionToFormat(version)
             }
             LauncherType.GDLAUNCHER_NEXT -> {
-                fetchJsonData(path/"config.json").ifKey("modloader") { modLoader ->
+                loadJson(path/"config.json").ifKey("modloader") { modLoader ->
                     //TODO find better way to extract data, this is stupid and unreliable
                     val modLoaderJsonArray = modLoader.asJsonArray
                     if (modLoaderJsonArray.size() == 3)
@@ -68,14 +68,14 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
                     }
                 }
                 //In case it's a weird name, like snapshots
-                else fetchJsonData(path/".main.json").ifKey("assets") {
+                else loadJson(path/".main.json").ifKey("assets") {
                     version = file.name
                     resourceFormat = VersionConverter().fromVersionToFormat(it.asString)
                 }
             }
             LauncherType.MULTIMC -> {
                 //Gets version from jsonData
-                val json = fetchJsonData(path/"mmc-pack.main.json")
+                val json = loadJson(path/"mmc-pack.main.json")
                 //Checks if the "components" array exists and if so, extracts the array
                 json.ifKey("components") {
                     it.asJsonArray.forEach { entry ->
@@ -98,7 +98,7 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
                 resourceFormat = VersionConverter().fromVersionToFormat(version)
             }
             LauncherType.TECHNIC -> {
-                val json = fetchJsonData((path/"bin"/"version.json"))
+                val json = loadJson(path/"bin"/"version.json")
                 json.ifKey("id") {
                     if (it.asString.contains("-")) {
                         val splitString = it.asString.split("-")
@@ -191,11 +191,4 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
 
     // Special getter to make code more readable when people don't want to use the map
     val allMods get() = mods.values
-
-    private fun fetchJsonData(jsonLocation: Path): JsonObject {
-        //TODO consider merging this function with JsonLoader()
-        val file = jsonLocation.toFile()
-        return if (file.exists() && file.isFile) loadJson(jsonLocation)
-        else JsonObject()
-    }
 }

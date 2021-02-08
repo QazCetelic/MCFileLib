@@ -1,62 +1,66 @@
 package mcfilelib.util
 
 import mcfilelib.classes.Launcher
-import java.io.File
 import java.nio.file.Path
 import java.nio.file.Paths
 
 object Launchers {
-    fun fromPath(path: String): LauncherType {
-        val file = File(path)
-        return if (file.isDirectory) {
-            when (file.name) {
-                "GDLauncher" -> LauncherType.GDLAUNCHER
-                "gdlauncher_next" -> LauncherType.GDLAUNCHER_NEXT
-                ".minecraft" -> LauncherType.VANILLA
-                "multimc" -> LauncherType.MULTIMC
-                ".technic" -> LauncherType.TECHNIC
-                //In case a path to an invalid folder was given
-                else -> LauncherType.UNKNOWN
-            }
-        } else LauncherType.UNKNOWN
-    }
+    val types = listOf (
+        LauncherType.GDLAUNCHER,
+        LauncherType.GDLAUNCHER_NEXT,
+        LauncherType.VANILLA,
+        LauncherType.MULTIMC,
+        LauncherType.TECHNIC,
+    )
 
-    fun fromType(type: LauncherType): Launcher? = when (OSInfo.os) {
-        //todo: This isn't done yet, I need to know the paths that are used on other OS'
-        OSInfo.OS.LINUX -> {
-            val userHome = Paths.get(System.getProperty("user.home"))
-            when (type) {
-                LauncherType.VANILLA -> toLauncherIfExists(userHome/".minecraft")
-                LauncherType.MULTIMC -> toLauncherIfExists(userHome/".local"/"share"/"multimc")
-                LauncherType.TECHNIC -> toLauncherIfExists(userHome/".technic")
-                LauncherType.GDLAUNCHER -> toLauncherIfExists(userHome/".config"/"GDLauncher")
-                LauncherType.GDLAUNCHER_NEXT -> toLauncherIfExists(userHome/".config"/"gdlauncher_next")
-                else -> null
-            }
+    fun fromPathToType(path: Path): LauncherType {
+        for (launcher in types) {
+            val launcherObject = fromTypeToLauncher(launcher) ?: continue
+            if (launcherObject.path in path) {
+                return launcher
+            } else continue
         }
-        else -> null
+        return LauncherType.UNKNOWN
     }
 
-    //Returns Launcher enum or null if the it doesn't exist
-    private fun toLauncherIfExists(path: Path): Launcher? {
-        return if (path.toFile().exists()) {
-            Launcher(path)
-        } else null
-    }
-
-    fun getAllInstalled(): List<Launcher> {
-        val launchers = ArrayList<Launcher>()
-        listOf (
-            LauncherType.VANILLA,
-            LauncherType.MULTIMC,
-            LauncherType.TECHNIC,
-            //LauncherType.GDLAUNCHER,
-            //LauncherType.GDLAUNCHER_NEXT  todo fix GDLauncher detection
-        ).forEach {
-            val result = fromType(it)
-            //result is null when the launcher doesn't exist
-            if (result != null) launchers.add(result)
+    fun fromTypeToLauncher(type: LauncherType): Launcher? {
+        //Returns Launcher enum or null if the it doesn't exist
+        fun toLauncherIfExists(path: Path): Launcher? {
+            return if (path.toFile().exists()) {
+                Launcher(path, type)
+            } else null
         }
-        return launchers.toList()
+
+        return when (OSInfo.os) {
+            // TODO This isn't done yet, I need to know the paths that are used on other OS'
+            OSInfo.OS.LINUX -> {
+                val userHome = Paths.get(System.getProperty("user.home"))
+                when (type) {
+                    LauncherType.VANILLA -> toLauncherIfExists(userHome/".minecraft")
+                    LauncherType.MULTIMC -> toLauncherIfExists(userHome/".local"/"share"/"multimc")
+                    LauncherType.TECHNIC -> toLauncherIfExists(userHome/".technic")
+                    LauncherType.GDLAUNCHER -> toLauncherIfExists(userHome/".config"/"GDLauncher")
+                    LauncherType.GDLAUNCHER_NEXT -> toLauncherIfExists(userHome/".config"/"gdlauncher_next")
+                    else -> null
+                }
+            }
+            else -> null
+        }
+    }
+
+    // Stores results after first time because the process is relatively intensive due to IO tasks
+    val allInstalledLaunchers: List<Launcher> by lazy {
+        val installedLaunchers = ArrayList<Launcher>()
+        (
+                types
+                // temporary disabled GDLAUNCHER, todo re-enable later
+                //- LauncherType.GDLAUNCHER
+                //- LauncherType.GDLAUNCHER_NEXT
+                ).forEach {
+                val result = fromTypeToLauncher(it)
+                //result is null when the launcher doesn't exist
+                if (result != null) installedLaunchers.add(result)
+            }
+        installedLaunchers.toList()
     }
 }

@@ -5,7 +5,7 @@ import mcfilelib.util.Launchers
 fun ocurrences() {
     val occurrences = mutableMapOf<String, Int>()
 
-    val launchers = Launchers.getAllInstalled()
+    val launchers = Launchers.allInstalledLaunchers
     launchers.forEach { launcher ->
         launcher.instances.forEach { instance ->
             instance.allMods.forEach { mod ->

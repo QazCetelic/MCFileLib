@@ -1,13 +1,17 @@
 package mcfilelib.classes
 
+import mcfilelib.util.FileEditable
 import mcfilelib.util.LauncherType
 import mcfilelib.util.Launchers
-import mcfilelib.util.FileEditable
 import mcfilelib.util.div
 import java.nio.file.Path
 
-class Launcher(path: Path): FileEditable(path) {
-    val type = Launchers.fromPath(path.toString())
+class Launcher(
+    //Passed on to FileEditable
+    path: Path,
+    //Can be given but can also be figured out by automatically
+    val type: LauncherType = Launchers.fromPathToType(path)
+): FileEditable(path) {
     val instances: List<Instance>
     init {
         val file = path.toFile()

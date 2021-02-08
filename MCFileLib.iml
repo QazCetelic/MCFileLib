@@ -51,5 +51,6 @@
     <orderEntry type="library" name="KotlinJavaRuntime" level="project" />
     <orderEntry type="library" name="com.google.code.gson:gson:2.8.6" level="project" />
     <orderEntry type="library" name="com.vdurmont:semver4j:3.1.0" level="project" />
+    <orderEntry type="library" name="NeatKotlin" level="project" />
   </component>
 </module>

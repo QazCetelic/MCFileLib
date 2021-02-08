@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="NeatKotlin">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../NeatKotlin/out/artifacts/NeatKotlin_jar/NeatKotlin.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

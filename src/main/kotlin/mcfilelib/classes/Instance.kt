@@ -1,6 +1,5 @@
 package mcfilelib.classes
 
-import com.google.gson.JsonObject
 import mcfilelib.util.*
 import mcfilelib.util.file_entry.config.ConfigDirectory
 import java.nio.file.Path
@@ -28,12 +27,14 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
                 val json = loadJson(path/"config.json")
                 json.ifKey("version") { version = it.asString }
                 json.ifKey("forgeVersion") {
-                    foundModLoaders.add(
-                        ModLoader(
-                            "Forge",
-                            it.asString.replace("forge-", "")
+                    if (!it.isJsonNull) {
+                        foundModLoaders.add(
+                            ModLoader(
+                                "Forge",
+                                it.asString.replace("forge-", "")
+                            )
                         )
-                    )
+                    }
                 }
                 resourceFormat = VersionConverter().fromVersionToFormat(version)
             }
@@ -75,7 +76,7 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
             }
             LauncherType.MULTIMC -> {
                 //Gets version from jsonData
-                val json = loadJson(path/"mmc-pack.main.json")
+                val json = loadJson(path/"mmc-pack.json")
                 //Checks if the "components" array exists and if so, extracts the array
                 json.ifKey("components") {
                     it.asJsonArray.forEach { entry ->
@@ -116,8 +117,8 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
     val configs = ConfigDirectory(path/".minecraft"/"config")
 
     val name = run {
-        var name = fancierText(path.toFile().name)
-        when(type) {
+        var name = path.toFile().name // todo fix NeatKotlin lib and add .undev() to this to fix name
+        when (type) {
             LauncherType.VANILLA -> name = "Default Instance"
             LauncherType.MULTIMC -> {
                 //Gets name from "instance.cfg" instead of file name because renaming instance in MultiMC doesn't seem te rename folder

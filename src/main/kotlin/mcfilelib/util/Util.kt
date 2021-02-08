@@ -38,20 +38,3 @@ fun loadJson(path: Path): JsonObject {
 fun JsonObject.ifKey(key: String, lambda: (json: JsonElement) -> Unit) {
     if (this.has(key)) lambda(this[key])
 }
-
-fun fancierText(string: String): String {
-    val chars = string.toCharArray()
-    if (chars.size > 1) {
-        var isDivided = false
-        for (i in chars.indices) {
-            if (chars[i] == '-' && chars[i] == '_') {
-                chars[i] = ' '
-                isDivided = true
-            }
-            if (isDivided && chars[i] == ' ' && chars[i+1].isLetter()) {
-                 chars[i+1] = chars[i+1].toUpperCase()
-            }
-        }
-    }
-    return chars.toString()
-}

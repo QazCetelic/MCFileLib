@@ -13,9 +13,8 @@ Currently in Alpha
   + ResourcePacks
   + DataPacks
 - Launchers
-  + Returning a path when given a launcher type _Launchers.fromType()_
-  + Returning a Launcher type when given a path to the **main folder of the launcher** _Launchers.fromPath()_
-  + A function that returns a list with all installed launchers _Launchers.getAll()_
+  + Get a launcher object from the type when it exists
+  + Get the type when given a path
 - Worlds
 - Screenshots
 - VersionConverter

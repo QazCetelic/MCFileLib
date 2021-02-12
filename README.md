@@ -15,6 +15,11 @@ Currently in Alpha
 - Launchers
   + Get a launcher object from the type when it exists
   + Get the type when given a path
+  + Should work with:
+    - MultiMC
+    - GDLauncher
+    - Technic
+    - of course vanilla too
 - Worlds
 - Screenshots
 - VersionConverter

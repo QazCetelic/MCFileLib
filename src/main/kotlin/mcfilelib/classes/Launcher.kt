@@ -22,7 +22,7 @@ class Launcher(
 
         val foundInstances = ArrayList<Instance>()
         val instancesPath = this.path/type.instanceFolder
-        //Vanilla is structured as ONE instance, that's why the Launcher object uses it's own path to create an Instance object
+        // Vanilla is structured as ONE instance, that's why the Launcher object uses it's own path to create an Instance object
         if (type == LauncherType.VANILLA) {
             foundInstances.add(Instance(this.path, LauncherType.VANILLA))
         }

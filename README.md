@@ -3,6 +3,8 @@
 ### A library written in Kotlin to get meta-data from Minecraft related files
 Currently in Alpha
 
+[Examples can be found on the wiki](https://github.com/QazCetelic/MCFileLib/wiki/Examples)
+
 - ModPacks (or Instances)
 - Mods
   + Fabric Mods

@@ -196,5 +196,6 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
     }
 
     // Special getter to make code more readable when people don't want to use the map
+    @Deprecated("Use mods.values instead", ReplaceWith("mods.values"))
     val allMods get() = mods.values
 }

@@ -2,6 +2,7 @@ package mcfilelib.classes
 
 import mcfilelib.util.*
 import mcfilelib.util.file_entry.config.ConfigDirectory
+import java.io.File
 import java.nio.file.Path
 import java.util.*
 
@@ -131,13 +132,17 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
     }
 
     val resourcepacks = run {
-        //Create path to the folder containing the ResourcePacks
-        val resourcePackFolderFiles =
-            if (type == LauncherType.MULTIMC) (path/".minecraft"/"resourcepacks").toFile().listFiles()
-            else (path/"resourcepacks").toFile().listFiles()
-
         val foundResourcePacks = mutableListOf<ResourcePack>()
-        resourcePackFolderFiles?.forEach {
+
+        fun getPackFiles(name: String): Array<File>? = (
+            if (type == LauncherType.MULTIMC) (path/".minecraft"/name)
+            else (path/name)
+        ).toFile().listFiles()
+
+        getPackFiles("resourcepacks")?.forEach {
+            foundResourcePacks += ResourcePack(it.toPath())
+        }
+        getPackFiles("texturepacks")?.forEach {
             foundResourcePacks += ResourcePack(it.toPath())
         }
         foundResourcePacks.toList()

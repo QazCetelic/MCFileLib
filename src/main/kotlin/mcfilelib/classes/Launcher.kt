@@ -1,16 +1,13 @@
 package mcfilelib.classes
 
-import mcfilelib.util.FileEditable
-import mcfilelib.util.LauncherType
-import mcfilelib.util.Launchers
-import mcfilelib.util.div
+import mcfilelib.util.*
 import java.nio.file.Path
 
 class Launcher(
     //Passed on to FileEditable
     path: Path,
     //Can be given but can also be figured out by automatically
-    val type: LauncherType = Launchers.fromPathToType(path)
+    val type: LauncherType = path.toLauncherType()
 ): FileEditable(path) {
     val instances: List<Instance>
     init {
@@ -22,16 +19,10 @@ class Launcher(
 
         val foundInstances = ArrayList<Instance>()
         val instancesPath = this.path/type.instanceFolder
-        // Vanilla is structured as ONE instance, that's why the Launcher object uses it's own path to create an Instance object
-        if (type == LauncherType.VANILLA) {
-            foundInstances.add(Instance(this.path, LauncherType.VANILLA))
-        }
-        else {
-            val instancesFolderFiles = instancesPath.toFile().listFiles()
-            instancesFolderFiles?.forEach {
-                //Prevents MultiMC's folder sneaking in
-                if (it.name != "_MMC_TEMP" && it.isDirectory) foundInstances += Instance(it.toPath(), type)
-            }
+        val instancesFolderFiles = instancesPath.toFile().listFiles()
+        instancesFolderFiles?.forEach {
+            //Prevents MultiMC's folder sneaking in
+            if (it.name != "_MMC_TEMP" && it.isDirectory) foundInstances += Instance(it.toPath(), type)
         }
         instances = foundInstances
     }

@@ -35,6 +35,31 @@ fun loadJson(path: Path): JsonObject {
 /**
  * A function to reduce the code needed for getting values from json, because it's quite common
  */
-fun JsonObject.ifKey(key: String, lambda: (json: JsonElement) -> Unit) {
-    if (this.has(key)) lambda(this[key])
+fun JsonObject.ifKey(key: String, lambda: (json: JsonElement) -> Unit): Boolean {
+    return if (this.has(key)) {
+        lambda(this[key])
+        true
+    } else false
+}
+
+fun String.undev(): String {
+    val chars = this.toCharArray()
+    if (chars.size > 1) {
+        var isDivided = false
+        for (i in chars.indices) {
+            if (chars[i] == '-' || chars[i] == '_' && chars.size > i + 1 && chars[i+1].isLetter() ) {
+                chars[i] = ' '
+                chars[i+1] = chars[i+1].toUpperCase()
+                isDivided = true
+            }
+        }
+        if (isDivided) {
+            chars[0] = chars[0].toUpperCase()
+        }
+    }
+    val sb = StringBuilder()
+    for (char in chars) {
+        sb.append(char)
+    }
+    return sb.toString()
 }

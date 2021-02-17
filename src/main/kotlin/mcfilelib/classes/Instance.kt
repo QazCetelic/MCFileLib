@@ -9,11 +9,14 @@ import java.util.*
 class Instance(path: Path, type: LauncherType): FileEditable(path) {
     var version: String? = null
         private set
+    var resourceFormat: Int? = null
+        private set
+
+    val launcherType = type
 
     val modloaders: List<ModLoader>
 
-    var resourceFormat = -1
-        private set
+    //todo add support for launch arguments
 
     init {
         val file = path.toFile()
@@ -37,7 +40,6 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
                         )
                     }
                 }
-                resourceFormat = VersionConverter().fromVersionToFormat(version)
             }
             LauncherType.GDLAUNCHER_NEXT -> {
                 loadJson(path/"config.json").ifKey("modloader") { modLoader ->
@@ -46,33 +48,37 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
                     if (modLoaderJsonArray.size() == 3)
                         foundModLoaders.add(
                             ModLoader(
-                            //ModLoader name
-                            modLoaderJsonArray[0].asString,
-                            //ModLoader version
-                            modLoaderJsonArray[2].asString
-                        )
+                                //ModLoader name
+                                modLoaderJsonArray[0].asString,
+                                //ModLoader version
+                                modLoaderJsonArray[2].asString
+                            )
                         )
                     version = modLoaderJsonArray[1].asString
-                    resourceFormat = VersionConverter().fromVersionToFormat(version)
                 }
             }
             LauncherType.VANILLA -> {
-                //Checks if it contains a dot because names like "1.16.2" do and names like "20w27a" (Snapshots) don't
-                if (file.name.contains(".")) {
-                    //Only take the first part if the name has 2 parts
-                    if (file.name.contains("-")) {
-                        version = file.name.split("-")[0]
-                        resourceFormat = VersionConverter().fromVersionToFormat(version)
+                val json = loadJson(path/"${file.name}.json")
+                // id key is version
+                val id = json["id"].asString
+                // Checks if it's a normal version like 1.8.3 and not 20w13b
+                if (isVersion(id)) version = id
+                else {
+                    if (json.has("assets")) {
+                        val assetsVersion = json["assets"].asString
+                        // resourceFormat is set here instead of just using the given version later because of the way versions are handled for snapshots.
+                        resourceFormat = fromVersionToFormat(assetsVersion)
+                        version = "$assetsVersion, Snapshot $id"
                     }
                     else {
-                        version = file.name
-                        resourceFormat = VersionConverter().fromVersionToFormat(version)
+                        // Optifine exception because it creates a json file with the same naming schema as Mojang does but fills it with different values -_-
+                        if (file.name.toLowerCase().contains("optifine")) {
+                            // Uses .ifKey because everything could happen apparently
+                            json.ifKey("inheritsFrom") {
+                                version = it.asString
+                            }
+                        } else throw Exception("Invalid Json")
                     }
-                }
-                //In case it's a weird name, like snapshots
-                else loadJson(path/".main.json").ifKey("assets") {
-                    version = file.name
-                    resourceFormat = VersionConverter().fromVersionToFormat(it.asString)
                 }
             }
             LauncherType.MULTIMC -> {
@@ -97,7 +103,6 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
                         }
                     }
                 }
-                resourceFormat = VersionConverter().fromVersionToFormat(version)
             }
             LauncherType.TECHNIC -> {
                 val json = loadJson(path/"bin"/"version.json")
@@ -113,14 +118,17 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
             else -> throw Exception("${type.displayName} is unsupported")
         }
         modloaders = foundModLoaders
+
+        if (resourceFormat == null && version != null && isVersion(version!!)) {
+            resourceFormat = fromVersionToFormat(version)
+        }
     }
 
     val configs = ConfigDirectory(path/".minecraft"/"config")
 
     val name = run {
-        var name = path.toFile().name // todo fix NeatKotlin lib and add .undev() to this to fix name
+        var name = path.toFile().name.undev()
         when (type) {
-            LauncherType.VANILLA -> name = "Default Instance"
             LauncherType.MULTIMC -> {
                 //Gets name from "instance.cfg" instead of file name because renaming instance in MultiMC doesn't seem te rename folder
                 (path/"instance.cfg").toFile().forEachLine {
@@ -134,10 +142,9 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
     val resourcepacks = run {
         val foundResourcePacks = mutableListOf<ResourcePack>()
 
-        fun getPackFiles(name: String): Array<File>? = (
-            if (type == LauncherType.MULTIMC) (path/".minecraft"/name)
-            else (path/name)
-        ).toFile().listFiles()
+        fun getPackFiles(name: String): Array<File>? =
+            // This adds the subfolder if it's necessary for example ".minecraft/" for MultiMC
+            (path/(type.subfolder + name)).toFile().listFiles()
 
         getPackFiles("resourcepacks")?.forEach {
             foundResourcePacks += ResourcePack(it.toPath())
@@ -149,12 +156,8 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
     }
 
     val screenshots = run {
-        val screenshotFiles = (path/"${
-            if (type == LauncherType.MULTIMC) ".minecraft/"
-            else ""
-        }screenshots").toFile().listFiles()
         val foundScreenshots = mutableListOf<Screenshot>()
-        screenshotFiles?.forEach {
+        (path/(type.subfolder + "screenshots")).toFile().listFiles()?.forEach {
             foundScreenshots += Screenshot(it.toPath())
         }
         foundScreenshots.toList()
@@ -164,36 +167,66 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
      * The icon of the Instance, uses icon.png or background.png if not found
      */
     val iconPath = run {
-        var result: Path? = null
-        for (image in listOf("icon", "background")) {
-            val file = if (type.subfolder != "") {
-                (path/type.subfolder/"$image.png").toFile()
-            } else (path/"$image.png").toFile()
-            if (file.exists()) {
-                result = file.toPath()
-                break
+        // Returns the first icon it can find or null
+        for (iconName in listOf("icon", "background")) {
+            val path = path/(type.subfolder + "$iconName.png")
+            if (path.toFile().exists()) {
+                return@run path
             }
         }
-        return@run result
+        return@run null
     }
 
-    // TODO consider using map with mod id as key instead
     val mods = run {
         var unknownIDNameGeneratorNumber = 1
         val foundMods = mutableMapOf<String, Mod>()
-        (path/"${type.subfolder}mods").toFile().listFiles()?.forEach {
+        (path/(type.subfolder + "mods")).toFile().listFiles()?.forEach {
             if (it.extension == "jar" || it.name.endsWith(".jar.disabled")) {
                 val mod = Mod(it.toPath())
-                // In case that the mod id is unknown
-                if (mod.id == null) {
-                    if (mod.name != null) foundMods[mod.name!!.replace(" ", "_")] = mod
-                    else foundMods["unknownMod$unknownIDNameGeneratorNumber"] = mod
-                    unknownIDNameGeneratorNumber++
-                } else foundMods[mod.id!!] = mod
+
+                fun addWithGeneratedID() {
+                    /*
+                        This part has a lot of safety mechanisms that are very unlikely to be needed.
+                        They still exists just in case someone would like to use "unknownMod2" as their mod ID or something silly like that.
+                    */
+                    // Creates ID from the name, should work most of the time but could theoretically fail
+                    fun nameToID() = mod.name!!.replace(" ", "_")
+                    fun createIDFromNumber(): String {
+                        // Generates a new ID
+                        val createdID = "unknownMod$unknownIDNameGeneratorNumber"
+                        // Ups the number for the next ID
+                        unknownIDNameGeneratorNumber++
+                        // Either returns the ID or generates the next one and returns that if it's already used by another mod
+                        return if (createdID !in foundMods.keys) createdID else nameToID()
+                    }
+                    // If a mod ID isn't found it will try to use the name to create an ID to use
+                    if (mod.name != null && nameToID() !in foundMods.keys) foundMods[nameToID()] = mod
+                    // It will just generate a number when the mod name cannot be used because it's already used as id by another mod or if it doesn't exist.
+                    else foundMods[createIDFromNumber()] = mod
+                }
+                when (mod.id) {
+                    // Checks if it can't be added...
+                    null -> addWithGeneratedID()
+                    in foundMods.keys -> addWithGeneratedID()
+                    // ...or if it can
+                    else -> foundMods[mod.id!!] = mod
+                }
             }
         }
-        Collections.unmodifiableMap(foundMods)
+        foundMods.toMap()
     }
+
+    /*
+    todo fix launch() command
+    fun launch() {
+        when (launcherType) {
+            LauncherType.MULTIMC -> {
+                ProcessBuilder("/home/qaz/.local/share/multimc/MultiMC", "-l", this.path.toFile().name).inheritIO().start()
+            }
+            else -> TODO("${launcherType.displayName} can't be launched yet")
+        }
+    }
+     */
 
     // Special getter to make code more readable when people don't want to use the map
     @Deprecated("Use mods.values instead", ReplaceWith("mods.values"))

@@ -3,7 +3,7 @@ package mcfilelib.util
 enum class LauncherType(val displayName: String, val instanceFolder: String, val subfolder: String = "") {
     VANILLA(
         displayName = "Vanilla",
-        instanceFolder = ""
+        instanceFolder = "versions",
     ),
     //GDLauncher has 2 entries because the way data is stored is changed. The second one is called "_NEXT" because that was used for the folder name.
     GDLAUNCHER(

@@ -1,9 +1,9 @@
 package mcfilelib.classes
 
 import mcfilelib.util.file_entry.assets.ContentGroupEntry
-import mcfilelib.util.VersionConverter
 import mcfilelib.util.FileEditable
 import mcfilelib.util.PackData
+import mcfilelib.util.fromFormatToRange
 import java.awt.image.BufferedImage
 import java.nio.file.Path
 
@@ -46,7 +46,7 @@ abstract class Pack(path: Path, isResourcePack: Boolean): FileEditable(path) {
             }
         }
     }
-    open val versionRange = VersionConverter().fromFormatToRange(format, isResourcePack)
+    open val versionRange = fromFormatToRange(format, isResourcePack)
     override fun toString() = "(name=$name, path=$path, format=$format${
         if (versionRange != null) " (${versionRange})"
         else ""

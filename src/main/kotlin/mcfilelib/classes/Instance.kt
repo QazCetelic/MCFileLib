@@ -128,12 +128,10 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
 
     val name = run {
         var name = path.toFile().name.undev()
-        when (type) {
-            LauncherType.MULTIMC -> {
-                //Gets name from "instance.cfg" instead of file name because renaming instance in MultiMC doesn't seem te rename folder
-                (path/"instance.cfg").toFile().forEachLine {
-                    if (it.startsWith("name=")) name = it.removePrefix("name=")
-                }
+        if (type == LauncherType.MULTIMC) {
+            //Gets name from "instance.cfg" instead of file name because renaming instance in MultiMC doesn't seem te rename folder
+            (path/"instance.cfg").toFile().forEachLine {
+                if (it.startsWith("name=")) name = it.removePrefix("name=")
             }
         }
         name
@@ -142,9 +140,7 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
     val resourcepacks = run {
         val foundResourcePacks = mutableListOf<ResourcePack>()
 
-        fun getPackFiles(name: String): Array<File>? =
-            // This adds the subfolder if it's necessary for example ".minecraft/" for MultiMC
-            (path/(type.subfolder + name)).toFile().listFiles()
+        fun getPackFiles(name: String): Array<File>? = (path/(type.subfolder + name)).toFile().listFiles()
 
         getPackFiles("resourcepacks")?.forEach {
             foundResourcePacks += ResourcePack(it.toPath())
@@ -155,13 +151,11 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
         foundResourcePacks.toList()
     }
 
-    val screenshots = run {
-        val foundScreenshots = mutableListOf<Screenshot>()
-        (path/(type.subfolder + "screenshots")).toFile().listFiles()?.forEach {
-            foundScreenshots += Screenshot(it.toPath())
+    val screenshots = mutableListOf<Screenshot>().also {
+        (path/(type.subfolder + "screenshots")).toFile().listFiles()?.forEach { file ->
+            it += Screenshot(file.toPath())
         }
-        foundScreenshots.toList()
-    }
+    }.toList()
 
     /**
      * The icon of the Instance, uses icon.png or background.png if not found

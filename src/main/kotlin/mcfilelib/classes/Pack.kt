@@ -1,8 +1,8 @@
 package mcfilelib.classes
 
-import mcfilelib.util.file_entry.assets.ContentGroupEntry
 import mcfilelib.util.FileEditable
 import mcfilelib.util.PackData
+import mcfilelib.util.file_entry.assets.ContentGroupEntry
 import mcfilelib.util.fromFormatToRange
 import java.awt.image.BufferedImage
 import java.nio.file.Path
@@ -17,10 +17,11 @@ abstract class Pack(path: Path, isResourcePack: Boolean): FileEditable(path) {
 
     init {
         //Gets metadata from main.json file
-        val packData = PackData(path)
-        format = packData.format
-        description = packData.description
-        icon = packData.image
+        PackData(path).also {
+            format = it.format
+            description = it.description
+            icon = it.image
+        }
 
         val file = path.toFile()
         if (file.extension == "zip") {

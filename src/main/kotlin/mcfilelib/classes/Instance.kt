@@ -13,6 +13,11 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
         private set
 
     val launcherType = type
+    // todo implement this for other launchers than Technic
+    var allocatedMemory: Int? = null
+        private set
+    var javaArguments: List<String> = listOf()
+        private set
 
     val modloaders: List<ModLoader>
 
@@ -20,9 +25,10 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
 
     init {
         val file = path.toFile()
-        if (!file.exists()) throw Exception("Files don't exist")
+        if (!file.exists()) throw Exception("Doesn't exist")
 
         val foundModLoaders = mutableListOf<ModLoader>()
+        val foundJavaArguments = mutableListOf<String>()
 
         //Uses hardcoded methods of data extraction because every launcher does it different
         when(type) {
@@ -42,19 +48,13 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
                 }
             }
             LauncherType.GDLAUNCHER_NEXT -> {
-                loadJson(path/"config.json").ifKey("modloader") { modLoader ->
-                    //TODO find better way to extract data, this is stupid and unreliable
-                    val modLoaderJsonArray = modLoader.asJsonArray
-                    if (modLoaderJsonArray.size() == 3)
-                        foundModLoaders.add(
-                            ModLoader(
-                                //ModLoader name
-                                modLoaderJsonArray[0].asString,
-                                //ModLoader version
-                                modLoaderJsonArray[2].asString
-                            )
-                        )
-                    version = modLoaderJsonArray[1].asString
+                loadJson(path/"config.json").ifKey("modloader") {
+                    // TODO find better way to extract data, this could unreliable
+                    val jsonArray = it.asJsonArray
+                    if (jsonArray.size() == 3) {
+                        foundModLoaders.add(ModLoader(name = jsonArray[0].asString, version = jsonArray[2].asString))
+                        version = jsonArray[1].asString
+                    }
                 }
             }
             LauncherType.VANILLA -> {
@@ -70,8 +70,9 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
                         resourceFormat = fromVersionToFormat(assetsVersion)
                         version = "$assetsVersion, Snapshot $id"
                     }
+                    // In case other json is in the .json file as expected
                     else {
-                        // Optifine exception because it creates a json file with the same naming schema as Mojang does but fills it with different values -_-
+                        // Optifine exception because it creates a json file with the same naming schema as Mojang in does, but fills it with different values -_-
                         if (file.name.toLowerCase().contains("optifine")) {
                             // Uses .ifKey because everything could happen apparently
                             json.ifKey("inheritsFrom") {
@@ -86,20 +87,14 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
                 val json = loadJson(path/"mmc-pack.json")
                 //Checks if the "components" array exists and if so, extracts the array
                 json.ifKey("components") {
-                    it.asJsonArray.forEach { entry ->
+                    for (entry in it.asJsonArray) {
                         //Each "component" object has a name, this loops through the array and checks if the name matches to something that is needed
                         when (entry.asJsonObject["cachedName"].asString) {
                             //Gets Minecraft version
-                            "Minecraft" -> {
-                                version = entry.asJsonObject["version"].asString
-                            }
+                            "Minecraft" -> version = entry.asJsonObject["version"].asString
                             //Gets modloader versions
-                            "Fabric Loader" -> {
-                                foundModLoaders.add(ModLoader("Fabric", entry.asJsonObject["version"].asString))
-                            }
-                            "Forge" -> {
-                                foundModLoaders.add(ModLoader("Forge", entry.asJsonObject["version"].asString))
-                            }
+                            "Fabric Loader" -> foundModLoaders.add(ModLoader("Fabric", entry.asJsonObject["version"].asString))
+                            "Forge" -> foundModLoaders.add(ModLoader("Forge", entry.asJsonObject["version"].asString))
                         }
                     }
                 }
@@ -113,7 +108,12 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
                         if (splitString[1].startsWith("Forge")) foundModLoaders.add(ModLoader("Forge", splitString[1].removePrefix("Forge")))
                     }
                 }
-                //TODO add support to get description and other data
+                json.ifKey("minecraftArguments") {
+                    javaArguments = splitArgumentString(it.asString)
+                }
+                loadJson(path/"bin"/"runData").ifKey("memory") {
+                    allocatedMemory = it.asInt
+                }
             }
             else -> throw Exception("${type.displayName} is unsupported")
         }
@@ -126,22 +126,19 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
 
     val configs = ConfigDirectory(path/".minecraft"/"config")
 
-    val name = run {
-        var name = path.toFile().name.undev()
-        if (type == LauncherType.MULTIMC) {
-            //Gets name from "instance.cfg" instead of file name because renaming instance in MultiMC doesn't seem te rename folder
-            (path/"instance.cfg").toFile().forEachLine {
-                if (it.startsWith("name=")) name = it.removePrefix("name=")
-            }
+    val name = if (type == LauncherType.MULTIMC) {
+        lateinit var foundName: String
+        // Gets name from "instance.cfg" instead of file name because renaming instance in MultiMC doesn't seem te rename folder
+        (path/"instance.cfg").toFile().forEachLine {
+            if (it.startsWith("name=")) foundName = it.removePrefix("name=")
         }
-        name
-    }
+        foundName
+    } else path.toFile().name.undev()
 
     val resourcepacks = run {
         val foundResourcePacks = mutableListOf<ResourcePack>()
 
         fun getPackFiles(name: String): Array<File>? = (path/(type.subfolder + name)).toFile().listFiles()
-
         getPackFiles("resourcepacks")?.forEach {
             foundResourcePacks += ResourcePack(it.toPath())
         }
@@ -163,9 +160,9 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
     val iconPath = run {
         // Returns the first icon it can find or null
         for (iconName in listOf("icon", "background")) {
-            val path = path/(type.subfolder + "$iconName.png")
-            if (path.toFile().exists()) {
-                return@run path
+            val iconPath = path/(type.subfolder + "$iconName.png")
+            if (iconPath.toFile().exists()) {
+                return@run iconPath
             }
         }
         return@run null

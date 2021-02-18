@@ -35,11 +35,14 @@ fun loadJson(path: Path): JsonObject {
 /**
  * A function to reduce the code needed for getting values from json, because it's quite common
  */
-fun JsonObject.ifKey(key: String, lambda: (json: JsonElement) -> Unit): Boolean {
+fun JsonObject.ifKey(key: String, exception: (() -> Unit)? = null, lambda: (json: JsonElement) -> Unit): Boolean {
     return if (this.has(key)) {
         lambda(this[key])
         true
-    } else false
+    } else {
+        if (exception != null) exception()
+        false
+    }
 }
 
 fun String.undev(): String {
@@ -62,4 +65,8 @@ fun String.undev(): String {
         sb.append(char)
     }
     return sb.toString()
+}
+
+fun splitArgumentString(argumentString: String): List<String> {
+    return argumentString.removePrefix("--").split(" --")
 }

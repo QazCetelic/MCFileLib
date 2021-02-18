@@ -27,7 +27,7 @@ class Launcher(
                 //Prevents MultiMC's folder sneaking in
                 if (it.name != "_MMC_TEMP" && it.isDirectory) list += Instance(it.toPath(), type)
             }
-        }
+        }.toList()
     }
 
     override fun toString(): String = "(${type.displayName}: ${this.path})"

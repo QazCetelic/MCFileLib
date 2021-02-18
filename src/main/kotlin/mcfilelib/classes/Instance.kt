@@ -38,12 +38,7 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
                 json.ifKey("version") { version = it.asString }
                 json.ifKey("forgeVersion") {
                     if (!it.isJsonNull) {
-                        foundModLoaders.add(
-                            ModLoader(
-                                "Forge",
-                                it.asString.replace("forge-", "")
-                            )
-                        )
+                        foundModLoaders += ModLoader(name = "Forge", version = it.asString.replace("forge-", ""))
                     }
                 }
             }
@@ -52,7 +47,7 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
                     // TODO find better way to extract data, this could unreliable
                     val jsonArray = it.asJsonArray
                     if (jsonArray.size() == 3) {
-                        foundModLoaders.add(ModLoader(name = jsonArray[0].asString, version = jsonArray[2].asString))
+                        foundModLoaders += ModLoader(name = jsonArray[0].asString, version = jsonArray[2].asString)
                         version = jsonArray[1].asString
                     }
                 }
@@ -93,8 +88,8 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
                             //Gets Minecraft version
                             "Minecraft" -> version = entry.asJsonObject["version"].asString
                             //Gets modloader versions
-                            "Fabric Loader" -> foundModLoaders.add(ModLoader("Fabric", entry.asJsonObject["version"].asString))
-                            "Forge" -> foundModLoaders.add(ModLoader("Forge", entry.asJsonObject["version"].asString))
+                            "Fabric Loader" -> foundModLoaders += ModLoader("Fabric", entry.asJsonObject["version"].asString)
+                            "Forge" -> foundModLoaders += ModLoader("Forge", entry.asJsonObject["version"].asString)
                         }
                     }
                 }
@@ -105,7 +100,7 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
                     if (it.asString.contains("-")) {
                         val splitString = it.asString.split("-")
                         version = splitString[0]
-                        if (splitString[1].startsWith("Forge")) foundModLoaders.add(ModLoader("Forge", splitString[1].removePrefix("Forge")))
+                        if (splitString[1].startsWith("Forge")) foundModLoaders += ModLoader("Forge", splitString[1].removePrefix("Forge"))
                     }
                 }
                 json.ifKey("minecraftArguments") {
@@ -119,9 +114,7 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
         }
         modloaders = foundModLoaders
 
-        if (resourceFormat == null && version != null && isVersion(version!!)) {
-            resourceFormat = fromVersionToFormat(version)
-        }
+        if (resourceFormat == null && version != null && isVersion(version!!)) resourceFormat = fromVersionToFormat(version)
     }
 
     val configs = ConfigDirectory(path/".minecraft"/"config")
@@ -135,18 +128,15 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
         foundName
     } else path.toFile().name.undev()
 
-    val resourcepacks = run {
-        val foundResourcePacks = mutableListOf<ResourcePack>()
-
+    val resourcepacks = mutableListOf<ResourcePack>().also { list ->
         fun getPackFiles(name: String): Array<File>? = (path/(type.subfolder + name)).toFile().listFiles()
         getPackFiles("resourcepacks")?.forEach {
-            foundResourcePacks += ResourcePack(it.toPath())
+            list += ResourcePack(it.toPath())
         }
         getPackFiles("texturepacks")?.forEach {
-            foundResourcePacks += ResourcePack(it.toPath())
+            list += ResourcePack(it.toPath())
         }
-        foundResourcePacks.toList()
-    }
+    }.toList()
 
     val screenshots = mutableListOf<Screenshot>().also {
         (path/(type.subfolder + "screenshots")).toFile().listFiles()?.forEach { file ->
@@ -168,9 +158,8 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
         return@run null
     }
 
-    val mods = run {
+    val mods = mutableMapOf<String, Mod>().also { foundMods ->
         var unknownIDNameGeneratorNumber = 1
-        val foundMods = mutableMapOf<String, Mod>()
         (path/(type.subfolder + "mods")).toFile().listFiles()?.forEach {
             if (it.extension == "jar" || it.name.endsWith(".jar.disabled")) {
                 val mod = Mod(it.toPath())
@@ -204,7 +193,6 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
                 }
             }
         }
-        foundMods.toMap()
     }
 
     /*

@@ -1,7 +1,7 @@
 package mcfilelib.classes
 
-import mcfilelib.util.Time
 import mcfilelib.util.FileEditable
+import mcfilelib.util.Time
 import java.nio.file.Path
 import javax.imageio.ImageIO
 

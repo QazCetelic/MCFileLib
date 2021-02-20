@@ -1,4 +1,4 @@
-package classes.used.file_entry.assets
+package mcfilelib.util.file_entry.assets
 
 import mcfilelib.util.FileEditable
 import java.nio.file.Path

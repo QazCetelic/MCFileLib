@@ -189,7 +189,7 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
                     else set(createIDFromNumber(), mod)
                 }
                 when (mod.id) {
-                    // Checks if it can't be added...
+                    // Checks if it can't be directly added...
                     null -> addWithGeneratedID()
                     in keys -> addWithGeneratedID()
                     // ...or if it can

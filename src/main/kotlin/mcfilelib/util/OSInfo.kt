@@ -1,7 +1,6 @@
 package mcfilelib.util
 
 import java.io.IOException
-import java.lang.Exception
 import java.util.*
 
 

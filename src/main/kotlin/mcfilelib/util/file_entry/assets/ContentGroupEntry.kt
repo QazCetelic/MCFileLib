@@ -1,6 +1,5 @@
 package mcfilelib.util.file_entry.assets
 
-import classes.used.file_entry.assets.ModelEntry
 import mcfilelib.util.FileEditable
 import java.nio.file.Path
 

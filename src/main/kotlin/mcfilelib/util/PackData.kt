@@ -1,7 +1,7 @@
 package mcfilelib.util
 
-import mcfilelib.json.ResourcePackData
 import com.google.gson.Gson
+import mcfilelib.json.ResourcePackData
 import java.awt.image.BufferedImage
 import java.io.File
 import java.nio.file.Path

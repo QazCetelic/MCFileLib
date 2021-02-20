@@ -10,7 +10,7 @@ class Time (
 ) {
     /**
      * Returns "YEAR-MONTH-DAY_HOUR.MINUTE.SECOND"
-     * It uses different characters in between because that's done by Minecraft itself, the string should be the same as the file name without extension.
+     * It uses different characters in between because that's how it's done by Minecraft itself, the string should be the same as the file name without extension.
      */
     override fun toString() = "$year-$month-${day}_$hour.$minute.$second"
 }

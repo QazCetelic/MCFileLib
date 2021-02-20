@@ -1,5 +1,6 @@
 package mcfilelib.generic
 
+import fillList
 import mcfilelib.util.FileEditable
 import java.awt.image.BufferedImage
 import java.io.File
@@ -13,12 +14,11 @@ class World(path: Path): FileEditable(path) {
         val file = path.toFile()
         if (file.isDirectory) {
             name = path.toFile().name
-            val list = ArrayList<DataPack>()
-            //Checks if the dataclasses.readonly.main.generic.main.mcfilelib.generic.DataPack folder is actually a folder, and not just a file.
-            File("$path/datapacks/").listFiles()?.forEach {
-                list += DataPack(it.toPath())
+            dataPacks = fillList<DataPack> {
+                File("$path/datapacks/").listFiles()?.forEach {
+                    add(DataPack(it.toPath()))
+                }
             }
-            dataPacks = list.toList()
         } else throw Exception("World is not a directory")
     }
 

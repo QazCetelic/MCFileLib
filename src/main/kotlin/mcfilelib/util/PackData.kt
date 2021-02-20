@@ -40,7 +40,7 @@ internal class PackData(path: Path) {
             }
 
         if (data != null) {
-            format = data.pack.pack_format
+            format = data.pack.packFormat
             description = data.pack.description
         }
         else {

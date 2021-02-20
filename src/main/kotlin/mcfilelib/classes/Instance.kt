@@ -1,8 +1,11 @@
 package mcfilelib.classes
 
+import div
+import fillList
+import fillMap
 import mcfilelib.util.*
 import mcfilelib.util.file_entry.config.ConfigDirectory
-import java.io.File
+import undev
 import java.nio.file.Path
 import java.util.*
 
@@ -119,30 +122,31 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
 
     val configs = ConfigDirectory(path/".minecraft"/"config")
 
-    val name = if (type == LauncherType.MULTIMC) {
-        lateinit var foundName: String
-        // Gets name from "instance.cfg" instead of file name because renaming instance in MultiMC doesn't seem te rename folder
-        (path/"instance.cfg").toFile().forEachLine {
-            if (it.startsWith("name=")) foundName = it.removePrefix("name=")
+    val name = run {
+        var foundName: String? = null
+        if (type == LauncherType.MULTIMC) {
+            // Gets name from "instance.cfg" instead of file name because renaming instance in MultiMC doesn't seem te rename folder
+            (path/"instance.cfg").toFile().forEachLine {
+                if (it.startsWith("name=")) foundName = it.removePrefix("name=")
+            }
         }
-        foundName
-    } else path.toFile().name.undev()
+        foundName ?: path.toFile().name.undev()
+    }
 
-    val resourcepacks = mutableListOf<ResourcePack>().also { list ->
-        fun getPackFiles(name: String): Array<File>? = (path/(type.subfolder + name)).toFile().listFiles()
-        getPackFiles("resourcepacks")?.forEach {
-            list += ResourcePack(it.toPath())
+    private fun getInstanceFiles(name: String) = (path/(launcherType.subfolder + name)).toFile().listFiles()
+    val resourcepacks = fillList<ResourcePack> {
+        getInstanceFiles("resourcepacks")?.forEach {
+            add(ResourcePack(it.toPath()))
         }
-        getPackFiles("texturepacks")?.forEach {
-            list += ResourcePack(it.toPath())
+        getInstanceFiles("texturepacks")?.forEach {
+            add(ResourcePack(it.toPath()))
         }
-    }.toList()
-
-    val screenshots = mutableListOf<Screenshot>().also {
-        (path/(type.subfolder + "screenshots")).toFile().listFiles()?.forEach { file ->
-            it += Screenshot(file.toPath())
+    }
+    val screenshots = fillList<Screenshot> {
+        getInstanceFiles("screenshots")?.forEach { file ->
+            add(Screenshot(file.toPath()))
         }
-    }.toList()
+    }
 
     /**
      * The icon of the Instance, uses icon.png or background.png if not found
@@ -158,9 +162,9 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
         return@run null
     }
 
-    val mods = mutableMapOf<String, Mod>().also { foundMods ->
+    val mods = fillMap<String, Mod> {
         var unknownIDNameGeneratorNumber = 1
-        (path/(type.subfolder + "mods")).toFile().listFiles()?.forEach {
+        getInstanceFiles("mods")?.forEach {
             if (it.extension == "jar" || it.name.endsWith(".jar.disabled")) {
                 val mod = Mod(it.toPath())
 
@@ -177,19 +181,19 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
                         // Ups the number for the next ID
                         unknownIDNameGeneratorNumber++
                         // Either returns the ID or generates the next one and returns that if it's already used by another mod
-                        return if (createdID !in foundMods.keys) createdID else nameToID()
+                        return if (createdID !in keys) createdID else nameToID()
                     }
                     // If a mod ID isn't found it will try to use the name to create an ID to use
-                    if (mod.name != null && nameToID() !in foundMods.keys) foundMods[nameToID()] = mod
+                    if (mod.name != null && nameToID() !in keys) set(nameToID(), mod)
                     // It will just generate a number when the mod name cannot be used because it's already used as id by another mod or if it doesn't exist.
-                    else foundMods[createIDFromNumber()] = mod
+                    else set(createIDFromNumber(), mod)
                 }
                 when (mod.id) {
                     // Checks if it can't be added...
                     null -> addWithGeneratedID()
-                    in foundMods.keys -> addWithGeneratedID()
+                    in keys -> addWithGeneratedID()
                     // ...or if it can
-                    else -> foundMods[mod.id!!] = mod
+                    else -> set(mod.id!!, mod)
                 }
             }
         }

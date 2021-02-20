@@ -1,5 +1,8 @@
 package mcfilelib.classes
 
+import div
+import fillMap
+import forCheck
 import mcfilelib.util.FileEditable
 import mcfilelib.util.PackData
 import mcfilelib.util.file_entry.assets.ContentGroupEntry
@@ -29,18 +32,15 @@ abstract class Pack(path: Path, isResourcePack: Boolean): FileEditable(path) {
             contentGroupEntries = mapOf()
         }
         else {
-            val files = path.resolve("assets").toFile().listFiles()
+            val files = (path/"assets").toFile().listFiles()
             if (files != null) {
-                val foundContentGroupEntries = mutableMapOf<String, ContentGroupEntry>()
-                files.forEach {
-                    foundContentGroupEntries[it.name] = ContentGroupEntry(it.toPath())
+                contentGroupEntries = fillMap {
+                    files.forEach {
+                        set(it.name, ContentGroupEntry(it.toPath()))
+                    }
                 }
-                var foundModSupport = false
-                foundContentGroupEntries.values.forEach {
-                    if (!it.vanilla || it.includesOptifine) foundModSupport = true
-                }
-                contentGroupEntries = foundContentGroupEntries.toMap()
-                modSupport = foundModSupport
+
+                modSupport = contentGroupEntries.values.forCheck { !it.vanilla || it.includesOptifine }
             } else {
                 contentGroupEntries = mapOf()
                 modSupport = null

@@ -1,5 +1,6 @@
 package mcfilelib.util
 
+import div
 import mcfilelib.classes.Launcher
 import java.nio.file.Path
 import java.nio.file.Paths

@@ -1,8 +1,9 @@
 package mcfilelib.classes
 
+import div
+import fillList
 import mcfilelib.util.FileEditable
 import mcfilelib.util.LauncherType
-import mcfilelib.util.div
 import mcfilelib.util.toLauncherType
 import java.nio.file.Path
 
@@ -20,14 +21,12 @@ class Launcher(
         if (!file.exists()) throw Exception("Invalid Launcher: Directory doesn't exist")
         if (type == LauncherType.UNKNOWN) throw Exception("Invalid Launcher: Unknown launcherType")
 
-        instances = mutableListOf<Instance>().also { list ->
-            val instancesPath = this.path/type.instanceFolder
-            val instancesFolderFiles = instancesPath.toFile().listFiles()
-            instancesFolderFiles?.forEach {
+        instances = fillList<Instance> {
+            (super.path/type.instanceFolder).toFile().listFiles()?.forEach {
                 //Prevents MultiMC's folder sneaking in
-                if (it.name != "_MMC_TEMP" && it.isDirectory) list += Instance(it.toPath(), type)
+                if (it.name != "_MMC_TEMP" && it.isDirectory) add(Instance(it.toPath(), type))
             }
-        }.toList()
+        }
     }
 
     override fun toString(): String = "(${type.displayName}: ${this.path})"

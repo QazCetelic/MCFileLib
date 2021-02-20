@@ -249,8 +249,8 @@ class Mod(path: Path): FileEditable(path) {
                         }
                     }
                 }
-                icon =  if (iconPath != null) {
-                    val entry = zipFile.getEntry(iconPath)
+                icon = if (iconPath != null) {
+                    val entry = zipFile.getEntry(iconPath!!)
                     if (entry != null) ImageIO.read(zipFile.getInputStream(entry))
                     else null
                 } else null

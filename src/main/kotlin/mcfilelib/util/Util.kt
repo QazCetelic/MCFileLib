@@ -7,11 +7,6 @@ import java.io.IOException
 import java.nio.file.Path
 
 /**
- * Allows you to write paths in your code like this example: basePath/"folder"/"text.txt".
- */
-operator fun Path.div(string: String): Path = this.resolve(string)
-
-/**
  * Fetches file from path and parses the text containing it to a JsonObject, returns empty JsonObject if it fails.
  */
 fun loadJson(path: Path): JsonObject {
@@ -43,28 +38,6 @@ fun JsonObject.ifKey(key: String, exception: (() -> Unit)? = null, lambda: (json
         if (exception != null) exception()
         false
     }
-}
-
-fun String.undev(): String {
-    val chars = this.toCharArray()
-    if (chars.size > 1) {
-        var isDivided = false
-        for (i in chars.indices) {
-            if (chars[i] == '-' || chars[i] == '_' && chars.size > i + 1 && chars[i+1].isLetter() ) {
-                chars[i] = ' '
-                chars[i+1] = chars[i+1].toUpperCase()
-                isDivided = true
-            }
-        }
-        if (isDivided) {
-            chars[0] = chars[0].toUpperCase()
-        }
-    }
-    val sb = StringBuilder()
-    for (char in chars) {
-        sb.append(char)
-    }
-    return sb.toString()
 }
 
 fun splitArgumentString(argumentString: String): List<String> {

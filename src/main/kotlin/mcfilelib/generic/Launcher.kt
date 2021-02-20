@@ -21,7 +21,7 @@ class Launcher(
         if (!file.exists()) throw Exception("Invalid Launcher: Directory doesn't exist")
         if (type == LauncherType.UNKNOWN) throw Exception("Invalid Launcher: Unknown launcherType")
 
-        instances = fillList<Instance> {
+        instances = fillList {
             (super.path/type.instanceFolder).toFile().listFiles()?.forEach {
                 //Prevents MultiMC's folder sneaking in
                 if (it.name != "_MMC_TEMP" && it.isDirectory) add(Instance(it.toPath(), type))

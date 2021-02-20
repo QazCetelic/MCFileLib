@@ -32,6 +32,7 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
 
         val foundModLoaders = mutableListOf<ModLoader>()
         val foundJavaArguments = mutableListOf<String>()
+        fun splitArgumentString(argumentString: String): List<String> = argumentString.removePrefix("--").split(" --")
 
         //Uses hardcoded methods of data extraction because every launcher does it different
         when(type) {

@@ -39,7 +39,3 @@ fun JsonObject.ifKey(key: String, exception: (() -> Unit)? = null, lambda: (json
         false
     }
 }
-
-fun splitArgumentString(argumentString: String): List<String> {
-    return argumentString.removePrefix("--").split(" --")
-}

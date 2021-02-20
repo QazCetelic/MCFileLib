@@ -1,6 +1,6 @@
 package mcfilelib.util
 
-data class Time (
+class Time (
     val year: Int,
     val month: Int,
     val day: Int,

@@ -1,4 +1,4 @@
-package mcfilelib.classes
+package mcfilelib.generic
 
 import div
 import fillMap

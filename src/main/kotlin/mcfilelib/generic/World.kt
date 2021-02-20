@@ -1,4 +1,4 @@
-package mcfilelib.classes
+package mcfilelib.generic
 
 import mcfilelib.util.FileEditable
 import java.awt.image.BufferedImage
@@ -14,7 +14,7 @@ class World(path: Path): FileEditable(path) {
         if (file.isDirectory) {
             name = path.toFile().name
             val list = ArrayList<DataPack>()
-            //Checks if the dataclasses.readonly.main.classes.main.mcfilelib.classes.DataPack folder is actually a folder, and not just a file.
+            //Checks if the dataclasses.readonly.main.generic.main.mcfilelib.generic.DataPack folder is actually a folder, and not just a file.
             File("$path/datapacks/").listFiles()?.forEach {
                 list += DataPack(it.toPath())
             }

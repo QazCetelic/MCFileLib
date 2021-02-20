@@ -1,4 +1,4 @@
-package mcfilelib.classes
+package mcfilelib.generic
 
 import div
 import fillList
@@ -35,7 +35,7 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
 
         //Uses hardcoded methods of data extraction because every launcher does it different
         when(type) {
-            //GDLauncher Next is the modern version, this is for compatibility and only supports the forge dataclasses.readonly.main.classes.main.mcfilelib.classes.ModLoader
+            //GDLauncher Next is the modern version, this is for compatibility and only supports the forge dataclasses.readonly.main.generic.main.mcfilelib.generic.ModLoader
             LauncherType.GDLAUNCHER -> {
                 val json = loadJson(path/"config.json")
                 json.ifKey("version") { version = it.asString }

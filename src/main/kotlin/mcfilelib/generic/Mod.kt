@@ -1,4 +1,4 @@
-package mcfilelib.classes
+package mcfilelib.generic
 
 import com.google.gson.Gson
 import com.google.gson.JsonElement

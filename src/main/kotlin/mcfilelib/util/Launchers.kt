@@ -1,28 +1,34 @@
 package mcfilelib.util
 
 import div
+import fillList
 import mcfilelib.generic.Launcher
+import mcfilelib.util.LauncherType.*
 import java.nio.file.Path
 import java.nio.file.Paths
 
 object Launchers {
     val types = listOf (
-        LauncherType.GDLAUNCHER,
-        LauncherType.GDLAUNCHER_NEXT,
-        LauncherType.VANILLA,
-        LauncherType.MULTIMC,
-        LauncherType.TECHNIC,
+        GDLAUNCHER,
+        GDLAUNCHER_NEXT,
+        VANILLA,
+        MULTIMC,
+        TECHNIC,
     )
 
-    // Stores results after first time because the process is relatively intensive due to IO tasks
-    val allInstalledLaunchers: List<Launcher> by lazy {
-        val installedLaunchers = mutableListOf<Launcher>()
-        types.forEach {
-            val result = it.toLauncher()
+    var allInstalledLaunchers: List<Launcher> = collectLaunchers()
+        private set
+
+    private fun collectLaunchers() = fillList<Launcher> {
+        for (type in types) {
+            val result = type.toLauncher()
             //result is null when the launcher doesn't exist
-            if (result != null) installedLaunchers.add(result)
+            if (result != null) add(result)
         }
-        installedLaunchers.toList()
+    }
+
+    fun refreshLaunchers() {
+        allInstalledLaunchers = collectLaunchers()
     }
 }
 
@@ -41,11 +47,11 @@ fun LauncherType.toPath(): Path? = when (OSInfo.os) {
     OSInfo.OS.LINUX -> {
         val userHome = Paths.get(System.getProperty("user.home"))
         when (this) {
-            LauncherType.VANILLA -> (userHome/".minecraft")
-            LauncherType.MULTIMC -> (userHome/".local"/"share"/"multimc")
-            LauncherType.TECHNIC -> (userHome/".technic")
-            LauncherType.GDLAUNCHER -> (userHome/".config"/"GDLauncher")
-            LauncherType.GDLAUNCHER_NEXT -> (userHome/".config"/"gdlauncher_next")
+            VANILLA -> (userHome/".minecraft")
+            MULTIMC -> (userHome/".local"/"share"/"multimc")
+            TECHNIC -> (userHome/".technic")
+            GDLAUNCHER -> (userHome/".config"/"GDLauncher")
+            GDLAUNCHER_NEXT -> (userHome/".config"/"gdlauncher_next")
             else -> null
         }
     }
@@ -54,7 +60,5 @@ fun LauncherType.toPath(): Path? = when (OSInfo.os) {
 
 fun LauncherType.toLauncher(): Launcher? {
     val path = this.toPath()
-    return if (path != null && path.toFile().exists()) {
-        Launcher(path, this)
-    } else null
+    return if (path != null && path.toFile().exists()) Launcher(path, this) else null
 }

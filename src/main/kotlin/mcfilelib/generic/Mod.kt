@@ -223,10 +223,10 @@ class Mod(path: Path): FileEditable(path) {
                         type = ModType.Forge
 
                         //Only converts to json if the file is not blank
-                        var text = String(zipFile.getInputStream(entry).readBytes())
+                        val text = String(zipFile.getInputStream(entry).readBytes())
                         if (text.isNotBlank()) {
                             //Try catch block in case the json is invalid (Yes, these things actually occur, looking at you F5 Fix!)
-                            try {
+                            runCatching {
                                 val data = Gson().fromJson(
                                     text,
                                     JsonElement::class.java
@@ -242,9 +242,6 @@ class Mod(path: Path): FileEditable(path) {
                                         }
                                     }
                                 }
-                            }
-                            catch (e: Exception) {
-                                //Ignore it and move on
                             }
                         }
                     }

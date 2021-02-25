@@ -26,7 +26,7 @@ class Screenshot(path: Path): FileEditable(path) {
         val name = file.nameWithoutExtension
         //Check regex for the screenshot name format
         time = if ("[0-9]{4}-[0-9]{2}-[0-9]{2}_[0-9]{2}\\.[0-9]{2}\\.[0-9]{2}".toRegex().containsMatchIn(name)) {
-            if (file.extension.toLowerCase() == "png") {
+            if (file.extension.equals("png", ignoreCase = true)) {
                 //Replace custom class with already existing class
                 Time (
                     //Gets the time from the string

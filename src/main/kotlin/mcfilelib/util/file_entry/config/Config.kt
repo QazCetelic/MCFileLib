@@ -5,11 +5,11 @@ import java.nio.file.Path
 import java.util.*
 
 class Config(path: Path): ConfigEntry(path) {
-    val type = when (this.path.toFile().extension.toLowerCase()) {
-        "json" -> ConfigTypes.JSON
-        "properties" -> ConfigTypes.PROPERTIES
-        "toml" -> ConfigTypes.TOML
-        "nbt" -> ConfigTypes.NBT
+    val type = when (this.path.toFile().extension.toUpperCase()) {
+        "JSON" -> ConfigTypes.JSON
+        "PROPERTIES" -> ConfigTypes.PROPERTIES
+        "TOML" -> ConfigTypes.TOML
+        "NBT" -> ConfigTypes.NBT
         else -> ConfigTypes.OTHER
     }
 

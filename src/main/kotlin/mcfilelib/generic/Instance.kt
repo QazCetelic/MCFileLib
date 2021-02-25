@@ -5,6 +5,7 @@ import fillList
 import fillMap
 import mcfilelib.util.*
 import mcfilelib.util.file_entry.config.ConfigDirectory
+import mcfilelib.util.LauncherType.*
 import undev
 import java.nio.file.Path
 import java.util.*
@@ -37,7 +38,7 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
         //Uses hardcoded methods of data extraction because every launcher does it different
         when(type) {
             //GDLauncher Next is the modern version, this is for compatibility and only supports the forge dataclasses.readonly.main.generic.main.mcfilelib.generic.ModLoader
-            LauncherType.GDLAUNCHER -> {
+            GDLAUNCHER -> {
                 val json = loadJson(path/"config.json")
                 json.ifKey("version") { version = it.asString }
                 json.ifKey("forgeVersion") {
@@ -46,7 +47,7 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
                     }
                 }
             }
-            LauncherType.GDLAUNCHER_NEXT -> {
+            GDLAUNCHER_NEXT -> {
                 loadJson(path/"config.json").ifKey("modloader") {
                     // TODO find better way to extract data, this could unreliable
                     val jsonArray = it.asJsonArray
@@ -56,7 +57,7 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
                     }
                 }
             }
-            LauncherType.VANILLA -> {
+            VANILLA -> {
                 val json = loadJson(path/"${file.name}.json")
                 // id key is version
                 val id = json["id"].asString
@@ -72,7 +73,7 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
                     // In case other json is in the .json file as expected
                     else {
                         // Optifine exception because it creates a json file with the same naming schema as Mojang in does, but fills it with different values -_-
-                        if (file.name.toLowerCase().contains("optifine")) {
+                        if (file.name.contains("optifine", ignoreCase = true)) {
                             // Uses .ifKey because everything could happen apparently
                             json.ifKey("inheritsFrom") {
                                 version = it.asString
@@ -81,7 +82,7 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
                     }
                 }
             }
-            LauncherType.MULTIMC -> {
+            MULTIMC -> {
                 //Gets version from jsonData
                 val json = loadJson(path/"mmc-pack.json")
                 //Checks if the "components" array exists and if so, extracts the array
@@ -98,7 +99,7 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
                     }
                 }
             }
-            LauncherType.TECHNIC -> {
+            TECHNIC -> {
                 val json = loadJson(path/"bin"/"version.json")
                 json.ifKey("id") {
                     if (it.asString.contains("-")) {
@@ -125,7 +126,7 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
 
     val name = run {
         var foundName: String? = null
-        if (type == LauncherType.MULTIMC) {
+        if (type == MULTIMC) {
             // Gets name from "instance.cfg" instead of file name because renaming instance in MultiMC doesn't seem te rename folder
             (path/"instance.cfg").toFile().forEachLine {
                 if (it.startsWith("name=")) foundName = it.removePrefix("name=")

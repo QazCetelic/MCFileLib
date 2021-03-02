@@ -2,7 +2,6 @@ package mcfilelib.generic
 
 import div
 import fillMap
-import forCheck
 import mcfilelib.util.FileEditable
 import mcfilelib.util.PackData
 import mcfilelib.util.file_entry.assets.ContentGroupEntry
@@ -20,10 +19,10 @@ abstract class Pack(path: Path, isResourcePack: Boolean): FileEditable(path) {
 
     init {
         //Gets metadata from main.json file
-        PackData(path).also {
-            format = it.format
-            description = it.description
-            icon = it.image
+        PackData(path).also { pack ->
+            format = pack.format
+            description = pack.description
+            icon = pack.image
         }
 
         val file = path.toFile()
@@ -35,12 +34,12 @@ abstract class Pack(path: Path, isResourcePack: Boolean): FileEditable(path) {
             val files = (path/"assets").toFile().listFiles()
             if (files != null) {
                 contentGroupEntries = fillMap {
-                    files.forEach {
-                        set(it.name, ContentGroupEntry(it.toPath()))
+                    files.forEach { file ->
+                        set(file.name, ContentGroupEntry(file.toPath()))
                     }
                 }
-
-                modSupport = contentGroupEntries.values.forCheck { !it.vanilla || it.includesOptifine }
+                //todo figure out if .any{} is actually the same as .forCheck{}
+                modSupport = contentGroupEntries.values.any { !it.vanilla || it.includesOptifine }
             } else {
                 contentGroupEntries = mapOf()
                 modSupport = null

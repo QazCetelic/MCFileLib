@@ -3,6 +3,7 @@ package testing
 import mcfilelib.util.Launchers
 
 fun ocurrences() {
+    println("Running occurrences:")
     val occurrences = mutableMapOf<String, Int>()
 
     val launchers = Launchers.allInstalledLaunchers

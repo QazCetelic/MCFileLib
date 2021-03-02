@@ -30,12 +30,12 @@ class Screenshot(path: Path): FileEditable(path) {
                 //Replace custom class with already existing class
                 Time (
                     //Gets the time from the string
-                    name.substring(0..3).toInt(),
-                    name.substring(5..6).toInt(),
-                    name.substring(8..9).toInt(),
-                    name.substring(11..12).toByte(),
-                    name.substring(14..15).toByte(),
-                    name.substring(17..18).toByte()
+                    year = name.substring(0..3).toLong(),
+                    month = name.substring(5..6).toByte(),
+                    day = name.substring(8..9).toByte(),
+                    hour = name.substring(11..12).toByte(),
+                    minute = name.substring(14..15).toByte(),
+                    second = name.substring(17..18).toByte(),
                 )
             } else throw Exception("Invalid screenshot: Invalid file format")
         } else throw Exception("Invalid screenshot: Invalid time format")

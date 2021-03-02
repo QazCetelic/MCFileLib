@@ -64,7 +64,7 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
                 // Checks if it's a normal version like 1.8.3 and not 20w13b
                 if (isVersion(id)) version = id
                 else {
-                    if (json.has("assets")) {
+                    if ("assets" in json) {
                         val assetsVersion = json["assets"].asString
                         // resourceFormat is set here instead of just using the given version later because of the way versions are handled for snapshots.
                         resourceFormat = fromVersionToFormat(assetsVersion)
@@ -125,23 +125,22 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
     val configs = ConfigDirectory(path/".minecraft"/"config")
 
     val name = run {
-        var foundName: String? = null
         if (type == MULTIMC) {
             // Gets name from "instance.cfg" instead of file name because renaming instance in MultiMC doesn't seem te rename folder
-            (path/"instance.cfg").toFile().forEachLine {
-                if (it.startsWith("name=")) foundName = it.removePrefix("name=")
+            for (line in (path/"instance.cfg").toFile().readLines()) {
+                if (line.startsWith("name=")) return@run line.removePrefix("name=")
             }
         }
-        foundName ?: path.toFile().name.undev()
+        return@run path.toFile().name.undev()
     }
 
     private fun getInstanceFiles(name: String) = (path/(launcherType.subfolder + name)).toFile().listFiles()
     val resourcepacks = fillList<ResourcePack> {
-        getInstanceFiles("resourcepacks")?.forEach {
-            add(ResourcePack(it.toPath()))
+        getInstanceFiles("resourcepacks")?.forEach { file ->
+            add(ResourcePack(file.toPath()))
         }
-        getInstanceFiles("texturepacks")?.forEach {
-            add(ResourcePack(it.toPath()))
+        getInstanceFiles("texturepacks")?.forEach { file ->
+            add(ResourcePack(file.toPath()))
         }
     }
     val screenshots = fillList<Screenshot> {

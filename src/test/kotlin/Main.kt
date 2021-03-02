@@ -2,14 +2,5 @@ package testing
 
 //This is used for testing stuff
 fun main() {
-    tasks()
-}
-
-fun tasks() {
-    println("Running ocurrences:")
-    ocurrences()
-    println("Running resourcePacks:")
-    resourcePacks()
-    println("Running resourcePacks:")
-    screenshots()
+    tests("/home/qaz/Projects/Programming/MCFileLib")
 }

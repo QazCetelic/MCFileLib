@@ -8,6 +8,7 @@
       <sourceFolder url="file://$MODULE_DIR$/src/test/kotlin" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/test/resources" type="java-test-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/test/kotlin/resources" type="java-test-resource" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
@@ -52,5 +53,6 @@
     <orderEntry type="library" name="Gson 2.8.6" level="project" />
     <orderEntry type="library" name="Semver4j 3.1.0" level="project" />
     <orderEntry type="library" name="Neatlin-jvm-0.1" level="project" />
+    <orderEntry type="library" name="TomlJ 1.0.0" level="project" />
   </component>
 </module>

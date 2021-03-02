@@ -10,29 +10,30 @@ import java.nio.file.Path
  * Fetches file from path and parses the text containing it to a JsonObject, returns empty JsonObject if it fails.
  */
 fun loadJson(path: Path): JsonObject {
-    //JSON to return
-    var json = JsonObject()
     //File containing JSON
     val jsonFile = path.toFile()
 
     //Extract JSON
     if (!jsonFile.isDirectory) {
-        try {
-            //Takes main.json text from file and turns it into an object
-            val jsonText = jsonFile.readText()
-            if (jsonText.isNotBlank()) json = Gson().fromJson(jsonText, JsonObject::class.java)
+        runCatching {
+            return Gson().fromJson(jsonFile.readText(), JsonObject::class.java)
         }
-        catch (e: IOException) {e.printStackTrace()}
     }
-    return json
+    // Returns empty object if something went wrong
+    return JsonObject()
 }
 
 /**
  * A function to reduce the code needed for getting values from json, because it's quite common
  */
 fun JsonObject.ifKey(key: String, lambda: (json: JsonElement) -> Unit): Boolean {
-    return if (this.has(key)) {
+    return if (key in this) {
         lambda(this[key])
         true
     } else false
 }
+
+/**
+ * "has" function can be used the Kotlin way
+ */
+operator fun JsonObject.contains(key: String) = this.has(key)

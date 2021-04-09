@@ -27,8 +27,14 @@ object Launchers {
         }
     }
 
-    fun refreshLaunchers() {
-        allInstalledLaunchers = collectLaunchers()
+    /**
+     * @return Boolean: If the installed launchers actually changed
+     */
+    fun refreshLaunchers(): Boolean {
+        val newLauncherList = collectLaunchers()
+        val changed = newLauncherList != allInstalledLaunchers
+        allInstalledLaunchers = newLauncherList
+        return changed
     }
 }
 

@@ -1,12 +1,12 @@
 package testing
 
 import div
-import mcfilelib.generic.Mod
-import mcfilelib.generic.Screenshot
-import mcfilelib.generic.World
+import mcfilelib.generic.*
+import mcfilelib.util.LauncherType
 import toi8
 import java.nio.file.Path
 import java.nio.file.Paths
+import kotlin.system.measureTimeMillis
 import kotlin.test.assertTrue
 
 fun tests(projectPathString: String) {
@@ -14,6 +14,8 @@ fun tests(projectPathString: String) {
     testMods(resourcesPath/"mods")
     testWorld(resourcesPath/"worlds")
     testScreenshots(resourcesPath/"screenshots")
+    testInstance(resourcesPath/"instances")
+    testLaunchers(resourcesPath/"launchers")
 
     /*
     ocurrences()
@@ -51,23 +53,54 @@ fun testMods(mods: Path) {
 }
 
 fun testWorld(worlds: Path) {
-    val world = World(worlds/"New World")
-    assertTrue { world.dataPacks.size == 1 }
-    assertTrue { world.icon?.height == 64 }
-    assertTrue { world.name == "New World" }
-    // Datapacks
-    val datapack = world.dataPacks[0]
-    assertTrue { datapack.name == "Compass+Tracker+v2" }
-    assertTrue { datapack.format == 6 }
-    assertTrue { datapack.versionRange.toString() == "1.16.2-1.16.4" }
-    assertTrue { datapack.description == "Track up to 50 entities with a specialized compass" }
-    assertTrue { datapack.icon != null }
-    assertTrue { datapack.modSupport == null }
+    val time = measureTimeMillis {
+        val world = World(worlds/"New World")
+        assertTrue { world.dataPacks.size == 1 }
+        assertTrue { world.icon?.height == 64 }
+        assertTrue { world.name == "New World" }
+        // Datapacks
+        val datapack = world.dataPacks[0]
+        assertTrue { datapack.name == "Compass+Tracker+v2" }
+        assertTrue { datapack.format == 6 }
+        assertTrue { datapack.versionRange.toString() == "1.16.2-1.16.4" }
+        assertTrue { datapack.description == "Track up to 50 entities with a specialized compass" }
+        assertTrue { datapack.icon != null }
+        assertTrue { datapack.modSupport == null }
+    }
+    //println("Worlds test finished in ${time}ms")
 }
 
 fun testScreenshots(screenshots: Path) {
-    val screenshot1 = Screenshot(screenshots/"2021-03-02_15.59.30.png")
-    assertTrue { screenshot1.time.year == 2021L && screenshot1.time.month == 3.toi8() && screenshot1.time.day == 2.toi8() && screenshot1.time.hour == 15.toi8() && screenshot1.time.minute == 59.toi8() && screenshot1.time.second == 30.toi8() }
-    val screenshot2 = Screenshot(screenshots/"2021-03-02_15.59.43.png")
-    assertTrue { screenshot2.time.year == 2021L && screenshot2.time.month == 3.toi8() && screenshot2.time.day == 2.toi8() && screenshot2.time.hour == 15.toi8() && screenshot2.time.minute == 59.toi8() && screenshot2.time.second == 43.toi8() }
+    val time = measureTimeMillis {
+        val screenshot1 = Screenshot(screenshots/"2021-03-02_15.59.30.png")
+        assertTrue { screenshot1.time.year == 2021L && screenshot1.time.month == 3.toi8() && screenshot1.time.day == 2.toi8() && screenshot1.time.hour == 15.toi8() && screenshot1.time.minute == 59.toi8() && screenshot1.time.second == 30.toi8() }
+        val screenshot2 = Screenshot(screenshots/"2021-03-02_15.59.43.png")
+        assertTrue { screenshot2.time.year == 2021L && screenshot2.time.month == 3.toi8() && screenshot2.time.day == 2.toi8() && screenshot2.time.hour == 15.toi8() && screenshot2.time.minute == 59.toi8() && screenshot2.time.second == 43.toi8() }
+    }
+    //println("Screenshots test finished in ${time}ms")
+}
+
+fun testInstance(instances: Path) {
+    val multiMCPackPath = instances/"FTB Sky Adventures"
+    val time = measureTimeMillis {
+        val instance = Instance(multiMCPackPath, LauncherType.MULTIMC)
+    }
+    //println("Instance test finished in ${time}ms")
+}
+
+fun testLaunchers(launchers: Path) {
+    val time = measureTimeMillis {
+        val multiMC = Launcher(launchers/"multimc", LauncherType.MULTIMC)
+        val authors = mutableListOf<String>()
+        for (instance in multiMC.instances) for (mod in instance.mods) for (author in mod.authors) {
+            authors += author
+        }
+
+        val authorOccurrences = authors.groupingBy { it }.eachCount().filter { it.value > 1 }
+
+        println(authorOccurrences["Stan Hebben"])
+        println(authorOccurrences["BlayTheNinth"])
+        println(authorOccurrences["McJty"])
+    }
+    //println("Launcher test finished in ${time}ms")
 }

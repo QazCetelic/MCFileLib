@@ -6,6 +6,7 @@ import mcfilelib.util.FileEditable
 import mcfilelib.util.LauncherType
 import mcfilelib.util.toLauncherType
 import java.nio.file.Path
+import mcfilelib.util.LauncherType.*
 
 class Launcher(
     //Passed on to FileEditable
@@ -17,9 +18,10 @@ class Launcher(
     init {
         val file = path.toFile()
 
-        //Verify
-        if (!file.exists()) throw Exception("Invalid Launcher: Directory doesn't exist")
-        if (type == LauncherType.UNKNOWN) throw Exception("Invalid Launcher: Unknown launcherType")
+        when {
+            !file.exists() -> throw Exception("Invalid Launcher: Directory doesn't exist")
+            type == UNKNOWN -> throw Exception("Invalid Launcher: Unknown launcherType")
+        }
 
         instances = fillList {
             (super.path/type.instanceFolder).toFile().listFiles()?.forEach {

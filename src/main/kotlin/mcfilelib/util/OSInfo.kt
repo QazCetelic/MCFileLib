@@ -1,7 +1,7 @@
 package mcfilelib.util
 
-import java.util.*
 import mcfilelib.util.OSInfo.OS.*
+import java.util.*
 
 
 object OSInfo {

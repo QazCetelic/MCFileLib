@@ -3,18 +3,17 @@ package mcfilelib.generic
 import com.google.gson.Gson
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
-import file.isNotEmpty
-import getEntryAsText
+import file.isEmpty
+import mcfilelib.generic.Mod.ModType.*
 import mcfilelib.util.FileEditable
 import mcfilelib.util.contains
 import mcfilelib.util.ifKey
-import java.awt.Image
-import java.nio.file.Path
-import java.util.*
-import java.util.zip.ZipFile
-import javax.imageio.ImageIO
-import mcfilelib.generic.Mod.ModType.*
+import neatlin.zipFile.get
+import neatlin.zipFile.getEntryAsText
 import org.tomlj.Toml
+import java.nio.charset.Charset
+import java.nio.file.Path
+import java.util.zip.ZipFile
 
 /**
  * Object for viewing mod meta-data such as: name, description, version, dependencies, icon etc.
@@ -74,8 +73,6 @@ class Mod(path: Path): FileEditable(path) {
     // todo implement this in forge
     var clientSide: Boolean? = null
         private set
-    var icon: Image?
-        private set
 
     /**
      * What kind of mod it is, like Forge, Fabric, Rift or LiteLoader
@@ -92,224 +89,211 @@ class Mod(path: Path): FileEditable(path) {
         private set
 
     init {
-        val file = path.toFile()
-        if (!file.exists()) throw Exception("Invalid mod: File doesn't exist")
+        val modFile = path.toFile()
+
+        // Some launchers disable mods by renaming it to disable so the game doesn't recognize them
+        disabled = modFile.extension == "disabled"
 
         val tempAuthors = mutableListOf<String>()
         val tempDependencies = mutableListOf<ModDependency>()
 
-        // Some launchers disable mods by renaming it to disable so the game doesn't recognize them
-        disabled = file.extension == "disabled"
-
-        // Checks if it's actually in a mod file format (".jar")
-        if (file.extension == "jar" || file.name.endsWith(".jar.disabled")) {
+        when {
+            !modFile.exists() -> throw Exception("File doesn't exist")
+            // Checks if it's actually in a mod file format (".jar")
+            !(modFile.extension == "jar" || modFile.name.endsWith(".jar.disabled")) -> throw Exception("Not a jar")
             // Checks if the zip file isn't empty because that would cause an exception
-            if (file.isNotEmpty()) {
-                // Looks through the data of the mod itself
-                val zipFile = ZipFile(file)
-                // Todo use ZipFile.getEntry() instead of using a loop
-                for (entry in zipFile.entries()) {
-                    when {
-                        // Finds the license but only assigns it if it's not assigned already
-                        entry.name == "LICENSE" && license == null -> license = zipFile.getEntryAsText(entry)
+            modFile.isEmpty() -> throw Exception("Mod is empty")
+        }
 
-                        // Gets Fabric mod data
-                        entry.name == "fabric.mod.json" -> {
-                            type = Fabric
-                            val text = zipFile.getEntryAsText(entry)
-                            val json = Gson().fromJson(text, JsonObject::class.java)
-                            // Im doing it like this because the json data is different in some mods and I don't know why, this seems the most reliable option
-                            if ("schemaVersion" in json && json["schemaVersion"].asInt == 1) {
-                                json.ifKey("name") { name = it.asString }
-                                json.ifKey("description") { description = it.asString }
-                                json.ifKey("id") { id = it.asString }
-                                json.ifKey("version") { modVersion = it.asString }
-                                json.ifKey("authors") {
-                                    val authorList = it.asJsonArray.toList()
-                                    for (author in authorList) {
-                                        when {
-                                            author.isJsonPrimitive -> tempAuthors.add(author.asString)
-                                            author.isJsonObject -> {
-                                                author.asJsonObject.ifKey("name") { name ->
-                                                    //Prevents lists to sneak into the author name field, because this should somewhere else (looking at you, ArloTheEpic!)
-                                                    if ("\n" !in name.asString) tempAuthors.add(name.asString)
-                                                }
-                                                //todo get more data from author object
-                                            }
-                                        }
-                                    }
-                                }
-                                json.ifKey("contact") { contactJson ->
-                                    //TODO reconsider having a special class for extracting the JSON, I could also use .ifKey(){}
-                                    val contactData = Gson().fromJson(contactJson.toString(), JsonObject::class.java)
-                                    contactData.ifKey("email") { email = it.asString }
-                                    contactData.ifKey("issues") { issues = it.asString }
-                                    contactData.ifKey("sources") { sources = it.asString }
-                                }
-                                json.ifKey("icon") { iconPath = it.asString }
-                                json.ifKey("depends") {
-                                    val entries = mutableListOf<ModDependency>()
-                                    it.asJsonObject.entrySet().forEach { entry ->
-                                        //Don't get the depend as value as string
-                                        //todo fix this: entries.add(ModDependency(entry.key, entry.value.asString))
-                                    }
-                                    dependencies = entries
-                                }
-                                json.ifKey("custom") {
-                                    it.asJsonObject.ifKey("modmenu:clientsideOnly") { clientSideEntry ->
-                                        clientSide = clientSideEntry.asBoolean
-                                    }
-                                }
-                            } else throw Exception("Invalid schema version") //In case it changes in the future
-                        }
+        // Looks through the data of the mod itself
+        val zipFile = ZipFile(modFile)
 
-                        //Gets Forge mod data as Toml
-                        entry.name == "META-INF/mods.toml" -> {
-                            // Using Toml is a pita, I'll use json instead
-                            val jsonData = Toml.parse(zipFile.getEntryAsText(entry)).toJson()
-                            val jsonObject = Gson().fromJson(jsonData, JsonObject::class.java)
-                            jsonObject.ifKey("mods") { mods ->
-                                // Currently only process one mode in multi-mod jars, todo consider changing that
-                                val modJson = mods.asJsonArray[0].asJsonObject
-                                modJson.ifKey("modId") { id = it.asString }
-                                modJson.ifKey("displayName") { name = it.asString }
-                                modJson.ifKey("description") { description = it.asString }
-                                modJson.ifKey("displayURL") { updateURL = it.asString }
-                                modJson.ifKey("authors") { authors ->
-                                    // Splits up strings "Vazkii, BluSunrize and Damien A.W. Hazard" into [Vazkii, BluSunrize, Damien A.W. Hazard]
-                                    for (author in authors.asString.trim().split(" and ", ", ")) {
-                                        tempAuthors += author
-                                    }
-                                }
-                                modJson.ifKey("credits") { credits = it.asString }
-                                modJson.ifKey("logoFile") { iconPath = it.asString }
-                                modJson.ifKey("updateJSONURL") { updateJsonURL = it.asString }
-                                modJson.ifKey("version") { modVersion = it.asString }
-                            }
-                            jsonObject.ifKey("issueTrackerURL") { issues = it.asString }
-                            jsonObject.ifKey("dependencies") { dependenciesElement ->
-                                val dependencies = dependenciesElement.asJsonObject
-                                for (key in dependencies.keySet()) {
-                                    val modDependencies = dependencies[key].asJsonArray
-                                    for (modDependencyJson in modDependencies) {
-                                        val modDependency = modDependencyJson.asJsonObject
-                                        when (modDependency["modId"].asString) {
-                                            "forge" -> modloaderVersion = modDependency["versionRange"].asString
-                                            "minecraft" -> mcVersion = modDependency["versionRange"].asString.removePrefix("[").removeSuffix("]")
-                                        }
-                                    }
-                                }
-                            }
-                        }
+        // Finds the license but only assigns it if it's not assigned already
+        zipFile["LICENSE"]?.let { entry ->
+            if (license == null) license = zipFile.getEntryAsText(entry)
+        }
 
-                        // Gets Forge mod data as json
-                        entry.name == "mcmod.info" -> {
-                            type = Forge
-                            fun processEntry(modListEntry: JsonObject) {
-                                modListEntry.ifKey("modinfoversion") {
-                                    //TODO support more different modinfo versions
-                                    if (it.asInt != 2) throw Exception("${it.asString} is not supported!")
+        // Gets Fabric mod data
+        zipFile["fabric.mod.json"]?.let { entry ->
+            type = Fabric
+            val text = zipFile.getEntryAsText(entry)
+            val json = Gson().fromJson(text, JsonObject::class.java)
+            // Im doing it like this because the json data is different in some mods and I don't know why, this seems the most reliable option
+            if ("schemaVersion" in json && json["schemaVersion"].asInt == 1) {
+                json.ifKey("name") { name = it.asString }
+                json.ifKey("description") { description = it.asString }
+                json.ifKey("id") { id = it.asString }
+                json.ifKey("version") { modVersion = it.asString }
+                json.ifKey("authors") {
+                    val authorList = it.asJsonArray.toList()
+                    for (author in authorList) {
+                        when {
+                            author.isJsonPrimitive -> tempAuthors.add(author.asString)
+                            author.isJsonObject -> {
+                                author.asJsonObject.ifKey("name") { name ->
+                                    //Prevents lists to sneak into the author name field, because this should somewhere else (looking at you, ArloTheEpic!)
+                                    if ("\n" !in name.asString) tempAuthors.add(name.asString)
                                 }
-
-                                /*
-                                    Credits to mcpcfanc at https://www.minecraftforum.net/forums/mapping-and-modding-java-edition/minecraft-mods/modification-development/2405990-mcmod-info-file-guide-and-help
-                                    https://forums.minecraftforge.net/topic/6811-mcmodinfo/
-                                 */
-
-                                modListEntry.ifKey("modid") { id = it.asString}
-                                modListEntry.ifKey("name") { name = it.asString}
-                                modListEntry.ifKey("description") { description = it.asString }
-                                modListEntry.ifKey("url") { site = it.asString }
-                                modListEntry.ifKey("version") { modVersion = it.asString }
-                                modListEntry.ifKey("mcversion") { mcVersion = it.asString }
-
-                                // Version specific
-                                // updateUrl only works on older versions
-                                modListEntry.ifKey("updateUrl") { updateURL = it.asString }
-                                // "authorList" is for 1.7+
-                                modListEntry.ifKey("authorList") {
-                                    it.asJsonArray.forEach { author ->
-                                        tempAuthors.add(author.asString)
-                                    }
-                                }
-                                // "authors" is for below 1.7
-                                modListEntry.ifKey("authors") {
-                                    it.asJsonArray.forEach { author ->
-                                        tempAuthors.add(author.asString)
-                                    }
-                                }
-                                modListEntry.ifKey("logoFile") { iconPath = it.asString }
-                                modListEntry.ifKey("dependencies") { dependencies ->
-                                    dependencies.asJsonArray.forEach { dependency ->
-                                        //TODO parse mod dependencies correctly
-                                        tempDependencies.add(ModDependency(dependency.asString, "Unknown version"))
-                                    }
-                                }
-                                /*
-
-                                    Unsure if I should implement this
-
-                                modListEntry.ifKey("dependants") {
-                                    it.asJsonArray.forEach {
-                                        dependants.add(it.asString)
-                                    }
-                                }
-                                modListEntry.ifKey("requiredMods") {
-                                    it.asJsonArray.forEach {
-                                        hardDependencies.add(it.asString)
-                                    }
-                                }
-
-                                "requiredMods, useDependencyInformation, and requiredMods are not included in most MCMOD.INFO files, so they are not in the example above. They can be manually added and will still be functional."
-
-                                    It's unknown if these are actually functional
-
-                                modListEntry.ifKey("credits") { credits = it.asString }
-                                modListEntry.ifKey("parent") { parent = it.asString } //This might only be useful when processing submods
-                                modListEntry.ifKey("screenshots") {
-                                    it.asJsonArray.forEach {
-                                        authors.add(it.asString)
-                                    }
-                                }
-                                */
-                            }
-
-                            //Only converts to json if the file is not blank
-                            val text = zipFile.getEntryAsText(entry)
-                            if (text.isNotBlank()) {
-                                //Try catch block in case the json is invalid (Yes, these things actually occur, looking at you F5 Fix!)
-                                runCatching {
-                                    val data = Gson().fromJson(
-                                        text,
-                                        JsonElement::class.java
-                                    )
-                                    when {
-                                        data == null -> {/* Do nothing */}
-                                        data.isJsonObject -> processEntry(data.asJsonObject)
-                                        data.isJsonArray -> {
-                                            val jsonArray = data.asJsonArray
-                                            //it currently only takes the first entry, TODO maybe process more
-                                            if (jsonArray.size() != 0) {
-                                                processEntry(jsonArray[0].asJsonObject)
-                                            }
-                                        }
-                                    }
-                                }
+                                //todo get more data from author object
                             }
                         }
                     }
                 }
-                icon = run {
-                    if (iconPath != null) {
-                        val entry = zipFile.getEntry(iconPath!!)
-                        if (entry != null) return@run ImageIO.read(zipFile.getInputStream(entry))
+                json.ifKey("contact") { contactJson ->
+                    //TODO reconsider having a special class for extracting the JSON, I could also use .ifKey(){}
+                    val contactData = Gson().fromJson(contactJson.toString(), JsonObject::class.java)
+                    contactData.ifKey("email") { email = it.asString }
+                    contactData.ifKey("issues") { issues = it.asString }
+                    contactData.ifKey("sources") { sources = it.asString }
+                }
+                json.ifKey("icon") { iconPath = it.asString }
+                json.ifKey("depends") {
+                    val entries = mutableListOf<ModDependency>()
+                    it.asJsonObject.entrySet().forEach { entry ->
+                        //Don't get the depend as value as string
+                        //todo fix this: entries.add(ModDependency(entry.key, entry.value.asString))
                     }
-                    return@run null
+                    dependencies = entries
+                }
+                json.ifKey("custom") {
+                    it.asJsonObject.ifKey("modmenu:clientsideOnly") { clientSideEntry ->
+                        clientSide = clientSideEntry.asBoolean
+                    }
+                }
+            } else throw Exception("Invalid schema version") //In case it changes in the future
+        }
+
+        //Gets Forge mod data as Toml
+        zipFile["META-INF/mods.toml"]?.let { entry ->
+            // Using Toml is a pita, I'll use json instead
+            val jsonData = Toml.parse(zipFile.getEntryAsText(entry)).toJson()
+            val jsonObject = Gson().fromJson(jsonData, JsonObject::class.java)
+            jsonObject.ifKey("mods") { mods ->
+                // Currently only process one mode in multi-mod jars, todo consider changing that
+                val modJson = mods.asJsonArray[0].asJsonObject
+                modJson.ifKey("modId") { id = it.asString }
+                modJson.ifKey("displayName") { name = it.asString }
+                modJson.ifKey("description") { description = it.asString }
+                modJson.ifKey("displayURL") { updateURL = it.asString }
+                modJson.ifKey("authors") { authors ->
+                    // Splits up strings "Vazkii, BluSunrize and Damien A.W. Hazard" into [Vazkii, BluSunrize, Damien A.W. Hazard]
+                    for (author in authors.asString.trim().split(" and ", ", ")) {
+                        tempAuthors += author
+                    }
+                }
+                modJson.ifKey("credits") { credits = it.asString }
+                modJson.ifKey("logoFile") { iconPath = it.asString }
+                modJson.ifKey("updateJSONURL") { updateJsonURL = it.asString }
+                modJson.ifKey("version") { modVersion = it.asString }
+            }
+            jsonObject.ifKey("issueTrackerURL") { issues = it.asString }
+            jsonObject.ifKey("dependencies") { dependenciesElement ->
+                val dependencies = dependenciesElement.asJsonObject
+                for (key in dependencies.keySet()) {
+                    val modDependencies = dependencies[key].asJsonArray
+                    for (modDependencyJson in modDependencies) {
+                        val modDependency = modDependencyJson.asJsonObject
+                        when (modDependency["modId"].asString) {
+                            "forge" -> modloaderVersion = modDependency["versionRange"].asString
+                            "minecraft" -> mcVersion = modDependency["versionRange"].asString.removePrefix("[").removeSuffix("]")
+                        }
+                    }
                 }
             }
-            // Can't get icon when the modfile is empty
-            else icon = null
-        } else throw Exception("Invalid mod: Not a jar")
+        }
+
+        // Gets Forge mod data as json
+        zipFile["mcmod.info"]?.let { entry ->
+            type = Forge
+            fun processEntry(modListEntry: JsonObject) {
+                modListEntry.ifKey("modinfoversion") {
+                    //TODO support more different modinfo versions
+                    if (it.asInt != 2) throw Exception("${it.asString} is not supported!")
+                }
+
+                /*
+                    Credits to mcpcfanc at https://www.minecraftforum.net/forums/mapping-and-modding-java-edition/minecraft-mods/modification-development/2405990-mcmod-info-file-guide-and-help
+                    https://forums.minecraftforge.net/topic/6811-mcmodinfo/
+                 */
+
+                modListEntry.ifKey("modid") { id = it.asString}
+                modListEntry.ifKey("name") { name = it.asString}
+                modListEntry.ifKey("description") { description = it.asString }
+                modListEntry.ifKey("url") { site = it.asString }
+                modListEntry.ifKey("version") { modVersion = it.asString }
+                modListEntry.ifKey("mcversion") { mcVersion = it.asString }
+
+                // Version specific
+                // updateUrl only works on older versions
+                modListEntry.ifKey("updateUrl") { updateURL = it.asString }
+                // "authorList" is for 1.7+
+                modListEntry.ifKey("authorList") {
+                    it.asJsonArray.forEach { author ->
+                        tempAuthors.add(author.asString)
+                    }
+                }
+                // "authors" is for below 1.7
+                modListEntry.ifKey("authors") {
+                    it.asJsonArray.forEach { author ->
+                        tempAuthors.add(author.asString)
+                    }
+                }
+                modListEntry.ifKey("logoFile") { iconPath = it.asString }
+                modListEntry.ifKey("dependencies") { dependencies ->
+                    dependencies.asJsonArray.forEach { dependency ->
+                        //TODO parse mod dependencies correctly
+                        tempDependencies.add(ModDependency(dependency.asString, "Unknown version"))
+                    }
+                }
+                modListEntry.ifKey("credits") { credits = it.asString }
+                /*
+                Unsure if I should implement this
+
+                modListEntry.ifKey("dependants") {
+                    it.asJsonArray.forEach {
+                        dependants.add(it.asString)
+                    }
+                }
+                modListEntry.ifKey("requiredMods") {
+                    it.asJsonArray.forEach {
+                        hardDependencies.add(it.asString)
+                    }
+                }
+
+                "requiredMods, useDependencyInformation, and requiredMods are not included in most MCMOD.INFO files, so they are not in the example above. They can be manually added and will still be functional."
+
+                    It's unknown if these are actually functional
+
+                modListEntry.ifKey("parent") { parent = it.asString } //This might only be useful when processing submods
+                modListEntry.ifKey("screenshots") {
+                    it.asJsonArray.forEach {
+                        authors.add(it.asString)
+                    }
+                }
+                */
+            }
+
+            //Only converts to json if the file is not blank
+            val text = zipFile.getEntryAsText(entry)
+            if (text.isNotBlank()) {
+                //Try catch block in case the json is invalid (Yes, these things actually occur, looking at you F5 Fix!)
+                runCatching {
+                    val data = Gson().fromJson(
+                        text,
+                        JsonElement::class.java
+                    )
+                    when {
+                        data == null -> {/* Do nothing */}
+                        data.isJsonObject -> processEntry(data.asJsonObject)
+                        data.isJsonArray -> {
+                            val jsonArray = data.asJsonArray
+                            // it currently only takes the first entry, TODO maybe process more
+                            if (jsonArray.size() != 0) processEntry(jsonArray[0].asJsonObject)
+                        }
+                    }
+                }
+            }
+        }
 
         dependencies = tempDependencies.toList()
         authors = tempAuthors.toList()

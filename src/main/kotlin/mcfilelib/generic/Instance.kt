@@ -3,10 +3,13 @@ package mcfilelib.generic
 import div
 import fillList
 import fillMap
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import mcfilelib.util.*
-import mcfilelib.util.file_entry.config.ConfigDirectory
 import mcfilelib.util.LauncherType.*
-import undev
+import mcfilelib.util.file_entry.config.ConfigDirectory
+import neatlin.string.undev
 import java.nio.file.Path
 import java.util.*
 
@@ -43,7 +46,10 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
                 json.ifKey("version") { version = it.asString }
                 json.ifKey("forgeVersion") {
                     if (!it.isJsonNull) {
-                        foundModLoaders += ModLoader(name = "Forge", version = it.asString.replace("forge-", ""))
+                        foundModLoaders += ModLoader(
+                            name = "Forge",
+                            version = it.asString.replace("forge-", "")
+                        )
                     }
                 }
             }
@@ -52,7 +58,10 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
                     // TODO find better way to extract data, this could unreliable
                     val jsonArray = it.asJsonArray
                     if (jsonArray.size() == 3) {
-                        foundModLoaders += ModLoader(name = jsonArray[0].asString, version = jsonArray[2].asString)
+                        foundModLoaders += ModLoader(
+                            name = jsonArray[0].asString,
+                            version = jsonArray[2].asString
+                        )
                         version = jsonArray[1].asString
                     }
                 }
@@ -88,13 +97,22 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
                 //Checks if the "components" array exists and if so, extracts the array
                 json.ifKey("components") {
                     for (entry in it.asJsonArray) {
-                        //Each "component" object has a name, this loops through the array and checks if the name matches to something that is needed
-                        when (entry.asJsonObject["cachedName"].asString) {
-                            //Gets Minecraft version
-                            "Minecraft" -> version = entry.asJsonObject["version"].asString
-                            //Gets modloader versions
-                            "Fabric Loader" -> foundModLoaders += ModLoader("Fabric", entry.asJsonObject["version"].asString)
-                            "Forge" -> foundModLoaders += ModLoader("Forge", entry.asJsonObject["version"].asString)
+                        // Yes, this ifKey is needed, sometimes the JSON is invalid here but not anywhere else -_-
+                        entry.asJsonObject.ifKey("cachedName") {
+                            //Each "component" object has a name, this loops through the array and checks if the name matches to something that is needed
+                            when (it.asString) {
+                                //Gets Minecraft version
+                                "Minecraft" -> version = entry.asJsonObject["version"].asString
+                                //Gets modloader versions
+                                "Fabric Loader" -> foundModLoaders += ModLoader(
+                                    name = "Fabric",
+                                    version = entry.asJsonObject["version"].asString
+                                )
+                                "Forge" -> foundModLoaders += ModLoader(
+                                    name = "Forge",
+                                    version = entry.asJsonObject["version"].asString
+                                )
+                            }
                         }
                     }
                 }
@@ -136,8 +154,8 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
 
     private fun getInstanceFiles(name: String) = (path/(launcherType.subfolder + name)).toFile().listFiles()
     val resourcepacks = fillList<ResourcePack> {
-        getInstanceFiles("resourcepacks")?.forEach { file ->
-            add(ResourcePack(file.toPath()))
+        getInstanceFiles("resourcepacks")?.forEach {
+            add(ResourcePack(it.toPath()))
         }
         getInstanceFiles("texturepacks")?.forEach { file ->
             add(ResourcePack(file.toPath()))
@@ -156,49 +174,53 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
         // Returns the first icon it can find or null
         for (iconName in listOf("icon", "background")) {
             val iconPath = path/(type.subfolder + "$iconName.png")
-            if (iconPath.toFile().exists()) {
-                return@run iconPath
-            }
+            if (iconPath.toFile().exists()) return@run iconPath
         }
         return@run null
     }
 
-    val mods = fillMap<String, Mod> {
-        var unknownIDNameGeneratorNumber = 1
-        getInstanceFiles("mods")?.forEach {
-            if (it.extension == "jar" || it.name.endsWith(".jar.disabled")) {
-                val mod = Mod(it.toPath())
+    val modMap = fillMap<String, Mod> {
+        runBlocking {
+            var unknownIDNameGeneratorNumber = 1
+            getInstanceFiles("mods")?.forEach {
+                launch (Dispatchers.Default) {
+                    if (it.extension == "jar" || it.name.endsWith(".jar.disabled")) {
+                        val mod = Mod(it.toPath())
+                        // All mods should have a seperate id so this shouldn't exit, well theoretically.
+                        fun addWithGeneratedID() {
+                            /*
+                                This part has a lot of safety mechanisms that are very unlikely to be needed.
+                                They still exists just in case someone would like to use "unknownMod2" as their mod ID or something silly like that.
+                                But at this point I wouldn't even be surprised anymore.
+                            */
+                            fun generateID(): String {
+                                fun createIDFromNumber(): String {
+                                    val createdID = "unknownMod$unknownIDNameGeneratorNumber"
+                                    // For the next ID
+                                    unknownIDNameGeneratorNumber++
+                                    // Either returns the ID or generates the next one and returns that if it's already used by another mod
+                                    return if (createdID !in keys) createdID else createIDFromNumber()
+                                }
+                                // Creates ID from the name, should work most of the time but could theoretically fail
+                                if (mod.name != null && mod.name!!.replace(" ", "_") !in keys) return mod.name!!.replace(" ", "_")
+                                else return createIDFromNumber()
+                            }
 
-                fun addWithGeneratedID() {
-                    /*
-                        This part has a lot of safety mechanisms that are very unlikely to be needed.
-                        They still exists just in case someone would like to use "unknownMod2" as their mod ID or something silly like that.
-                    */
-                    // Creates ID from the name, should work most of the time but could theoretically fail
-                    fun nameToID() = mod.name!!.replace(" ", "_")
-                    fun createIDFromNumber(): String {
-                        // Generates a new ID
-                        val createdID = "unknownMod$unknownIDNameGeneratorNumber"
-                        // Ups the number for the next ID
-                        unknownIDNameGeneratorNumber++
-                        // Either returns the ID or generates the next one and returns that if it's already used by another mod
-                        return if (createdID !in keys) createdID else nameToID()
+                            set(generateID(), mod)
+                        }
+                        when (mod.id) {
+                            // Checks if it can't directly be added...
+                            null -> addWithGeneratedID()
+                            in keys -> addWithGeneratedID()
+                            // ...or if it can
+                            else -> set(mod.id!!, mod)
+                        }
                     }
-                    // If a mod ID isn't found it will try to use the name to create an ID to use
-                    if (mod.name != null && nameToID() !in keys) set(nameToID(), mod)
-                    // It will just generate a number when the mod name cannot be used because it's already used as id by another mod or if it doesn't exist.
-                    else set(createIDFromNumber(), mod)
-                }
-                when (mod.id) {
-                    // Checks if it can't be directly added...
-                    null -> addWithGeneratedID()
-                    in keys -> addWithGeneratedID()
-                    // ...or if it can
-                    else -> set(mod.id!!, mod)
                 }
             }
         }
     }
+    val mods get() = modMap.values
 
     /*
     todo fix launch() command
@@ -211,8 +233,4 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
         }
     }
      */
-
-    // Special getter to make code more readable when people don't want to use the map
-    @Deprecated("Use mods.values instead", ReplaceWith("mods.values"))
-    val allMods get() = mods.values
 }

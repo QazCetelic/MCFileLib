@@ -20,13 +20,14 @@ abstract class Pack(path: Path, isResourcePack: Boolean): FileEditable(path) {
     init {
         //Gets metadata from main.json file
         PackData(path).also { pack ->
-            format = pack.format
-            description = pack.description
+            format = pack.format ?: -1
+            description = pack.description ?: "Failed to load description"
             icon = pack.image
         }
 
         val file = path.toFile()
         if (file.extension == "zip") {
+            // Gives up
             modSupport = null
             contentGroupEntries = mapOf()
         }

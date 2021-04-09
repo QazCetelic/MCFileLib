@@ -14,7 +14,7 @@ class World(path: Path): FileEditable(path) {
         val file = path.toFile()
         if (file.isDirectory) {
             name = path.toFile().name
-            dataPacks = fillList<DataPack> {
+            dataPacks = fillList {
                 File("$path/datapacks/").listFiles()?.forEach {
                     add(DataPack(it.toPath()))
                 }

@@ -4,7 +4,7 @@ import kmp_semver.*
 
 fun fromVersionToFormat(version: String?): Int? {
     return if (version != null) {
-        val versionAsSemVer = version.toSemVer() ?: return null
+        val versionAsSemVer = version.toSemVerOrNull() ?: return null
         //Find the right format for the provided version
         when {
             SemVer("1.6.1") > SemVer(version) -> 0

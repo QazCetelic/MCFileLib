@@ -1,7 +1,6 @@
 package mcfilelib.util
 
-import div
-import fillList
+import neatlin.*
 import mcfilelib.generic.Launcher
 import mcfilelib.util.LauncherType.*
 import java.nio.file.Path

@@ -1,7 +1,6 @@
 package mcfilelib.generic
 
-import div
-import fillMap
+import neatlin.*
 import mcfilelib.util.FileEditable
 import mcfilelib.util.PackData
 import mcfilelib.util.file_entry.assets.ContentGroupEntry

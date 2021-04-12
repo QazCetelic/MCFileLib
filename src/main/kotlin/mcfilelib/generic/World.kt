@@ -1,7 +1,7 @@
 package mcfilelib.generic
 
-import fillList
 import mcfilelib.util.FileEditable
+import neatlin.*
 import java.awt.image.BufferedImage
 import java.io.File
 import java.nio.file.Path

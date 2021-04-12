@@ -2,8 +2,7 @@ package mcfilelib.util
 
 import com.google.gson.Gson
 import mcfilelib.json.ResourcePackData
-import neatlin.zipFile.getEntryAsAWTImage
-import neatlin.zipFile.getEntryAsText
+import neatlin.*
 import java.awt.image.BufferedImage
 import java.io.File
 import java.nio.file.Path

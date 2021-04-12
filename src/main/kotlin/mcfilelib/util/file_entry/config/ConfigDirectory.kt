@@ -1,6 +1,6 @@
 package mcfilelib.util.file_entry.config
 
-import fillMap
+import neatlin.*
 import java.nio.file.Path
 
 /**

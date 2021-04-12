@@ -1,7 +1,6 @@
 package mcfilelib.generic
 
-import div
-import fillList
+import neatlin.*
 import mcfilelib.util.FileEditable
 import mcfilelib.util.LauncherType
 import mcfilelib.util.toLauncherType

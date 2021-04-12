@@ -1,10 +1,8 @@
 package testing
 
-import div
+import neatlin.*
 import mcfilelib.generic.*
 import mcfilelib.util.LauncherType
-import toPath
-import toi8
 import java.nio.file.Path
 import kotlin.system.measureTimeMillis
 import kotlin.test.assertTrue
@@ -30,7 +28,7 @@ fun testMods(mods: Path) {
         val jeiMod = Mod(mods/"jei_1.12.2-4.16.1.301.jar")
         assertTrue { jeiMod.name == "Just Enough Items" }
         assertTrue { jeiMod.modVersion.raw == "4.16.1.301" }
-        assertTrue { jeiMod.mcVersion == "1.12.2" }
+        assertTrue { jeiMod.mcVersion?.raw == "1.12.2" }
         assertTrue { "mezz" in jeiMod.authors }
         assertTrue { !jeiMod.disabled }
         assertTrue { jeiMod.license == null }
@@ -38,7 +36,7 @@ fun testMods(mods: Path) {
         val mantleMod = Mod(mods/"Mantle-1.8.9-0.9.2.jar")
         assertTrue { mantleMod.name == "Mantle" }
         assertTrue { mantleMod.modVersion.raw == "0.9.2" }
-        assertTrue { mantleMod.mcVersion == "1.8.9" }
+        assertTrue { mantleMod.mcVersion?.raw == "1.8.9" }
         assertTrue { "boni" in mantleMod.authors && "progWML6" in mantleMod.authors && "Alexbegt" in mantleMod.authors }
         assertTrue { !mantleMod.disabled }
         assertTrue { mantleMod.license == null }
@@ -46,7 +44,7 @@ fun testMods(mods: Path) {
         val immersiveEngineeringMod = Mod(mods/"ImmersiveEngineering-1.16.5-4.2.1-131.jar")
         assertTrue { immersiveEngineeringMod.name == "Immersive Engineering" }
         assertTrue { immersiveEngineeringMod.modVersion.raw == "1.16.5-4.2.1-131" }
-        assertTrue { immersiveEngineeringMod.mcVersion == "1.16.5" }
+        assertTrue { immersiveEngineeringMod.mcVersion?.raw == "1.16.5" }
         println(immersiveEngineeringMod.authors)
         assertTrue { "BluSunrize" in immersiveEngineeringMod.authors && "Damien A.W. Hazard" in immersiveEngineeringMod.authors }
     // FABRIC MODS
@@ -103,7 +101,7 @@ fun testLaunchers(launchers: Path) {
         val multiMC = Launcher(launchers/"multimc", LauncherType.MULTIMC)
         val authors = mutableListOf<String>()
         for (instance in multiMC.instances) for (mod in instance.mods) for (author in mod.authors) {
-            authors += author
+            authors.add(author)
         }
         assertTrue { authors.size == 961 }
 

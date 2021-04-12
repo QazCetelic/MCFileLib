@@ -3,16 +3,17 @@ package mcfilelib.generic
 import com.google.gson.Gson
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
-import file.isEmpty
+import neatlin.*
 import mcfilelib.generic.Mod.ModType.*
 import mcfilelib.util.FileEditable
 import mcfilelib.util.contains
 import mcfilelib.util.ifKey
+import mcfilelib.util.jsonDataProcessing.MCVersion
 import mcfilelib.util.jsonDataProcessing.ModVersion
 import mcfilelib.util.jsonDataProcessing.addAuthorsFromArray
 import mcfilelib.util.jsonDataProcessing.addAuthorsFromString
-import neatlin.zipFile.get
-import neatlin.zipFile.getEntryAsText
+import neatlin.file.isEmpty
+import neatlin.get
 import org.tomlj.Toml
 import java.nio.file.Path
 import java.util.zip.ZipFile
@@ -29,7 +30,7 @@ class Mod(path: Path): FileEditable(path) {
     lateinit var modVersion: ModVersion
         private set
     // todo convert this to a range
-    var mcVersion: String? = null
+    var mcVersion: MCVersion? = null
         private set
     var modloaderVersion: String? = null
         private set
@@ -126,6 +127,7 @@ class Mod(path: Path): FileEditable(path) {
                 json.ifKey("name") { name = it.asString }
                 json.ifKey("description") { description = it.asString }
                 json.ifKey("id") { id = it.asString }
+                // TODO ALSO EXTRACT MINECRAFT VERSION
                 json.ifKey("version") { modVersion = ModVersion(it.asString) }
                 json.ifKey("authors") { tempAuthors.addAuthorsFromArray(it) }
                 json.ifKey("contact") { contactJson ->
@@ -197,7 +199,7 @@ class Mod(path: Path): FileEditable(path) {
                         val modDependency = modDependencyJson.asJsonObject
                         when (modDependency["modId"].asString) {
                             "forge" -> modloaderVersion = modDependency["versionRange"].asString
-                            "minecraft" -> mcVersion = modDependency["versionRange"].asString.removePrefix("[").removeSuffix("]")
+                            "minecraft" -> mcVersion = MCVersion(modDependency["versionRange"].asString.removePrefix("[").removeSuffix("]"))
                         }
                     }
                 }
@@ -223,7 +225,7 @@ class Mod(path: Path): FileEditable(path) {
                 modListEntry.ifKey("description") { description = it.asString }
                 modListEntry.ifKey("url") { site = it.asString }
                 modListEntry.ifKey("version") { modVersion = ModVersion(it.asString) }
-                modListEntry.ifKey("mcversion") { mcVersion = it.asString }
+                modListEntry.ifKey("mcversion") { mcVersion = MCVersion(it.asString) }
 
                 // Version specific
                 // updateUrl only works on older versions

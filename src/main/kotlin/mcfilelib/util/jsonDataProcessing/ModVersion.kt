@@ -1,8 +1,6 @@
 package mcfilelib.util.jsonDataProcessing
 
-import kmp_semver.SemVer
-import kmp_semver.SemVerRange
-import kmp_semver.toSemVer
+import kmp_semver.*
 
 // TODO clean this up and figure out a way to do the range validity in a cleaner way
 // TODO replace startVersion and endVersion with a semverRange
@@ -41,8 +39,8 @@ class ModVersion {
             val processedString = string.removeSuffix(")").removePrefix("(")
             // Takes the latest version if it's a range (so if it has one comma)
             if (processedString.filter { it == '-' }.length == 1) processedString.split("-").let {
-                val start = it[0].toSemVer()
-                val end = it[1].toSemVer()
+                val start = it[0].toSemVerOrNull()
+                val end = it[1].toSemVerOrNull()
 
                 // Just returns the string if it's not a valid semantic version
                 if (start == null || end == null) {

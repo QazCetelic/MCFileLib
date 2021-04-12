@@ -8,10 +8,12 @@ import mcfilelib.generic.Mod.ModType.*
 import mcfilelib.util.FileEditable
 import mcfilelib.util.contains
 import mcfilelib.util.ifKey
+import mcfilelib.util.jsonDataProcessing.ModVersion
+import mcfilelib.util.jsonDataProcessing.addAuthorsFromArray
+import mcfilelib.util.jsonDataProcessing.addAuthorsFromString
 import neatlin.zipFile.get
 import neatlin.zipFile.getEntryAsText
 import org.tomlj.Toml
-import java.nio.charset.Charset
 import java.nio.file.Path
 import java.util.zip.ZipFile
 
@@ -24,7 +26,7 @@ class Mod(path: Path): FileEditable(path) {
     var description: String? = null
         private set
     //I forgot if this is for the mc version or mod itself todo make sure modVersion and MCVersion don't get confused
-    var modVersion: String? = null
+    lateinit var modVersion: ModVersion
         private set
     // todo convert this to a range
     var mcVersion: String? = null
@@ -92,11 +94,12 @@ class Mod(path: Path): FileEditable(path) {
         val modFile = path.toFile()
 
         // Some launchers disable mods by renaming it to disable so the game doesn't recognize them
-        disabled = modFile.extension == "disabled"
+        disabled = (modFile.extension == "disabled")
 
         val tempAuthors = mutableListOf<String>()
         val tempDependencies = mutableListOf<ModDependency>()
 
+        // Checks if the file isn't invalid
         when {
             !modFile.exists() -> throw Exception("File doesn't exist")
             // Checks if it's actually in a mod file format (".jar")
@@ -123,22 +126,8 @@ class Mod(path: Path): FileEditable(path) {
                 json.ifKey("name") { name = it.asString }
                 json.ifKey("description") { description = it.asString }
                 json.ifKey("id") { id = it.asString }
-                json.ifKey("version") { modVersion = it.asString }
-                json.ifKey("authors") {
-                    val authorList = it.asJsonArray.toList()
-                    for (author in authorList) {
-                        when {
-                            author.isJsonPrimitive -> tempAuthors.add(author.asString)
-                            author.isJsonObject -> {
-                                author.asJsonObject.ifKey("name") { name ->
-                                    //Prevents lists to sneak into the author name field, because this should somewhere else (looking at you, ArloTheEpic!)
-                                    if ("\n" !in name.asString) tempAuthors.add(name.asString)
-                                }
-                                //todo get more data from author object
-                            }
-                        }
-                    }
-                }
+                json.ifKey("version") { modVersion = ModVersion(it.asString) }
+                json.ifKey("authors") { tempAuthors.addAuthorsFromArray(it) }
                 json.ifKey("contact") { contactJson ->
                     //TODO reconsider having a special class for extracting the JSON, I could also use .ifKey(){}
                     val contactData = Gson().fromJson(contactJson.toString(), JsonObject::class.java)
@@ -175,17 +164,30 @@ class Mod(path: Path): FileEditable(path) {
                 modJson.ifKey("displayName") { name = it.asString }
                 modJson.ifKey("description") { description = it.asString }
                 modJson.ifKey("displayURL") { updateURL = it.asString }
-                modJson.ifKey("authors") { authors ->
-                    // Splits up strings "Vazkii, BluSunrize and Damien A.W. Hazard" into [Vazkii, BluSunrize, Damien A.W. Hazard]
-                    for (author in authors.asString.trim().split(" and ", ", ")) {
-                        tempAuthors += author
-                    }
-                }
+                modJson.ifKey("authors") { tempAuthors.addAuthorsFromString(it) }
                 modJson.ifKey("credits") { credits = it.asString }
                 modJson.ifKey("logoFile") { iconPath = it.asString }
                 modJson.ifKey("updateJSONURL") { updateJsonURL = it.asString }
-                modJson.ifKey("version") { modVersion = it.asString }
-            }
+                modJson.ifKey("version") {
+                    if (it.asString == "\${file.jarVersion}") {
+                        if ("v" in modFile.nameWithoutExtension) {
+                            val versionString = modFile.nameWithoutExtension.split("v")[1]
+                            // Checks for a dot because versions (e.g. 1.2.3) contain dots.
+                            if ('.' in versionString) {
+                                // Checks if it contains several digits…
+                                var digits = 0
+                                for (char in versionString) {
+                                    if (char.isDigit()) digits++
+                                }
+                                if (digits >= 3) {
+                                    // …and adds the string if so
+                                    modVersion = ModVersion(versionString)
+                                }
+                            }
+                        }
+                    }
+                    else modVersion = ModVersion(it.asString) }
+                }
             jsonObject.ifKey("issueTrackerURL") { issues = it.asString }
             jsonObject.ifKey("dependencies") { dependenciesElement ->
                 val dependencies = dependenciesElement.asJsonObject
@@ -220,24 +222,16 @@ class Mod(path: Path): FileEditable(path) {
                 modListEntry.ifKey("name") { name = it.asString}
                 modListEntry.ifKey("description") { description = it.asString }
                 modListEntry.ifKey("url") { site = it.asString }
-                modListEntry.ifKey("version") { modVersion = it.asString }
+                modListEntry.ifKey("version") { modVersion = ModVersion(it.asString) }
                 modListEntry.ifKey("mcversion") { mcVersion = it.asString }
 
                 // Version specific
                 // updateUrl only works on older versions
                 modListEntry.ifKey("updateUrl") { updateURL = it.asString }
                 // "authorList" is for 1.7+
-                modListEntry.ifKey("authorList") {
-                    it.asJsonArray.forEach { author ->
-                        tempAuthors.add(author.asString)
-                    }
-                }
+                modListEntry.ifKey("authorList") { tempAuthors.addAuthorsFromArray(it) }
                 // "authors" is for below 1.7
-                modListEntry.ifKey("authors") {
-                    it.asJsonArray.forEach { author ->
-                        tempAuthors.add(author.asString)
-                    }
-                }
+                modListEntry.ifKey("authors") { tempAuthors.addAuthorsFromArray(it) }
                 modListEntry.ifKey("logoFile") { iconPath = it.asString }
                 modListEntry.ifKey("dependencies") { dependencies ->
                     dependencies.asJsonArray.forEach { dependency ->
@@ -297,6 +291,7 @@ class Mod(path: Path): FileEditable(path) {
 
         dependencies = tempDependencies.toList()
         authors = tempAuthors.toList()
+        if (!this::modVersion.isInitialized) modVersion = ModVersion(null)
     }
 
     /**
@@ -319,18 +314,16 @@ class Mod(path: Path): FileEditable(path) {
         val version: String,
     )
 
-    override fun toString(): String {
-        return "$name: v$modVersion for $mcVersion by ${
-            // Lists all the authors, like this: 1, 2, 3 and 4
-            buildString {
-                for (i in authors.indices) {
-                    append(authors[i])
-                    when {
-                        i < authors.size - 2 -> append(", ")
-                        i == authors.size - 2 -> append(" and ")
-                    }
+    override fun toString() = "$name: v$modVersion for $mcVersion by ${
+        // Lists all the authors, like this: 1, 2, 3 and 4
+        buildString {
+            for (i in authors.indices) {
+                append(authors[i])
+                when {
+                    i < authors.size - 2 -> append(", ")
+                    i == authors.size - 2 -> append(" and ")
                 }
             }
-        }"
-    }
+        }
+    }"
 }

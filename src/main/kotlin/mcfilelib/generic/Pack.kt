@@ -11,7 +11,7 @@ import java.nio.file.Path
 
 abstract class Pack(path: Path, isResourcePack: Boolean): FileEditable(path) {
     val name: String = path.toFile().nameWithoutExtension
-    val format: Int
+    val format: Int?
     val description: String
     val icon: BufferedImage?
     val modSupport: Boolean?
@@ -20,7 +20,7 @@ abstract class Pack(path: Path, isResourcePack: Boolean): FileEditable(path) {
     init {
         //Gets metadata from main.json file
         PackData(path).also { pack ->
-            format = pack.format ?: -1
+            format = pack.format
             description = pack.description ?: "Failed to load description"
             icon = pack.image
         }

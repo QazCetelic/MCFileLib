@@ -51,10 +51,9 @@
     </orderEntry>
     <orderEntry type="library" name="KotlinJavaRuntime" level="project" />
     <orderEntry type="library" name="Gson 2.8.6" level="project" />
-    <orderEntry type="library" name="Semver4j 3.1.0" level="project" />
     <orderEntry type="library" name="Neatlin-jvm-0.1" level="project" />
     <orderEntry type="library" name="TomlJ 1.0.0" level="project" />
-    <orderEntry type="library" name="Kotlinx Coroutines 1.4.3" level="project" />
     <orderEntry type="library" name="org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.4.3" level="project" />
+    <orderEntry type="library" name="SemVer-KMP-jvm-1.0-SNAPSHOT" level="project" />
   </component>
 </module>

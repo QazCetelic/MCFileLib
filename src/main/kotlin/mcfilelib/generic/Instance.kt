@@ -3,9 +3,6 @@ package mcfilelib.generic
 import div
 import fillList
 import fillMap
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import mcfilelib.util.*
 import mcfilelib.util.LauncherType.*
 import mcfilelib.util.file_entry.config.ConfigDirectory
@@ -154,8 +151,8 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
 
     private fun getInstanceFiles(name: String) = (path/(launcherType.subfolder + name)).toFile().listFiles()
     val resourcepacks = fillList<ResourcePack> {
-        getInstanceFiles("resourcepacks")?.forEach {
-            add(ResourcePack(it.toPath()))
+        getInstanceFiles("resourcepacks")?.forEach { file ->
+            add(ResourcePack(file.toPath()))
         }
         getInstanceFiles("texturepacks")?.forEach { file ->
             add(ResourcePack(file.toPath()))
@@ -180,57 +177,41 @@ class Instance(path: Path, type: LauncherType): FileEditable(path) {
     }
 
     val modMap = fillMap<String, Mod> {
-        runBlocking {
-            var unknownIDNameGeneratorNumber = 1
-            getInstanceFiles("mods")?.forEach {
-                launch (Dispatchers.Default) {
-                    if (it.extension == "jar" || it.name.endsWith(".jar.disabled")) {
-                        val mod = Mod(it.toPath())
-                        // All mods should have a seperate id so this shouldn't exit, well theoretically.
-                        fun addWithGeneratedID() {
-                            /*
-                                This part has a lot of safety mechanisms that are very unlikely to be needed.
-                                They still exists just in case someone would like to use "unknownMod2" as their mod ID or something silly like that.
-                                But at this point I wouldn't even be surprised anymore.
-                            */
-                            fun generateID(): String {
-                                fun createIDFromNumber(): String {
-                                    val createdID = "unknownMod$unknownIDNameGeneratorNumber"
-                                    // For the next ID
-                                    unknownIDNameGeneratorNumber++
-                                    // Either returns the ID or generates the next one and returns that if it's already used by another mod
-                                    return if (createdID !in keys) createdID else createIDFromNumber()
-                                }
-                                // Creates ID from the name, should work most of the time but could theoretically fail
-                                if (mod.name != null && mod.name!!.replace(" ", "_") !in keys) return mod.name!!.replace(" ", "_")
-                                else return createIDFromNumber()
-                            }
-
-                            set(generateID(), mod)
+        var unknownIDNameGeneratorNumber = 1
+        getInstanceFiles("mods")?.forEach { file ->
+            if (file.extension == "jar" || file.name.endsWith(".jar.disabled")) {
+                val mod = Mod(file.toPath())
+                // All mods should have a separate id so this shouldn't exit, well theoretically.
+                fun addWithGeneratedID() {
+                    /*
+                        This part has a lot of safety mechanisms that are very unlikely to be needed.
+                        They still exists just in case someone would like to use "unknownMod2" as their mod ID or something silly like that.
+                        But at this point I wouldn't even be surprised anymore.
+                    */
+                    fun generateID(): String {
+                        fun createIDFromNumber(): String {
+                            val createdID = "unknownMod$unknownIDNameGeneratorNumber"
+                            // For the next ID
+                            unknownIDNameGeneratorNumber++
+                            // Either returns the ID or generates the next one and returns that if it's already used by another mod
+                            return if (createdID !in keys) createdID else createIDFromNumber()
                         }
-                        when (mod.id) {
-                            // Checks if it can't directly be added...
-                            null -> addWithGeneratedID()
-                            in keys -> addWithGeneratedID()
-                            // ...or if it can
-                            else -> set(mod.id!!, mod)
-                        }
+                        // Creates ID from the name, should work most of the time but could theoretically fail, it then creates an ID using a number
+                        val nameID = mod.name?.replace(" ", "_")
+                        return if (nameID != null && nameID !in keys) nameID else createIDFromNumber()
                     }
+
+                    set(generateID(), mod)
+                }
+                when (mod.id) {
+                    // Checks if it can't directly be added...
+                    null -> addWithGeneratedID()
+                    in keys -> addWithGeneratedID()
+                    // ...or if it can
+                    else -> set(mod.id!!, mod)
                 }
             }
         }
     }
     val mods get() = modMap.values
-
-    /*
-    todo fix launch() command
-    fun launch() {
-        when (launcherType) {
-            LauncherType.MULTIMC -> {
-                ProcessBuilder("/home/qaz/.local/share/multimc/MultiMC", "-l", this.path.toFile().name).inheritIO().start()
-            }
-            else -> TODO("${launcherType.displayName} can't be launched yet")
-        }
-    }
-     */
 }

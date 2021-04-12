@@ -1,15 +1,7 @@
 package mcfilelib.util
 
-import com.vdurmont.semver4j.Semver
+import kmp_semver.*
 
-class VersionRange(from: String, to: String) {
-    private val semverFrom = Semver(from, Semver.SemverType.LOOSE)
-    private val semverTo = Semver(to, Semver.SemverType.LOOSE)
-
-    operator fun contains(string: String): Boolean {
-        val semver = Semver(string, Semver.SemverType.LOOSE)
-        return (semver >= semverFrom) and (semver <= semverTo)
-    }
-
-    override fun toString(): String = "$semverFrom-$semverTo"
+fun versionRange(from: String, end: String): SemVerRange? {
+    return SemVerRange(from.toSemVer(patchRequired = false) ?: return null, end.toSemVer(patchRequired = false) ?: return null)
 }

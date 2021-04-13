@@ -1,4 +1,4 @@
-package mcfilelib.util.jsonDataProcessing
+package mcfilelib.json
 
 import kmp_semver.*
 
@@ -63,4 +63,6 @@ class ModVersion {
             versionRange = null
         }
     }
+
+    override fun toString() = raw
 }

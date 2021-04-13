@@ -1,4 +1,4 @@
-package mcfilelib.util.jsonDataProcessing
+package mcfilelib.json
 
 import com.google.gson.JsonElement
 import neatlin.*

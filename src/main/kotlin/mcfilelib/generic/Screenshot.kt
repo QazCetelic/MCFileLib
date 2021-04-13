@@ -1,6 +1,5 @@
 package mcfilelib.generic
 
-import mcfilelib.util.FileEditable
 import mcfilelib.util.Time
 import java.nio.file.Path
 import javax.imageio.ImageIO
@@ -10,7 +9,7 @@ import javax.imageio.ImageIO
  * You can get the time the screenshot was taken from the time val.
  * It includes a path to the file on disk, for special actions.
  */
-class Screenshot(path: Path): FileEditable(path) {
+class Screenshot(val path: Path) {
     /**
      * Time in YEAR-MONTH-DAY-HOUR-MINUTE-SECOND
      */

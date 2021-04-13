@@ -7,7 +7,7 @@ import mcfilelib.util.file_entry.config.ConfigDirectory
 import java.nio.file.Path
 import java.util.*
 
-class Instance(path: Path, type: LauncherType): FileEditable(path) {
+class Instance(val path: Path, type: LauncherType) {
     var version: String? = null
         private set
     var resourceFormat: Int? = null

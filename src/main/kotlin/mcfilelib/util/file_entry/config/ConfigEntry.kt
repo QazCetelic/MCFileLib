@@ -1,8 +1,7 @@
 package mcfilelib.util.file_entry.config
 
-import mcfilelib.util.FileEditable
 import java.nio.file.Path
 
-abstract class ConfigEntry(path: Path): FileEditable(path) {
+abstract class ConfigEntry(val path: Path) {
     val name = path.toFile().nameWithoutExtension
 }

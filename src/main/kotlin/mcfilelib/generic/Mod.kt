@@ -5,13 +5,12 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import neatlin.*
 import mcfilelib.generic.Mod.ModType.*
-import mcfilelib.util.FileEditable
 import mcfilelib.util.contains
 import mcfilelib.util.ifKey
-import mcfilelib.util.jsonDataProcessing.MCVersion
-import mcfilelib.util.jsonDataProcessing.ModVersion
-import mcfilelib.util.jsonDataProcessing.addAuthorsFromArray
-import mcfilelib.util.jsonDataProcessing.addAuthorsFromString
+import mcfilelib.json.MCVersion
+import mcfilelib.json.ModVersion
+import mcfilelib.json.addAuthorsFromArray
+import mcfilelib.json.addAuthorsFromString
 import neatlin.file.isEmpty
 import neatlin.get
 import org.tomlj.Toml
@@ -21,7 +20,7 @@ import java.util.zip.ZipFile
 /**
  * Object for viewing mod meta-data such as: name, description, version, dependencies, icon etc.
  */
-class Mod(path: Path): FileEditable(path) {
+class Mod(path: Path) {
     var name: String? = null
         private set
     var description: String? = null

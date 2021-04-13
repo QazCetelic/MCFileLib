@@ -4,6 +4,9 @@ import com.google.gson.Gson
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import java.nio.file.Path
+import java.util.zip.ZipEntry
+import java.util.zip.ZipFile
+import neatlin.*
 
 /**
  * Fetches file from path and parses the text containing it to a JsonObject, returns empty JsonObject if it fails.
@@ -19,6 +22,13 @@ fun loadJson(path: Path): JsonObject {
         }
     }
     // Returns empty object if something went wrong
+    return JsonObject()
+}
+
+fun ZipFile.loadJson(entry: String): JsonObject {
+    runCatching {
+        return Gson().fromJson(this.getEntryAsText(entry), JsonObject::class.java)
+    }
     return JsonObject()
 }
 

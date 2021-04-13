@@ -1,13 +1,12 @@
 package mcfilelib.generic
 
-import mcfilelib.util.FileEditable
 import neatlin.*
 import java.awt.image.BufferedImage
 import java.io.File
 import java.nio.file.Path
 import javax.imageio.ImageIO
 
-class World(path: Path): FileEditable(path) {
+class World(val path: Path) {
     val name: String
     val dataPacks: List<DataPack>
     init {

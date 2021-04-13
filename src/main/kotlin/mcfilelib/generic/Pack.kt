@@ -1,27 +1,25 @@
 package mcfilelib.generic
 
-import neatlin.*
-import mcfilelib.util.FileEditable
-import mcfilelib.util.PackData
 import mcfilelib.util.file_entry.assets.ContentGroupEntry
 import mcfilelib.util.fromFormatToRange
+import neatlin.div
+import neatlin.fillMap
 import java.awt.image.BufferedImage
 import java.nio.file.Path
 
-abstract class Pack(path: Path, isResourcePack: Boolean): FileEditable(path) {
+abstract class Pack(val path: Path, isResourcePack: Boolean) {
     val name: String = path.toFile().nameWithoutExtension
     val format: Int?
-    val description: String
+    val description: String?
     val icon: BufferedImage?
     val modSupport: Boolean?
     val contentGroupEntries: Map<String, ContentGroupEntry>
 
     init {
-        //Gets metadata from main.json file
-        PackData(path).also { pack ->
-            format = pack.format
-            description = pack.description ?: "Failed to load description"
-            icon = pack.image
+        PackMetadata(path).let {
+            format = it.format
+            description = it.description
+            icon = it.icon
         }
 
         val file = path.toFile()
@@ -38,14 +36,15 @@ abstract class Pack(path: Path, isResourcePack: Boolean): FileEditable(path) {
                         set(file.name, ContentGroupEntry(file.toPath()))
                     }
                 }
-                //todo figure out if .any{} is actually the same as .forCheck{}
                 modSupport = contentGroupEntries.values.any { !it.vanilla || it.includesOptifine }
-            } else {
+            }
+            else {
                 contentGroupEntries = mapOf()
                 modSupport = null
             }
         }
     }
+
     open val versionRange = fromFormatToRange(format, isResourcePack)
     override fun toString() = "(name=$name, path=$path, format=$format${
         if (versionRange != null) " (${versionRange})"

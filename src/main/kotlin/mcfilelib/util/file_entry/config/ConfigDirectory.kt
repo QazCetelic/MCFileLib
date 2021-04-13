@@ -25,9 +25,11 @@ class ConfigDirectory(path: Path): ConfigEntry(path) {
      */
     fun getAllConfigFiles(): Map<String, ConfigFile> = fillMap {
         // Gets all entries from the config directory it is called from and goes through them…
-        for (configEntry in this@ConfigDirectory.getAllConfigEntries()) if (configEntry.value is ConfigFile) {
-            // …and adds them to a map
-            set(configEntry.key, configEntry.value as ConfigFile)
+        for (configEntry in this@ConfigDirectory.getAllConfigEntries()) {
+            if (configEntry.value is ConfigFile) {
+                // …and adds them to a map
+                set(configEntry.key, configEntry.value as ConfigFile)
+            }
         }
     }
 

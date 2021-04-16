@@ -1,6 +1,7 @@
 package mcfilelib.generic
 
 import mcfilelib.util.Time
+import java.awt.image.BufferedImage
 import java.nio.file.Path
 import javax.imageio.ImageIO
 
@@ -18,13 +19,13 @@ class Screenshot(val path: Path) {
     /**
      * The getter directly gets the Image from disk, it is not stored in the object
      */
-    val image
+    val image: BufferedImage
         get() = ImageIO.read(path.toFile())
     init {
         val file = path.toFile()
         val name = file.nameWithoutExtension
         //Check regex for the screenshot name format
-        time = if ("[0-9]{4}-[0-9]{2}-[0-9]{2}_[0-9]{2}\\.[0-9]{2}\\.[0-9]{2}".toRegex().containsMatchIn(name)) {
+        time = if ("^[0-9]{4}-[0-9]{2}-[0-9]{2}_[0-9]{2}\\.[0-9]{2}\\.[0-9]{2}${'$'}".toRegex().containsMatchIn(name)) {
             if (file.extension.equals("png", ignoreCase = true)) {
                 //Replace custom class with already existing class
                 Time (

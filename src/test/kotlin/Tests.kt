@@ -1,5 +1,3 @@
-package testing
-
 import neatlin.*
 import mcfilelib.generic.*
 import mcfilelib.util.LauncherType
@@ -9,11 +7,11 @@ import kotlin.test.assertTrue
 
 fun tests(projectPathString: String) {
     val resourcesPath = projectPathString.toPath()/"src"/"test"/"kotlin"/"resources"
-    testMods(resourcesPath/"mods")
-    testWorld(resourcesPath/"worlds")
+    testMods(resourcesPath / "mods")
+    testWorld(resourcesPath / "worlds")
     testScreenshots(resourcesPath/"screenshots")
-    testInstance(resourcesPath/"instances")
-    testLaunchers(resourcesPath/"launchers")
+    testInstance(resourcesPath / "instances")
+    testLaunchers(resourcesPath / "launchers")
 
     /*
     ocurrences()
@@ -73,16 +71,6 @@ fun testWorld(worlds: Path) {
         assertTrue { datapack.modSupport == null }
     }
     println("Worlds test finished in ${time}ms")
-}
-
-fun testScreenshots(screenshots: Path) {
-    val time = measureTimeMillis {
-        val screenshot1 = Screenshot(screenshots/"2021-03-02_15.59.30.png")
-        assertTrue { screenshot1.time.year == 2021L && screenshot1.time.month == 3.toi8() && screenshot1.time.day == 2.toi8() && screenshot1.time.hour == 15.toi8() && screenshot1.time.minute == 59.toi8() && screenshot1.time.second == 30.toi8() }
-        val screenshot2 = Screenshot(screenshots/"2021-03-02_15.59.43.png")
-        assertTrue { screenshot2.time.year == 2021L && screenshot2.time.month == 3.toi8() && screenshot2.time.day == 2.toi8() && screenshot2.time.hour == 15.toi8() && screenshot2.time.minute == 59.toi8() && screenshot2.time.second == 43.toi8() }
-    }
-    println("Screenshots test finished in ${time}ms")
 }
 
 fun testInstance(instances: Path) {

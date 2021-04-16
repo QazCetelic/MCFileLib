@@ -1,5 +1,8 @@
 package mcfilelib.util
 
+/**
+ * Simple class to store time for screenshots
+ */
 class Time (
     val year: Long,
     val month: Byte,

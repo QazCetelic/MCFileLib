@@ -1,10 +1,12 @@
 package mcfilelib.util
 
-import neatlin.*
 import mcfilelib.generic.Launcher
 import mcfilelib.util.LauncherType.*
+import neatlin.div
+import neatlin.exists
+import neatlin.fillList
+import neatlin.toPath
 import java.nio.file.Path
-import java.nio.file.Paths
 
 object Launchers {
     val types = listOf (
@@ -44,13 +46,13 @@ fun Path.toLauncherType(): LauncherType {
             return launcherType
         } else continue
     }
-    return LauncherType.UNKNOWN
+    return UNKNOWN
 }
 
-fun LauncherType.toPath(): Path? = when (OSInfo.os) {
+fun LauncherType.toPath(): Path? = when (os) {
     // TODO This isn't done yet, I need to know the paths that are used on other OS'
-    OSInfo.OS.LINUX -> {
-        val userHome = Paths.get(System.getProperty("user.home"))
+    OS.LINUX -> {
+        val userHome = System.getProperty("user.home").toPath()
         when (this) {
             VANILLA -> (userHome/".minecraft")
             MULTIMC -> (userHome/".local"/"share"/"multimc")
@@ -64,6 +66,7 @@ fun LauncherType.toPath(): Path? = when (OSInfo.os) {
 }
 
 fun LauncherType.toLauncher(): Launcher? {
-    val path = this.toPath()
-    return if (path != null && path.toFile().exists()) Launcher(path, this) else null
+    return this.toPath()?.let {
+        if (it.exists()) Launcher(it, this) else null
+    }
 }

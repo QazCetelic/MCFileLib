@@ -16,6 +16,7 @@ Currently in Alpha
   + DataPacks
 - Launchers
   + Get a launcher object from the type when it exists
+  + Get installed launchers
   + Get the type when given a path
   + Should work with:
     - MultiMC

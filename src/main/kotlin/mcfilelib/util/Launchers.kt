@@ -62,7 +62,7 @@ fun LauncherType.toPath(): Path? = when (os) {
             else -> null
         }
     }
-    else -> null
+    else -> TODO("Not implemented")
 }
 
 fun LauncherType.toLauncher(): Launcher? {

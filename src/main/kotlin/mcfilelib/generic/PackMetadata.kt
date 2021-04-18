@@ -3,15 +3,16 @@ package mcfilelib.generic
 import com.google.gson.JsonObject
 import mcfilelib.util.ifKey
 import mcfilelib.util.loadJson
-import neatlin.div
+import neatlin.file.div
 import neatlin.getEntryAsAWTImage
-import neatlin.toPath
 import java.awt.image.BufferedImage
-import java.nio.file.Path
+import java.io.File
 import java.util.zip.ZipFile
 import javax.imageio.ImageIO
 
-class PackMetadata(path: Path) {
+class PackMetadata {
+    var name: String
+        private set
     var format: Int? = null
         private set
     var description: String? = null
@@ -19,18 +20,25 @@ class PackMetadata(path: Path) {
     var icon: BufferedImage? = null
         private set
 
-    init {
-        val packFile = path.toFile()
-        if (packFile.extension == "zip") {
-            val zipFile = ZipFile(packFile)
+    constructor(name: String, format: Int?, description: String?, icon: BufferedImage?) {
+        this.name = name
+        this.format = format
+        this.description = description
+        this.icon = icon
+    }
+
+    constructor(file: File) {
+        name = file.nameWithoutExtension
+        if (file.extension == "zip") {
+            val zipFile = ZipFile(file)
             readPackJson(zipFile.loadJson("pack.mcmeta"))
             icon = zipFile.getEntryAsAWTImage("pack.png")
         }
         else {
-            val mcmetaPath = path/"pack.mcmeta"
-            val imageFile = (path/"pack.png").toFile()
+            val mcmetaFile = file/"pack.mcmeta"
+            val imageFile = (file/"pack.png")
             icon = if (imageFile.exists()) ImageIO.read(imageFile) else null
-            if (mcmetaPath.toFile().exists()) readPackJson(loadJson(mcmetaPath))
+            if (mcmetaFile.exists()) readPackJson(loadJson(mcmetaFile.toPath()))
         }
     }
 

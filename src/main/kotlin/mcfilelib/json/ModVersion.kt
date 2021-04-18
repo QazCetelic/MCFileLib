@@ -43,19 +43,12 @@ class ModVersion {
                 val end = it[1].toSemVerOrNull()
 
                 // Just returns the string if it's not a valid semantic version
-                if (start == null || end == null) {
-                    // RANGE IS INVALID
-                    versionRange = null
-                }
-                else {
-                    // RANGE IS VALID
-                    versionRange = SemVerRange(start, end)
-                }
+                versionRange =
+                    if (start == null || end == null) null  // INVALID
+                    else SemVerRange(start, end)            // VALID
             }
-            else {
-                // RANGE IS INVALID
-                versionRange = null
-            }
+            // RANGE IS INVALID
+            else versionRange = null
         }
         else {
             // RANGE IS INVALID

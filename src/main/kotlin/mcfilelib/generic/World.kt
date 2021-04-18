@@ -1,6 +1,6 @@
 package mcfilelib.generic
 
-import neatlin.*
+import neatlin.fillList
 import java.awt.image.BufferedImage
 import java.io.File
 import java.nio.file.Path

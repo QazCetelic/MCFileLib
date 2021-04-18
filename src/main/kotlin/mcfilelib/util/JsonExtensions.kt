@@ -3,10 +3,9 @@ package mcfilelib.util
 import com.google.gson.Gson
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
+import neatlin.getEntryAsText
 import java.nio.file.Path
-import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
-import neatlin.*
 
 /**
  * Fetches file from path and parses the text containing it to a JsonObject, returns empty JsonObject if it fails.

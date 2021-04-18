@@ -1,10 +1,11 @@
 package mcfilelib.generic
 
-import neatlin.*
 import mcfilelib.util.LauncherType
+import mcfilelib.util.LauncherType.UNKNOWN
 import mcfilelib.util.toLauncherType
+import neatlin.div
+import neatlin.fillList
 import java.nio.file.Path
-import mcfilelib.util.LauncherType.*
 
 class Launcher(
     //Passed on to FileEditable

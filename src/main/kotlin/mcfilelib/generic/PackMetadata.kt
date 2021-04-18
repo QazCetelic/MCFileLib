@@ -11,8 +11,6 @@ import java.util.zip.ZipFile
 import javax.imageio.ImageIO
 
 class PackMetadata {
-    var name: String
-        private set
     var format: Int? = null
         private set
     var description: String? = null
@@ -20,26 +18,29 @@ class PackMetadata {
     var icon: BufferedImage? = null
         private set
 
-    constructor(name: String, format: Int?, description: String?, icon: BufferedImage?) {
-        this.name = name
+    constructor(format: Int?, description: String?, icon: BufferedImage?) {
         this.format = format
         this.description = description
         this.icon = icon
     }
 
     constructor(file: File) {
-        name = file.nameWithoutExtension
-        if (file.extension == "zip") {
-            val zipFile = ZipFile(file)
-            readPackJson(zipFile.loadJson("pack.mcmeta"))
-            icon = zipFile.getEntryAsAWTImage("pack.png")
+        if (file.exists()) {
+            if (file.extension == "zip") {
+                val zipFile = ZipFile(file)
+
+                readPackJson(zipFile.loadJson("pack.mcmeta"))
+                icon = zipFile.getEntryAsAWTImage("pack.png")
+            }
+            else {
+                val mcmetaFile = file/"pack.mcmeta"
+                val imageFile = file/"pack.png"
+
+                readPackJson(loadJson(mcmetaFile.toPath()))
+                icon = if (imageFile.exists()) ImageIO.read(imageFile) else null
+            }
         }
-        else {
-            val mcmetaFile = file/"pack.mcmeta"
-            val imageFile = (file/"pack.png")
-            icon = if (imageFile.exists()) ImageIO.read(imageFile) else null
-            if (mcmetaFile.exists()) readPackJson(loadJson(mcmetaFile.toPath()))
-        }
+        else throw Exception("Pack file doesn't exist")
     }
 
     private fun readPackJson(json: JsonObject) {
@@ -53,4 +54,30 @@ class PackMetadata {
             }
         }
     }
+
+    override fun toString() = "(Format: $format, Description: $description, Icon: ${
+        if (icon != null) "yes"
+        else "no"
+    })"
+
+    /**
+     * Generates JSON like how it's found in the *pack.mcmeta* file. Example:
+     *
+     * ```
+     * {
+     *   "pack": {
+     *     "pack_format": [format],
+     *     "description": "[description]"
+     *   }
+     * }
+     * ```
+     */
+    fun toMCMetaJSON() = """
+        {
+          "pack": {
+            "pack_format": $format,
+            "description": "$description"
+          }
+        }
+    """.trimIndent()
 }

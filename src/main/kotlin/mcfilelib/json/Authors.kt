@@ -1,8 +1,8 @@
 package mcfilelib.json
 
 import com.google.gson.JsonElement
-import neatlin.*
 import mcfilelib.util.ifKey
+import neatlin.fillList
 
 /**
  * Processes authors in the fabric format

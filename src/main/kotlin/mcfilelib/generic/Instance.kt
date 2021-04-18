@@ -1,9 +1,9 @@
 package mcfilelib.generic
 
-import neatlin.*
 import mcfilelib.util.*
 import mcfilelib.util.LauncherType.*
 import mcfilelib.util.file_entry.config.ConfigDirectory
+import neatlin.*
 import java.nio.file.Path
 import java.util.*
 

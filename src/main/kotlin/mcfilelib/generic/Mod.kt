@@ -5,7 +5,6 @@ import mcfilelib.json.ModVersion
 import mcfilelib.util.ModDependency
 import mcfilelib.util.ModType
 import mcfilelib.util.loadModMetadata
-import neatlin.div
 import neatlin.file.isEmpty
 import neatlin.file.sha256
 import neatlin.toPath

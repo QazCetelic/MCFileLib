@@ -1,6 +1,7 @@
 package mcfilelib.json
 
-import kmp_semver.*
+import kmp_semver.SemVerRange
+import kmp_semver.toSemVerOrNull
 
 // TODO clean this up and figure out a way to do the range validity in a cleaner way
 // TODO replace startVersion and endVersion with a semverRange

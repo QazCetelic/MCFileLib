@@ -1,6 +1,7 @@
 package mcfilelib.json
 
-import kmp_semver.*
+import kmp_semver.SemVer
+import kmp_semver.toSemVerOrNull
 
 class MCVersion(string: String?) {
     val raw: String = string ?: ""

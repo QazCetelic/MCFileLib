@@ -19,8 +19,9 @@ abstract class Pack(val path: Path, isResourcePack: Boolean) {
 
     init {
         val file = path.toFile()
+        name = file.nameWithoutExtension
+
         PackMetadata(file).let {
-            name = it.name
             format = it.format
             description = it.description
             icon = it.icon
@@ -57,7 +58,6 @@ abstract class Pack(val path: Path, isResourcePack: Boolean) {
     fun generateHash() = path.toFile().sha256()
 
     fun toPackMetadata() = PackMetadata(
-        name,
         format,
         description,
         icon,

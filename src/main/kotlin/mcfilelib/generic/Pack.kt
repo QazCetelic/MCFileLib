@@ -3,7 +3,8 @@ package mcfilelib.generic
 import mcfilelib.util.file_entry.assets.ContentGroupEntry
 import mcfilelib.util.fromFormatToRange
 import neatlin.div
-import neatlin.file.sha256
+import neatlin.file.Hash
+import neatlin.file.hash
 import neatlin.fillMap
 import java.awt.image.BufferedImage
 import java.nio.file.Path
@@ -22,14 +23,14 @@ abstract class Pack(val path: Path, isResourcePack: Boolean) {
         name = file.nameWithoutExtension
 
         PackMetadata(file).let {
-            format = it.format
+            format      = it.format
             description = it.description
-            icon = it.icon
+            icon        = it.icon
         }
 
         if (file.extension == "zip") {
             // Gives up
-            modSupport = null
+            modSupport          = null
             contentGroupEntries = mapOf()
         }
         else {
@@ -44,8 +45,8 @@ abstract class Pack(val path: Path, isResourcePack: Boolean) {
             }
             else {
                 // Gives up
+                modSupport          = null
                 contentGroupEntries = mapOf()
-                modSupport = null
             }
         }
     }
@@ -55,13 +56,12 @@ abstract class Pack(val path: Path, isResourcePack: Boolean) {
     /**
      * Gets the SHA-256 hash of the pack
      */
-    fun generateHash() = path.toFile().sha256()
+    fun generateHash() = path.toFile().hash(Hash.SHA256)
 
-    fun toPackMetadata() = PackMetadata(
-        format,
-        description,
-        icon,
-    )
+    /**
+     * Exports the metadata so it can be used for other purposes
+     */
+    fun toPackMetadata() = PackMetadata(format, description, icon)
 
     override fun toString() = "(name=$name, path=$path, format=$format${
         if (versionRange != null) " ($versionRange)"

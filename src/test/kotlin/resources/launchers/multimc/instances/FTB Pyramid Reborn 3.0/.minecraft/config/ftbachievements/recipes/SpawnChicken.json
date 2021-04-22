@@ -1,0 +1,30 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "ftba_group": "chicken",
+    "tier": 0,
+    "power": 250000,
+    "pattern": [
+        "###",
+        "#R#",
+        "###"
+    ],
+    "key": {
+        "#": {
+            "item": "minecraft:wheat_seeds",
+            "data": 0
+        },
+        "R": {
+            "type": "forge:ore_dict",
+            "ore": "blockDiamond"
+        }
+    },
+    "result": {
+        "item": "minecraft:spawn_egg",
+	"nbt": {
+       "EntityTag": {
+              "id": "Chicken"
+       }
+	}
+    },
+    "group": "chicken"
+}

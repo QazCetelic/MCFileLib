@@ -1,0 +1,21 @@
+Compass Tracker 1.16 Changelog
+
+v2.1:
+
+>>> General:
++ Added pack image
+* Overhauled and added commands to eliminate the necessity to have cheats enabled
+* Updated and improved the setup guide
+
+v2.0:
+
+>>> General:
++ Added Dimensional Tracking
+* Optimized and overhauled the compass functions
+* Updated and improved the setup guide
+
+v1.0:
+
+>>> General:
++ Added Tracking Compass
++ Added Tracker and Tracked Roles

@@ -1,0 +1,30 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "ftba_group": "resgen",
+    "tier": 1,
+    "power": 2500,
+    "pattern": [
+        "###",
+        "IRI",
+        "III"
+    ],
+    "key": {
+        "#": {
+            "type": "forge:ore_dict",
+            "ore": "plankWood"
+        },
+        "I": {
+            "type": "forge:ore_dict",
+            "ore": "blockIron"
+        },
+        "R": {
+            "type": "forge:ore_dict",
+            "ore": "blockRedstone"
+        }
+    },
+    "result": {
+        "item": "ftbachievements:resgen",
+        "count": 1
+    },
+    "group": "resgen"
+}

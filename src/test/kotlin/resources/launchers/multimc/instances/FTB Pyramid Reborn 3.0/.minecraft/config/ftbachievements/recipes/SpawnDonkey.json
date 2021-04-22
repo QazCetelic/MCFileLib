@@ -1,0 +1,30 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "ftba_group": "Donkey",
+    "tier": 0,
+    "power": 250000,
+    "pattern": [
+        "###",
+        "#R#",
+        "###"
+    ],
+    "key": {
+        "#": {
+            "type": "forge:ore_dict",
+            "ore": "chest"
+        },
+        "R": {
+            "item": "minecraft:egg",
+            "data": 0
+        }
+    },
+    "result": {
+        "item": "minecraft:spawn_egg",
+	"nbt": {
+       "EntityTag": {
+              "id": "Donkey"
+       }
+	}
+    },
+    "group": "Donkey"
+}

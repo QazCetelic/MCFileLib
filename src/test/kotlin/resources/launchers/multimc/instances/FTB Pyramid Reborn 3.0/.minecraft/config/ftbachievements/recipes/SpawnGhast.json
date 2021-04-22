@@ -1,0 +1,30 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "ftba_group": "Ghast",
+    "tier": 0,
+    "power": 250000,
+    "pattern": [
+        "###",
+        "#R#",
+        "###"
+    ],
+    "key": {
+        "#": {
+            "item": "minecraft:skull",
+            "data": 1
+        },
+        "R": {
+            "item": "minecraft:egg",
+            "data": 0
+        }
+    },
+    "result": {
+        "item": "minecraft:spawn_egg",
+	"nbt": {
+       "EntityTag": {
+              "id": "ghast"
+       }
+	}
+    },
+    "group": "Ghast"
+}

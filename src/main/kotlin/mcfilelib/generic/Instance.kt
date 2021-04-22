@@ -3,9 +3,11 @@ package mcfilelib.generic
 import mcfilelib.util.*
 import mcfilelib.util.LauncherType.*
 import mcfilelib.util.file_entry.config.ConfigDirectory
-import neatlin.*
+import neatlin.div
+import neatlin.fillList
+import neatlin.fillMap
+import neatlin.undev
 import java.nio.file.Path
-import java.util.*
 
 class Instance(val path: Path, type: LauncherType) {
     var version: String? = null
@@ -41,7 +43,7 @@ class Instance(val path: Path, type: LauncherType) {
                 json.ifKey("forgeVersion") {
                     if (!it.isJsonNull) {
                         foundModLoaders += ModLoader(
-                            name = "Forge",
+                            name    = "Forge",
                             version = it.asString.replace("forge-", "")
                         )
                     }
@@ -53,7 +55,7 @@ class Instance(val path: Path, type: LauncherType) {
                     val jsonArray = it.asJsonArray
                     if (jsonArray.size() == 3) {
                         foundModLoaders += ModLoader(
-                            name = jsonArray[0].asString,
+                            name    = jsonArray[0].asString,
                             version = jsonArray[2].asString
                         )
                         version = jsonArray[1].asString
@@ -99,11 +101,11 @@ class Instance(val path: Path, type: LauncherType) {
                                 "Minecraft" -> version = entry.asJsonObject["version"].asString
                                 //Gets modloader versions
                                 "Fabric Loader" -> foundModLoaders += ModLoader(
-                                    name = "Fabric",
+                                    name    = "Fabric",
                                     version = entry.asJsonObject["version"].asString
                                 )
                                 "Forge" -> foundModLoaders += ModLoader(
-                                    name = "Forge",
+                                    name    = "Forge",
                                     version = entry.asJsonObject["version"].asString
                                 )
                             }
@@ -205,7 +207,7 @@ class Instance(val path: Path, type: LauncherType) {
                     null -> addWithGeneratedID()
                     in keys -> addWithGeneratedID()
                     // ...or if it can
-                    else -> set(mod.id!!, mod)
+                    else -> set(mod.id, mod)
                 }
             }
         }

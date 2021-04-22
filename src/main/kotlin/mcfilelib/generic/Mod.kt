@@ -5,8 +5,9 @@ import mcfilelib.json.ModVersion
 import mcfilelib.util.ModDependency
 import mcfilelib.util.ModType
 import mcfilelib.util.loadModMetadata
+import neatlin.file.Hash
+import neatlin.file.hash
 import neatlin.file.isEmpty
-import neatlin.file.sha256
 import neatlin.toPath
 import java.nio.file.Files
 import java.nio.file.Path
@@ -111,7 +112,7 @@ class Mod(path: Path) {
     /**
      * Gets the SHA-256 hash of the mod
      */
-    fun generateHash() = path.toFile().sha256()
+    fun generateHash() = path.toFile().hash(Hash.SHA256)
 
     fun toModMetadata() = ModMetadata(
         id,

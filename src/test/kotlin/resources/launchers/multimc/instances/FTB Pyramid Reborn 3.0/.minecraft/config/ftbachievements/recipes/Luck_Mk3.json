@@ -1,0 +1,31 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "ftba_group": "luck3",
+    "tier": 0,
+    "power": 12500000,
+    "pattern": [
+        "###",
+        "IRI",
+        "III"
+    ],
+    "key": {
+        "#": {
+            "type": "forge:ore_dict",
+            "ore": "blockLapis"
+        },
+        "I": {
+            "item": "immersiveengineering:wirecoil",
+            "data": 5
+        },
+        "R": {
+            "item": "actuallyadditions:item_crystal_empowered",
+            "data": 4
+        }
+    },
+    "result": {
+        "item": "ftbachievements:upgrades",
+        "data": 12,
+        "count": 1
+    },
+    "group": "resgen"
+}

@@ -1,0 +1,19 @@
+{
+  "chestX": 0,
+  "chestY": 0,
+  "chestZ": 0,
+  "chestDimID": 0,
+  "startX": -1,
+  "startY": 122,
+  "startZ": 53,
+  "startDimID": 0,
+  "triggedAchivements": [],
+  "achivementTimes": {},
+  "timerData": {
+    "time": 0,
+    "active": false
+  },
+  "craftingProgress": {},
+  "players": "",
+  "invalid": false
+}

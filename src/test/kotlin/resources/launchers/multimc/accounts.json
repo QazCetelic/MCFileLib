@@ -1,0 +1,22 @@
+{
+    "accounts": [
+        {
+            "accessToken": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI4ZjY2YjlkZmM0NmUwYjJjMTE0NzA5MzkzMjE3MzQ0NiIsInlnZ3QiOiJlYjVjODBiNDVlMGE0YzYyOTFhMmUxOGIyYjQ0YjhlOSIsInNwciI6IjA2ZDdhYWUwMzhmOTRiNDZhNDc0M2NmN2ExMjgwNGI0IiwiaXNzIjoiWWdnZHJhc2lsLUF1dGgiLCJleHAiOjE2MTQ4ODc3MTEsImlhdCI6MTYxNDcxNDkxMX0.Yt0p0IP9imszZIIpod9CGpHVG3R6_Y6Efd7U71qQ-yc",
+            "activeProfile": "06d7aae038f94b46a4743cf7a12804b4",
+            "clientToken": "0324d55c554a482d967bfb8a2ea81414",
+            "profiles": [
+                {
+                    "id": "06d7aae038f94b46a4743cf7a12804b4",
+                    "legacy": false,
+                    "name": "QazCetelic"
+                }
+            ],
+            "user": {
+                "id": "8f66b9dfc46e0b2c1147093932173446"
+            },
+            "username": "timo88@ziggo.nl"
+        }
+    ],
+    "activeAccount": "timo88@ziggo.nl",
+    "formatVersion": 2
+}

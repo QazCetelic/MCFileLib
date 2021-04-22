@@ -1,6 +1,9 @@
 package mcfilelib.util
 
-import kmp_semver.*
+import kmp_semver.SemVer
+import kmp_semver.SemVerRange
+import kmp_semver.contains
+import kmp_semver.toSemVerOrNull
 
 fun fromVersionToFormat(version: String?): Int? {
     return if (version != null) {

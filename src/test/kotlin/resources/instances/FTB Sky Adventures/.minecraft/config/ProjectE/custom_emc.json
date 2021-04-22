@@ -1,0 +1,748 @@
+{
+  "entries": [
+    {
+      "item": "chisel:basalt2|7",
+      "emc": 1
+    },
+    {
+      "item": "chisel:marble2|7",
+      "emc": 1
+    },
+    {
+      "item": "modcurrency:wallet|0",
+      "emc": 0
+    },
+    {
+      "item": "forestry:apatite|0",
+      "emc": 64
+    },
+    {
+      "item": "actuallyadditions:item_misc|5",
+      "emc": 64
+    },
+    {
+      "item": "notenoughwands:wandcore|0",
+      "emc": 0
+    },
+    {
+      "item": "notenoughwands:advanced_wandcore|0",
+      "emc": 0
+    },
+    {
+      "item": "notenoughwands:teleportation_wand|0",
+      "emc": 0
+    },
+    {
+      "item": "notenoughwands:building_wand|0",
+      "emc": 0
+    },
+    {
+      "item": "notenoughwands:swapping_wand|0",
+      "emc": 0
+    },
+    {
+      "item": "notenoughwands:capturing_wand|0",
+      "emc": 0
+    },
+    {
+      "item": "notenoughwands:illumination_wand|0",
+      "emc": 0
+    },
+    {
+      "item": "notenoughwands:displacement_wand|0",
+      "emc": 0
+    },
+    {
+      "item": "notenoughwands:moving_wand|0",
+      "emc": 0
+    },
+    {
+      "item": "notenoughwands:acceleration_wand|0",
+      "emc": 0
+    },
+    {
+      "item": "notenoughwands:potion_wand|0",
+      "emc": 0
+    },
+    {
+      "item": "minecraft:leather|0",
+      "emc": 32
+    },
+    {
+      "item": "enderio:item_material|20",
+      "emc": 32
+    },
+    {
+      "item": "minecraft:netherrack|0",
+      "emc": 32
+    },
+    {
+      "item": "exnihilocreatio:block_dust|0",
+      "emc": 1
+    },
+    {
+      "item": "enderio:item_material|5",
+      "emc": 24
+    },
+    {
+      "item": "refinedstorage:silicon|0",
+      "emc": 24
+    },
+    {
+      "item": "minecraft:dye|15",
+      "emc": 28
+    },
+    {
+      "item": "minecraft:blaze_powder|0",
+      "emc": 307
+    },
+    {
+      "item": "thermalfoundation:material|2053",
+      "emc": 307
+    },
+    {
+      "item": "thermalfoundation:material|2051",
+      "emc": 307
+    },
+    {
+      "item": "thermalfoundation:material|2049",
+      "emc": 307
+    },
+    {
+      "item": "thermalfoundation:material|2052",
+      "emc": 1536
+    },
+    {
+      "item": "thermalfoundation:material|2050",
+      "emc": 1536
+    },
+    {
+      "item": "thermalfoundation:material|2048",
+      "emc": 1536
+    },
+    {
+      "item": "minecraft:prismarine_shard|0",
+      "emc": 128
+    },
+    {
+      "item": "minecraft:prismarine_crystals|0",
+      "emc": 128
+    },
+    {
+      "item": "minecraft:sugar|0",
+      "emc": 10
+    },
+    {
+      "item": "minecraft:dye|1",
+      "emc": 5
+    },
+    {
+      "item": "minecraft:dye|11",
+      "emc": 5
+    },
+    {
+      "item": "minecraft:dye|7",
+      "emc": 5
+    },
+    {
+      "item": "minecraft:dye|12",
+      "emc": 5
+    },
+    {
+      "item": "minecraft:dye|13",
+      "emc": 5
+    },
+    {
+      "item": "thermalfoundation:material|771",
+      "emc": 16
+    },
+    {
+      "item": "thermalfoundation:material|164",
+      "emc": 576
+    },
+    {
+      "item": "thermalfoundation:material|160",
+      "emc": 256
+    },
+    {
+      "item": "botania:manaresource|0",
+      "emc": 256
+    },
+    {
+      "item": "botania:manaresource|1",
+      "emc": 1024
+    },
+    {
+      "item": "botania:manaresource|2",
+      "emc": 8192
+    },
+    {
+      "item": "botania:manaresource|4",
+      "emc": 9472
+    },
+    {
+      "item": "draconicevolution:draconium_dust|0",
+      "emc": 8192
+    },
+    {
+      "item": "draconicevolution:draconium_ingot|0",
+      "emc": 8192
+    },
+    {
+      "item": "draconicevolution:dragon_heart|0",
+      "emc": 262144
+    },
+    {
+      "item": "draconicevolution:draconic_ingot|0",
+      "emc": 23665
+    },
+    {
+      "item": "thermalfoundation:material|32",
+      "emc": 256
+    },
+    {
+      "item": "thermalfoundation:material|33",
+      "emc": 2048
+    },
+    {
+      "item": "thermalfoundation:material|320",
+      "emc": 128
+    },
+    {
+      "item": "thermalfoundation:material|321",
+      "emc": 256
+    },
+    {
+      "item": "thermalfoundation:material|322",
+      "emc": 512
+    },
+    {
+      "item": "thermalfoundation:material|323",
+      "emc": 512
+    },
+    {
+      "item": "thermalfoundation:material|325",
+      "emc": 1024
+    },
+    {
+      "item": "thermalfoundation:material|326",
+      "emc": 4096
+    },
+    {
+      "item": "thermalfoundation:material|359",
+      "emc": 2412
+    },
+    {
+      "item": "thermalfoundation:material|352",
+      "emc": 256
+    },
+    {
+      "item": "thermalfoundation:material|353",
+      "emc": 1280
+    },
+    {
+      "item": "thermalfoundation:material|354",
+      "emc": 512
+    },
+    {
+      "item": "thermalfoundation:material|355",
+      "emc": 160
+    },
+    {
+      "item": "thermalfoundation:material|357",
+      "emc": 384
+    },
+    {
+      "item": "thermalfoundation:material|358",
+      "emc": 704
+    },
+    {
+      "item": "ic2:crafting|9",
+      "emc": 256
+    },
+    {
+      "item": "ic2:resource|4",
+      "emc": 8192
+    },
+    {
+      "item": "ic2:nuclear|2",
+      "emc": 819
+    },
+    {
+      "item": "ic2:nuclear|5",
+      "emc": 2048
+    },
+    {
+      "item": "ic2:nuclear|0",
+      "emc": 11058
+    },
+    {
+      "item": "ic2:uranium_fuel_rod|0",
+      "emc": 11314
+    },
+    {
+      "item": "ic2:plate|12",
+      "emc": 2304
+    },
+    {
+      "item": "ic2:nuclear|10",
+      "emc": 319302
+    },
+    {
+      "item": "ic2:plate|9",
+      "emc": 1440
+    },
+    {
+      "item": "ic2:plate|10",
+      "emc": 1552
+    },
+    {
+      "item": "ic2:plate|11",
+      "emc": 18432
+    },
+    {
+      "item": "ic2:plate|4",
+      "emc": 864
+    },
+    {
+      "item": "ic2:plate|13",
+      "emc": 7776
+    },
+    {
+      "item": "ic2:plate|14",
+      "emc": 4608
+    },
+    {
+      "item": "ic2:plate|6",
+      "emc": 0
+    },
+    {
+      "item": "ic2:plate|15",
+      "emc": 0
+    },
+    {
+      "item": "ic2:plate|16",
+      "emc": 2304
+    },
+    {
+      "item": "ic2:plate|17",
+      "emc": 2304
+    },
+    {
+      "item": "thermalfoundation:material|770",
+      "emc": 16
+    },
+    {
+      "item": "projecte:collector_mk1|0",
+      "emc": 10154440
+    },
+    {
+      "item": "projecte:collector_mk2|0",
+      "emc": 10376833
+    },
+    {
+      "item": "projecte:collector_mk3|0",
+      "emc": 10705543
+    },
+    {
+      "item": "thermalfoundation:material|1025",
+      "emc": 339
+    },
+    {
+      "item": "thermalfoundation:material|1024",
+      "emc": 347
+    },
+    {
+      "item": "thermalfoundation:material|1026",
+      "emc": 347
+    },
+    {
+      "item": "thermalfoundation:material|1027",
+      "emc": 371
+    },
+    {
+      "item": "thermalfoundation:material|772",
+      "emc": 16
+    },
+    {
+      "item": "minecraft:mossy_cobblestone|0",
+      "emc": 1
+    },
+    {
+      "item": "minecraft:stonebrick|1",
+      "emc": 1
+    },
+    {
+      "item": "extrautils2:machine|0",
+      "emc": 0
+    },
+    {
+      "item": "thaumcraft:quicksilver|0",
+      "emc": 128
+    },
+    {
+      "item": "exnihilocreatio:block_waterwheel|0",
+      "emc": 0
+    },
+    {
+      "item": "exnihilocreatio:block_axle_stone|0",
+      "emc": 0
+    },
+    {
+      "item": "exnihilocreatio:block_grinder|0",
+      "emc": 0
+    },
+    {
+      "item": "exnihilocreatio:block_auto_sifter|0",
+      "emc": 0
+    },
+    {
+      "item": "appliedenergistics2:material|45",
+      "emc": 32
+    },
+    {
+      "item": "thermalfoundation:material|135",
+      "emc": 16384
+    },
+    {
+      "item": "thaumcraft:crystal_vitium|0",
+      "emc": 64
+    },
+    {
+      "item": "thaumcraft:crystal_perditio|0",
+      "emc": 64
+    },
+    {
+      "item": "thaumcraft:crystal_ordo|0",
+      "emc": 64
+    },
+    {
+      "item": "thaumcraft:crystal_terra|0",
+      "emc": 64
+    },
+    {
+      "item": "thaumcraft:crystal_aqua|0",
+      "emc": 64
+    },
+    {
+      "item": "thaumcraft:crystal_ignis|0",
+      "emc": 64
+    },
+    {
+      "item": "thaumcraft:crystal_aer|0",
+      "emc": 64
+    },
+    {
+      "item": "thaumcraft:amber|0",
+      "emc": 128
+    },
+    {
+      "item": "minecraft:dye|3",
+      "emc": 36
+    },
+    {
+      "item": "hatchery:chickenmanure|0",
+      "emc": 8
+    },
+    {
+      "item": "minecraft:end_stone|0",
+      "emc": 400
+    },
+    {
+      "item": "forestry:beehives|5",
+      "emc": 128
+    },
+    {
+      "item": "forestry:beehives|6",
+      "emc": 128
+    },
+    {
+      "item": "magicbees:hiveblock|0",
+      "emc": 128
+    },
+    {
+      "item": "magicbees:hiveblock|1",
+      "emc": 128
+    },
+    {
+      "item": "magicbees:hiveblock|2",
+      "emc": 128
+    },
+    {
+      "item": "magicbees:hiveblock|3",
+      "emc": 128
+    },
+    {
+      "item": "magicbees:hiveblock|4",
+      "emc": 128
+    },
+    {
+      "item": "magicbees:hiveblock|5",
+      "emc": 128
+    },
+    {
+      "item": "forestry:beehives|4",
+      "emc": 128
+    },
+    {
+      "item": "forestry:beehives|3",
+      "emc": 128
+    },
+    {
+      "item": "forestry:beehives|2",
+      "emc": 128
+    },
+    {
+      "item": "forestry:beehives|1",
+      "emc": 128
+    },
+    {
+      "item": "forestry:beehives|0",
+      "emc": 128
+    },
+    {
+      "item": "extrabees:hive|3",
+      "emc": 128
+    },
+    {
+      "item": "extrabees:hive|2",
+      "emc": 128
+    },
+    {
+      "item": "extrabees:hive|1",
+      "emc": 128
+    },
+    {
+      "item": "extrabees:hive|0",
+      "emc": 128
+    },
+    {
+      "item": "projectred-core:resource_item|105",
+      "emc": 64
+    },
+    {
+      "item": "environmentaltech:lonsdaleite_crystal|0",
+      "emc": 8192
+    },
+    {
+      "item": "environmentaltech:aethium_crystal|0",
+      "emc": 0
+    },
+    {
+      "item": "environmentaltech:ionite_crystal|0",
+      "emc": 0
+    },
+    {
+      "item": "environmentaltech:pladium_crystal|0",
+      "emc": 8192
+    },
+    {
+      "item": "environmentaltech:kyronite_crystal|0",
+      "emc": 2048
+    },
+    {
+      "item": "environmentaltech:erodium_crystal|0",
+      "emc": 512
+    },
+    {
+      "item": "environmentaltech:litherite_crystal|0",
+      "emc": 128
+    },
+    {
+      "item": "fluxnetworks:flux|0",
+      "emc": 64
+    },
+    {
+      "item": "ironbackpacks:backpack|0",
+      "emc": 0
+    },
+    {
+      "item": "ironbackpacks:upgrade|0",
+      "emc": 0
+    },
+    {
+      "item": "enderio:item_material|51",
+      "emc": 64
+    },
+    {
+      "item": "enderio:item_material|52",
+      "emc": 64
+    },
+    {
+      "item": "botania:petal|15",
+      "emc": 48
+    },
+    {
+      "item": "botania:petal|13",
+      "emc": 48
+    },
+    {
+      "item": "botania:petal|12",
+      "emc": 48
+    },
+    {
+      "item": "botania:petal|11",
+      "emc": 48
+    },
+    {
+      "item": "botania:petal|5",
+      "emc": 48
+    },
+    {
+      "item": "botania:petal|10",
+      "emc": 48
+    },
+    {
+      "item": "botania:petal|7",
+      "emc": 48
+    },
+    {
+      "item": "botania:petal|9",
+      "emc": 48
+    },
+    {
+      "item": "botania:petal|0",
+      "emc": 48
+    },
+    {
+      "item": "environmentaltech:mica|0",
+      "emc": 64
+    },
+    {
+      "item": "darkutils:material|0",
+      "emc": 0
+    },
+    {
+      "item": "tconstruct:materials|17",
+      "emc": 64
+    },
+    {
+      "item": "thaumcraft:brain|0",
+      "emc": 64
+    },
+    {
+      "item": "actuallyadditions:item_misc|15",
+      "emc": 16
+    },
+    {
+      "item": "forestry:ash|0",
+      "emc": 1
+    },
+    {
+      "item": "botania:manaresource|23",
+      "emc": 10
+    },
+    {
+      "item": "minecraft:skull|2",
+      "emc": 1024
+    },
+    {
+      "item": "minecraft:skull|4",
+      "emc": 1024
+    },
+    {
+      "item": "minecraft:skull|0",
+      "emc": 1024
+    },
+    {
+      "item": "enderio:block_enderman_skull|0",
+      "emc": 1024
+    },
+    {
+      "item": "ic2:forge_hammer|0",
+      "emc": 1288
+    },
+    {
+      "item": "ic2:cutter|0",
+      "emc": 1280
+    },
+    {
+      "item": "ic2:dust|5",
+      "emc": 8192
+    },
+    {
+      "item": "ic2:dust|9",
+      "emc": 864
+    },
+    {
+      "item": "industrialforegoing:pink_slime|0",
+      "emc": 64
+    },
+    {
+      "item": "minecraft:elytra|0",
+      "emc": 139264
+    },
+    {
+      "item": "extrautils2:flattransfernode|1",
+      "emc": 28
+    },
+    {
+      "item": "enderio:item_alloy_ingot|8",
+      "emc": 816
+    },
+    {
+      "item": "extrautils2:flattransfernode|0",
+      "emc": 28
+    },
+    {
+      "item": "refinedstorage:storage_part|3",
+      "emc": 78686
+    },
+    {
+      "item": "lootbags:loot_opener|0",
+      "emc": 0
+    },
+    {
+      "item": "lootbags:loot_recycler|0",
+      "emc": 0
+    },
+    {
+      "item": "appliedenergistics2:material|5",
+      "emc": 24
+    },
+    {
+      "item": "minecraft:magma|0",
+      "emc": 1356
+    },
+    {
+      "item": "woot:stygianironingot|0",
+      "emc": 337
+    },
+    {
+      "item": "minecraft:iron_nugget|0",
+      "emc": 28
+    },
+    {
+      "item": "appliedenergistics2:material|23",
+      "emc": 152
+    },
+    {
+      "item": "appliedenergistics2:material|24",
+      "emc": 8280
+    },
+    {
+      "item": "appliedenergistics2:material|22",
+      "emc": 2136
+    },
+    {
+      "item": "tconstruct:ingots|5",
+      "emc": 128
+    },
+    {
+      "item": "yabba:antibarrel|0",
+      "emc": 0
+    },
+    {
+      "item": "akashictome:tome|0",
+      "emc": 0
+    },
+    {
+      "item": "immersiveengineering:conveyor|0",
+      "emc": 0
+    },
+    {
+      "item": "darkutils:material|3",
+      "emc": 0
+    }
+  ]
+}

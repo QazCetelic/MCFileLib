@@ -1,0 +1,86 @@
+{
+	"title": "FTB Pyramid",
+	"authors": [
+		"FTB"
+	],
+	"icon": "item:minecraft:grass",
+	"pages": [
+		{
+			"id": "rules",
+			"title": "Rules",
+			"icon": "item:minecraft:diamond"
+		},
+		{
+			"id": "getting_started",
+			"title": "Getting Started",
+			"icon": "item:minecraft:wooden_pickaxe"
+		},
+		{
+			"id": "cobble",
+			"title": "The Cobblegen",
+			"icon": "item:minecraft:cobblestone"
+		},
+		{
+			"id": "resgen",
+			"title": "Resource Generator",
+			"icon": "item:ftbachievements:resgen"
+		},
+		{
+			"id": "seebeck_generator",
+			"title": "Seebeck Generator",
+			"icon": "item:ftbachievements:heater"
+		},
+		{
+			"id": "powered_crafting_table",
+			"title": "Powered Crafting Table",
+			"icon": "item:ftbachievements:poweredcraftingtable"
+		},
+		{
+			"id": "moving_forwards",
+			"title": "Moving Forwards",
+			"icon": "item:minecraft:fireworks"
+		},
+		{
+			"id": "emergency",
+			"title": "In Case of Emergency",
+			"icon": "item:minecraft:barrier"
+		},
+		{
+			"id": "appendix",
+			"title": "Appendix",
+			"icon": "ftblib:icons/info"
+		},
+		{
+			"id": "hints",
+			"title": "Hints and Tips",
+			"icon": "item:minecraft:book",
+			"pages": [
+				{
+					"id": "food",
+					"title": "Extending early game food",
+					"icon": "item:minecraft:wheat"
+				},
+				{
+					"id": "gold",
+					"title": "How to get gold",
+					"icon": "item:minecraft:gold_ingot"
+				},
+				{
+					"id": "water",
+					"title": "How to get more water",
+					"icon": "item:minecraft:water_bucket"
+				},
+				{
+					"id": "angelring",
+					"title": "How to get extra angel rings for team members",
+					"icon": "item:extrautils2:angelring"
+				},
+				{
+					"id": "lava",
+					"title": "Secrets of lava",
+					"icon": "item:minecraft:lava_bucket"
+				}
+			]
+		}
+	]
+}

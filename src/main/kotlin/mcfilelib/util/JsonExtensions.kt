@@ -15,20 +15,20 @@ fun loadJson(path: Path): JsonObject {
     val jsonFile = path.toFile()
 
     //Extract JSON
-    if (!jsonFile.isDirectory) {
-        runCatching {
-            return Gson().fromJson(jsonFile.readText(), JsonObject::class.java)
-        }
+    if (jsonFile.isFile) runCatching {
+        return Gson().fromJson(jsonFile.readText(), JsonObject::class.java)
     }
     // Returns empty object if something went wrong
     return JsonObject()
 }
 
 fun ZipFile.loadJson(entry: String): JsonObject {
-    runCatching {
-        return Gson().fromJson(this.getEntryAsText(entry), JsonObject::class.java)
+    return try {
+        Gson().fromJson(this.getEntryAsText(entry), JsonObject::class.java)
     }
-    return JsonObject()
+    catch (_: Exception) {
+        JsonObject()
+    }
 }
 
 /**

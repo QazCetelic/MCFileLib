@@ -1,0 +1,22 @@
+{
+    "type": "minecraft:crafting_shapeless",
+    "ftba_group": "AngelRing",
+    "tier": 0,
+    "power": 25000,
+    "ingredients": [
+         {
+            "item": "extrautils2:angelring",
+            "data": 0
+        },
+        {
+            "type": "forge:ore_dict",
+            "ore": "ingotGold"
+        }
+    ],
+    "result": {
+        "item": "extrautils2:angelring",
+        "count": 2,
+        "data": 0
+    },
+    "group": "resgen"
+}

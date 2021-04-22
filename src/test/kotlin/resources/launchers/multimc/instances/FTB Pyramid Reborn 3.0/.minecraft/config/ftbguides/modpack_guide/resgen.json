@@ -1,0 +1,16 @@
+[
+	"In past maps, various tools have been used to allow players to create the raw resources they need to complete their goals. For the first time in this map, we are introducing our own custom method of acquiring these resources.",
+	"",
+	"The Resource Generator is an advanced block, that will allow you to convert raw energy directly into resources. Transferring raw energy (such as RF or EU) into any side of the ResGen will allow the device to start up.",
+	"",
+	"To start the process, you first need to indicate to the ResGen what item it should produce. To do this, you must place an item frame on any of the four sides, and then place the item you want to start to create into the item frame. The ResGen is capable of producing more than one item at a time. To do this just add a second item frame onto the ResGen and place a second item in that item frame. With this done the machine will alternate producing both items. The ResGen can be set to produce up to a maximum of four items.",
+	"",
+	"Note: The ResGen outputs items into an inventory connected to the top side.",
+	"",
+	"The amount of energy required to create an item varies according to the item. Also, the amount of time it takes to convert the energy into an item also varies according to the item you are trying to create. As a rule, only basic items can be duplicated although you may find a couple of exceptions to this rule. A full list of the items that can be duplicated can be found at the back of this guide.",
+	"",
+	"As you progress through the pack, you will be able to create upgrades which will enhance the abilities of the ResGen. These upgrades include:",
+	"Luck - A chance to get an extra item for free each cycle.",
+	"Efficiency - Reduce the amount of energy needed per crafting cycle.",
+	"Speed - Decrease the time taken to craft an item (This has the negative effect of increasing the base energy cost)"
+]

@@ -28,15 +28,12 @@ class PackMetadata {
         if (file.exists()) {
             if (file.extension == "zip") {
                 val zipFile = ZipFile(file)
-
                 readPackJson(zipFile.loadJson("pack.mcmeta"))
                 icon = zipFile.getEntryAsAWTImage("pack.png")
             }
             else {
-                val mcmetaFile = file/"pack.mcmeta"
                 val imageFile = file/"pack.png"
-
-                readPackJson(loadJson(mcmetaFile.toPath()))
+                readPackJson(loadJson((file/"pack.mcmeta").toPath()))
                 icon = if (imageFile.exists()) ImageIO.read(imageFile) else null
             }
         }

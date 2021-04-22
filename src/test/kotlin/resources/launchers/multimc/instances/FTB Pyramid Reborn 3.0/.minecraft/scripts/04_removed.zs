@@ -1,0 +1,117 @@
+/**
+ * ------------------------------------------------------------
+ *
+ * This file is part of the FTB Pyramid Reborn Modpack for Minecraft
+ * Copyright (c) 2018 Feed The Beast
+ *
+ * All Rights Reserved unless otherwise explicitly stated.
+ *
+ * ------------------------------------------------------------
+ */
+ 
+//mods.jei.JEI.removeAndHide();
+ 
+mods.jei.JEI.removeAndHide(<tp:quick_sand>);
+mods.jei.JEI.removeAndHide(<tp:lamp>);
+mods.jei.JEI.removeAndHide(<tp:juicer>);
+mods.jei.JEI.removeAndHide(<tp:soul_sandstone>);
+mods.jei.JEI.removeAndHide(<tp:ghost_block>);
+mods.jei.JEI.removeAndHide(<tp:asphalt_block>);
+mods.jei.JEI.removeAndHide(<tp:colored_lamp:*>);
+mods.jei.JEI.removeAndHide(<tp:colored_glowstone:*>);
+mods.jei.JEI.removeAndHide(<tp:colored_dust:*>);
+mods.jei.JEI.removeAndHide(<sonarcore:reinforcedstoneblock>);
+mods.jei.JEI.removeAndHide(<sonarcore:reinforcedstonestairs>);
+mods.jei.JEI.removeAndHide(<sonarcore:reinforcedstonefence>);
+mods.jei.JEI.removeAndHide(<sonarcore:reinforcedstonegate>);
+mods.jei.JEI.removeAndHide(<sonarcore:reinforcedstonebrick>);
+mods.jei.JEI.removeAndHide(<sonarcore:reinforcedstonebrickstairs>);
+mods.jei.JEI.removeAndHide(<sonarcore:reinforcedstonebrickfence>);
+mods.jei.JEI.removeAndHide(<sonarcore:reinforcedstonebrickgate>);
+mods.jei.JEI.removeAndHide(<sonarcore:reinforceddirtblock>);
+mods.jei.JEI.removeAndHide(<sonarcore:reinforceddirtstairs>);
+mods.jei.JEI.removeAndHide(<sonarcore:reinforceddirtfence>);
+mods.jei.JEI.removeAndHide(<sonarcore:reinforceddirtgate>);
+mods.jei.JEI.removeAndHide(<sonarcore:reinforceddirtbrick>);
+mods.jei.JEI.removeAndHide(<sonarcore:reinforceddirtbrickstairs>);
+mods.jei.JEI.removeAndHide(<sonarcore:reinforceddirtbrickfence>);
+mods.jei.JEI.removeAndHide(<sonarcore:reinforceddirtbrickgate>);
+mods.jei.JEI.removeAndHide(<ore:sonarStableStone>);
+mods.jei.JEI.removeAndHide(<sonarcore:stableglass>);
+mods.jei.JEI.removeAndHide(<sonarcore:clearstableglass>);
+mods.jei.JEI.removeAndHide(<ore:coinIron>);
+mods.jei.JEI.removeAndHide(<ore:coinGold>);
+mods.jei.JEI.removeAndHide(<ore:coinCopper>);
+mods.jei.JEI.removeAndHide(<ore:coinTin>);
+mods.jei.JEI.removeAndHide(<ore:coinSilver>);
+mods.jei.JEI.removeAndHide(<ore:coinLead>);
+mods.jei.JEI.removeAndHide(<ore:coinAluminum>);
+mods.jei.JEI.removeAndHide(<ore:coinNickel>);
+mods.jei.JEI.removeAndHide(<ore:coinPlatinum>);
+mods.jei.JEI.removeAndHide(<ore:coinIridium>);
+mods.jei.JEI.removeAndHide(<ore:coinMithril>);
+mods.jei.JEI.removeAndHide(<ore:coinSteel>);
+mods.jei.JEI.removeAndHide(<ore:coinElectrum>);
+mods.jei.JEI.removeAndHide(<ore:coinInvar>);
+mods.jei.JEI.removeAndHide(<ore:coinBronze>);
+mods.jei.JEI.removeAndHide(<ore:coinConstantan>);
+mods.jei.JEI.removeAndHide(<ore:coinSignalum>);
+mods.jei.JEI.removeAndHide(<ore:coinLumium>);
+mods.jei.JEI.removeAndHide(<ore:coinEnderium>);
+mods.jei.JEI.removeAndHide(<immersiveengineering:shader>);
+mods.jei.JEI.removeAndHide(<immersiveengineering:shader_bag>);
+mods.jei.JEI.removeAndHide(<immersiveengineering:ore>);
+mods.jei.JEI.removeAndHide(<immersiveengineering:ore:1>);
+mods.jei.JEI.removeAndHide(<immersiveengineering:ore:2>);
+mods.jei.JEI.removeAndHide(<immersiveengineering:ore:3>);
+mods.jei.JEI.removeAndHide(<immersiveengineering:ore:4>);
+mods.jei.JEI.removeAndHide(<ore:blockRockwool>);
+recipes.removeByRecipeName("thermalexpansion:satchel_1");
+mods.jei.JEI.removeAndHide(<thermalexpansion:florb:*>);
+mods.jei.JEI.removeAndHide(<thermalexpansion:morb:*>);
+mods.jei.JEI.removeAndHide(<botania:manatablet>);
+mods.jei.JEI.removeAndHide(<botania:pool:1>);
+mods.jei.JEI.removeAndHide(<draconicevolution:draconium_capacitor:2>);
+mods.jei.JEI.removeAndHide(<extrautils2:passivegenerator:6>);
+mods.jei.JEI.removeAndHide(<extrautils2:drum:4>);
+mods.jei.JEI.removeAndHide(<rftools:creative_screen>);
+mods.jei.JEI.removeAndHide(<immersiveengineering:metal_device0:3>);
+mods.jei.JEI.removeAndHide(<pneumaticcraft:creative_compressor>);
+mods.jei.JEI.removeAndHide(<rftools:powercell_creative>);
+mods.jei.JEI.removeAndHide(<refinedstorage:controller:1>.withTag({Energy: 32000}));
+mods.jei.JEI.removeAndHide(<refinedstorage:storage:4>);
+mods.jei.JEI.removeAndHide(<refinedstorage:portable_grid:1>);
+mods.jei.JEI.removeAndHide(<refinedstorage:fluid_storage:4>);
+mods.jei.JEI.removeAndHide(<refinedstorage:storage_disk:4>);
+mods.jei.JEI.removeAndHide(<refinedstorage:fluid_storage_disk:4>);
+mods.jei.JEI.removeAndHide(<refinedstorage:wireless_grid:1>);
+mods.jei.JEI.removeAndHide(<refinedstorage:wireless_fluid_grid:1>);
+mods.jei.JEI.removeAndHide(<refinedstorage:wireless_crafting_monitor:1>);
+mods.jei.JEI.removeAndHide(<refinedstorageaddons:wireless_crafting_grid:1>);
+mods.jei.JEI.removeAndHide(<thermalcultivation:watering_can:32000>);
+mods.jei.JEI.removeAndHide(<thermalexpansion:capacitor:32000>);
+mods.jei.JEI.removeAndHide(<thermalexpansion:reservoir:32000>);
+mods.jei.JEI.removeAndHide(<thermalexpansion:satchel:32000>);
+mods.jei.JEI.removeAndHide(<thermalfoundation:upgrade:256>);
+mods.jei.JEI.removeAndHide(<yabba:upgrade_creative>);
+mods.jei.JEI.removeAndHide(<charset:barrel>);
+mods.jei.JEI.removeAndHide(<charset:barrelcart>);
+mods.jei.JEI.removeAndHide(<torchmaster:mega_torch:1>);
+mods.jei.JEI.removeAndHide(<minecraft:command_block>);
+mods.jei.JEI.removeAndHide(<minecraft:repeating_command_block>);
+mods.jei.JEI.removeAndHide(<minecraft:chain_command_block>);
+mods.jei.JEI.removeAndHide(<minecraft:command_block_minecart>);
+mods.jei.JEI.removeAndHide(<tp:watering_can>);
+mods.jei.JEI.removeAndHide(<tp:watering_can_upgrade>);
+mods.jei.JEI.removeAndHide(<tp:stone_hammer>);
+mods.jei.JEI.removeAndHide(<zerocore:debugtool>);
+mods.jei.JEI.removeAndHide(<extrautils2:teleporter>);
+mods.jei.JEI.removeAndHide(<extrautils2:teleporter:1>);
+//mods.jei.JEI.removeAndHide();
+//mods.jei.JEI.removeAndHide();
+//mods.jei.JEI.removeAndHide();
+//mods.jei.JEI.removeAndHide();
+//mods.jei.JEI.removeAndHide();
+//mods.jei.JEI.removeAndHide();
+//mods.jei.JEI.removeAndHide();
+//mods.jei.JEI.removeAndHide();

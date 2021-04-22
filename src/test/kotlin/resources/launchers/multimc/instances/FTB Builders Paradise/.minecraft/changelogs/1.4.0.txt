@@ -1,0 +1,47 @@
+1.4.0 UPDATE
+
+Updated to forge 14.23.5.2838
+
+Mods Updated:
+-astralsorcery-1.12.2-1.10.19.jar
+-AutoRegLib-1.3-30.jar
+-BiomesOPlenty-1.12.2-7.0.1.2441-universal.jar
+-bonsaitrees-1.1.3-b156.jar
+-blockcraftery-1.12.2-1.3.1.jar
+-CoFHCore-1.12.2-4.6.3.27-universal.jar
+-CoFHWorld-1.12.2-1.3.1.7-universal.jar
+-CraftPresence-1.12.2-1.5.5.jar
+-CraftTweaker2-1.12-4.1.18.jar
+-emcbuilderswand-1.12.2-1.8.jar
+-FastWorkbench-1.12.2-1.7.2.jar
+-flatcoloredblocks-mc1.12-6.8.jar
+-FTBLib-5.4.3.101.jar
+-FTBUtilities-5.4.0.97.jar
+-FTBUtilitiesBackups-1.0.0.4.jar
+-furniture-6.3.0-1.12.2.jar
+-jei_1.12.2-4.15.0.280.jar
+-journeymap-1.12.2-5.5.5b7.jar
+-mysticallib-1.12.2-1.2.1.jar
+-Quark-r1.5-156.jar
+-randomtweaks-1.12.2-2.5.0.6.jar
+-SmoothFont-mc1.12.2-2.0.jar
+-Tesslocator-1.0.0.8.jar
+-ThermalCultivation-1.12.2-0.3.3.12-universal.jar
+-ThermalDynamics-1.12.2-2.5.5.21-universal.jar
+-ThermalExpansion-1.12.2-5.5.4.43-universal.jar
+-ThermalFoundation-1.12.2-2.6.3.27-universal.jar
+-ThermalInnovation-1.12.2-0.3.3.12-universal.jar
+
+
+Mods Added:
+
+
+Mods Removed:
+
+
+Changes:
+Fixed Thaumcraft Amber ores not spawning.
+Added conversion recipe for BoP Amber to TC Amber and back.
+Disabled Clay buckets from Ceramics due to getting stuck in AE2 systems.
+Fixed Leaf Wall and Hedge recipe conflicts.
+Fixed Colored Block Thin and White Stained Glass Slab recipe conflicts.

@@ -1,0 +1,26 @@
+{
+    "type": "minecraft:crafting_shapeless",
+    "ftba_group": "uranium",
+    "tier": 0,
+    "power": 250000,
+    "ingredients": [
+        {
+            "type": "forge:ore_dict",
+            "ore": "stone"
+        },
+        {
+            "item": "thermalfoundation:material",
+            "data": 1027
+        },
+        {
+            "item": "thermalfoundation:material",
+            "data": 1024
+        }
+    ],
+    "result": {
+        "item": "immersiveengineering:ore",
+        "data": 5,
+        "count": 1
+    },
+    "group": "resgen"
+}

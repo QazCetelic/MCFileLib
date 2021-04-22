@@ -1,0 +1,31 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "ftba_group": "power",
+    "tier": 0,
+    "power": 1250,
+    "pattern": [
+        "###",
+        "IRI",
+        "III"
+    ],
+    "key": {
+        "#": {
+            "type": "forge:ore_dict",
+            "ore": "blockEmerald"
+        },
+        "I": {
+            "item": "immersiveengineering:wirecoil",
+            "data": 5
+        },
+        "R": {
+            "item": "actuallyadditions:item_crystal",
+            "data": 5
+        }
+    },
+    "result": {
+        "item": "ftbachievements:upgrades",
+        "data": 5,
+        "count": 1
+    },
+    "group": "resgen"
+}

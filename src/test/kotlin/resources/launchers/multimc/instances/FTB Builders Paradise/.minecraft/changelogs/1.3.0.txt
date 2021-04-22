@@ -1,0 +1,21 @@
+1.3.0 UPDATE
+
+Mods Updated:
+-AutoRegLib-1.3-29.jar
+-BiomesOPlenty-1.12.2-7.0.1.2439-universal.jar
+-Mantle-1.12-1.3.3.55.jar
+-ProjectEX-1.2.0.36.jar
+-Quark-r1.5-152.jar
+-snowvariants-1.12.2-1.2.1.jar
+
+
+Mods Added:
+-jeibees-0.9.0.5-mc1.12.2.jar #25
+
+Mods Removed:
+
+
+Changes:
+-Removed some EMC values due to NBT #24
+-Added EMC to some AE2 items
+-Added EMC to Blizz, Blitz and Basalz rods #19

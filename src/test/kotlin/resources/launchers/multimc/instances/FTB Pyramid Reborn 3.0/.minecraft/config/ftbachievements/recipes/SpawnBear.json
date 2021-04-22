@@ -1,0 +1,30 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "ftba_group": "Bear",
+    "tier": 0,
+    "power": 250000,
+    "pattern": [
+        "###",
+        "#R#",
+        "###"
+    ],
+    "key": {
+        "#": {
+            "item": "minecraft:cooked_fish",
+            "data": 0
+        },
+        "R": {
+            "item": "minecraft:egg",
+            "data": 0
+        }
+    },
+    "result": {
+        "item": "minecraft:spawn_egg",
+	"nbt": {
+       "EntityTag": {
+              "id": "Polar_bear"
+       }
+	}
+    },
+    "group": "Bear"
+}

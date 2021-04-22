@@ -1,0 +1,11 @@
+[
+{
+    "h1": "I lost my starter items"
+},
+"If you ever find yourself in a position where you somehow lose the items from the starter chests and unable to continue, you can open the quest gui and click a button marked emergency. Clicking this will open a screen for 5 minutes and without closing it, will allow you to get a new set of initial items to get you going again.",
+"",
+{
+    "h1": "I lost my quest reward items"
+},
+"If you somehow manage to lose your reward items from one of the quest objectives, you can repeat the quest and receive the items for a second time. Be warned however that this will only work once."
+]

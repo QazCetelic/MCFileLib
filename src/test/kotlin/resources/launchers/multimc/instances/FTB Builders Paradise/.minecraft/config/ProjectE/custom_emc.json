@@ -1,0 +1,148 @@
+{
+  "entries": [
+    {
+      "item": "immersiveengineering:material|8",
+      "emc": 640
+    },
+    {
+      "item": "forestry:sapling|0",
+      "emc": 0
+    },
+    {
+      "item": "immersiveengineering:blueprint|0",
+      "emc": 0
+    },
+    {
+      "item": "minecraft:torch|0",
+      "emc": 9
+    },
+    {
+      "item": "biomesoplenty:dirt|0",
+      "emc": 1
+    },
+    {
+      "item": "biomesoplenty:grass|2",
+      "emc": 1
+    },
+    {
+      "item": "appliedenergistics2:material|3",
+      "emc": 256
+    },
+    {
+      "item": "appliedenergistics2:material|10",
+      "emc": 64
+    },
+    {
+      "item": "appliedenergistics2:material|11",
+      "emc": 512
+    },
+    {
+      "item": "appliedenergistics2:material|1",
+      "emc": 128
+    },
+    {
+      "item": "forge:bucketfilled|0",
+      "emc": 0
+    },
+    {
+      "item": "ceramics:clay_bucket|0",
+      "emc": 0
+    },
+    {
+      "item": "appliedenergistics2:material|17",
+      "emc": 8192
+    },
+    {
+      "item": "appliedenergistics2:material|16",
+      "emc": 64
+    },
+    {
+      "item": "appliedenergistics2:material|18",
+      "emc": 2048
+    },
+    {
+      "item": "appliedenergistics2:material|20",
+      "emc": 32
+    },
+    {
+      "item": "appliedenergistics2:material|23",
+      "emc": 160
+    },
+    {
+      "item": "appliedenergistics2:material|24",
+      "emc": 8288
+    },
+    {
+      "item": "appliedenergistics2:material|22",
+      "emc": 2144
+    },
+    {
+      "item": "appliedenergistics2:spatial_storage_cell_2_cubed|0",
+      "emc": 0
+    },
+    {
+      "item": "appliedenergistics2:fluid_storage_cell_64k|0",
+      "emc": 0
+    },
+    {
+      "item": "appliedenergistics2:fluid_storage_cell_16k|0",
+      "emc": 0
+    },
+    {
+      "item": "appliedenergistics2:fluid_storage_cell_4k|0",
+      "emc": 0
+    },
+    {
+      "item": "appliedenergistics2:fluid_storage_cell_1k|0",
+      "emc": 0
+    },
+    {
+      "item": "appliedenergistics2:storage_cell_64k|0",
+      "emc": 0
+    },
+    {
+      "item": "appliedenergistics2:storage_cell_16k|0",
+      "emc": 0
+    },
+    {
+      "item": "appliedenergistics2:storage_cell_4k|0",
+      "emc": 0
+    },
+    {
+      "item": "appliedenergistics2:storage_cell_1k|0",
+      "emc": 0
+    },
+    {
+      "item": "appliedenergistics2:spatial_storage_cell_16_cubed|0",
+      "emc": 0
+    },
+    {
+      "item": "appliedenergistics2:spatial_storage_cell_128_cubed|0",
+      "emc": 0
+    },
+    {
+      "item": "thermalfoundation:material|2048",
+      "emc": 3072
+    },
+    {
+      "item": "thermalfoundation:material|2050",
+      "emc": 3072
+    },
+    {
+      "item": "thermalfoundation:material|2052",
+      "emc": 3072
+    },
+    {
+      "item": "chisel:marble2|7",
+      "emc": 4
+    },
+    {
+      "item": "notenoughroofs:slate|0",
+      "emc": 4
+    },
+    {
+      "item": "chisel:limestone2|7",
+      "emc": 4
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "ftba_group": "Villager",
+    "tier": 0,
+    "power": 250000,
+    "pattern": [
+        "###",
+        "#R#",
+        "###"
+    ],
+    "key": {
+        "#": {
+            "type": "forge:ore_dict",
+            "ore": "gemEmerald"
+        },
+        "R": {
+            "item": "minecraft:egg",
+            "data": 0
+        }
+    },
+    "result": {
+        "item": "minecraft:spawn_egg",
+	"nbt": {
+       "EntityTag": {
+              "id": "Villager"
+       }
+	}
+    },
+    "group": "Villager"
+}

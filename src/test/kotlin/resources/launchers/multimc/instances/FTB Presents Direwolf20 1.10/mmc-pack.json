@@ -1,0 +1,14 @@
+{
+    "components": [
+        {
+            "important": true,
+            "uid": "net.minecraft",
+            "version": "1.10.2"
+        },
+        {
+            "uid": "net.minecraftforge",
+            "version": "12.18.3.2316"
+        }
+    ],
+    "formatVersion": 1
+}

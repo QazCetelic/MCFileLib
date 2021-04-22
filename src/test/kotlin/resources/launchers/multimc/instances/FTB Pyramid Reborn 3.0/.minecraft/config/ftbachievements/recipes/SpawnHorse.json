@@ -1,0 +1,30 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "ftba_group": "Horse",
+    "tier": 0,
+    "power": 250000,
+    "pattern": [
+        "###",
+        "#R#",
+        "###"
+    ],
+    "key": {
+        "#": {
+            "item": "minecraft:diamond_horse_armor",
+            "data": 0
+        },
+        "R": {
+            "item": "minecraft:egg",
+            "data": 0
+        }
+    },
+    "result": {
+        "item": "minecraft:spawn_egg",
+	"nbt": {
+       "EntityTag": {
+              "id": "Horse"
+       }
+	}
+    },
+    "group": "Horse"
+}

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--The syntax for an item stack is the same as you'd use in the /give command. NBT tags are supported! (e.g. minecraft:skull 1 3 {SkullOwner:"ganymedes01"})
+The syntax for a fluid stack is simiar to the item stack, it should be the fluid name followed by the amount. NBT tags are also supported! (e.g. water 1000)
+The syntax for ore dictionary values is the value between double-quotes. (e.g. "ingotIron")
+
+Examples:
+
+The following shows an example of how to add an item to the compost.
+The "value" parameter represents how much of the cruicible will be filled by this item. 0.08 = 8%
+<compost>
+	<input>minecraft:carrot 1 0</input>
+	<value>0.08</value>
+	<colour>"0xFF9B0F"</colour>
+</compost>
+
+The following shows an example of how to add a sieving recipe.
+The "input" MUST be a block! It cannot contain an item!
+The "rarity" is the chance out the ouptut being yielded. 150 = 1 chance in 150
+<sieve>
+	<input>minecraft:netherrack 1 0</input>
+	<output>minecraft:blaze_powder 1 0</output>
+	<rarity>150</rarity>
+</sieve>
+
+The following shows an example of how to add a cruicible recipe.
+The "input" MUST be a block! It cannot contain an item!
+<crucible>
+	<input>minecraft:packed_ice 1 0</input>
+	<output>water 2000</output>
+</crucible>
+
+The following shows an example of how to add a cruicible recipe.
+The "chance" is how often the item will be dropped. 0.5 = 50%
+The "luckMultiplier" will be mutiplied by the fortune of the hammer and then added to the chance. e.g: chance of 0.5, luckMultiplier of 0.25 and fortune 2 = 0.5 + (0.25 x 2) = 1 = 100%
+The "input" MUST be a block! It cannot contain an item!
+<hammer>
+	<input>minecraft:ice 1 0</input>
+	<output>minecraft:fish 1 0</output>
+	<chance>0.5</chance>
+	<luckMultiplier>0.05</luckMultiplier>
+</hammer>
+
+The following shows an example of how to add a block that can be used to power a cruicible.
+As a reference for the "value" parameter, lava has a value of 0.2, fire is 0.3, a torch is 0.1.
+The "input" MUST be a block! It cannot contain an item!
+<heat>
+	<input>minecraft:cake 1 0</input>
+	<value>0.5</value>
+</heat>-->
+
+<exnihilo>
+	<!--Add your recipes here!-->
+</exnihilo>

@@ -6,7 +6,7 @@ import mcfilelib.util.file_entry.config.ConfigDirectory
 import neatlin.div
 import neatlin.fillList
 import neatlin.fillMap
-import neatlin.undev
+import neatlin.io.div
 import java.nio.file.Path
 
 class Instance(val path: Path, type: LauncherType) {
@@ -88,10 +88,8 @@ class Instance(val path: Path, type: LauncherType) {
                 }
             }
             MULTIMC -> {
-                //Gets version from jsonData
-                val json = loadJson(path/"mmc-pack.json")
                 //Checks if the "components" array exists and if so, extracts the array
-                json.ifKey("components") {
+                loadJson(path/"mmc-pack.json").ifKey("components") {
                     for (entry in it.asJsonArray) {
                         // Yes, this ifKey is needed, sometimes the JSON is invalid here but not anywhere else -_-
                         entry.asJsonObject.ifKey("cachedName") {
@@ -145,7 +143,7 @@ class Instance(val path: Path, type: LauncherType) {
                 if (line.startsWith("name=")) return@run line.removePrefix("name=")
             }
         }
-        return@run path.toFile().name.undev()
+        return@run path.toFile().name //.undev()
     }
 
     private fun getInstanceFiles(name: String) = (path/(launcherType.subfolder + name)).toFile().listFiles()

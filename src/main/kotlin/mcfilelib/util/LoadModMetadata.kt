@@ -8,8 +8,8 @@ import mcfilelib.json.MCVersion
 import mcfilelib.json.ModVersion
 import mcfilelib.json.addAuthorsFromArray
 import mcfilelib.json.addAuthorsFromString
-import neatlin.get
-import neatlin.getEntryAsText
+import neatlin.io.zipfile.get
+import neatlin.io.zipfile.getEntryAsText
 import org.tomlj.Toml
 import java.io.File
 import java.util.zip.ZipFile

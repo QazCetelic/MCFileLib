@@ -2,6 +2,7 @@ package tests.asserting
 
 import mcfilelib.generic.Mod
 import neatlin.div
+import neatlin.io.div
 import java.nio.file.Path
 import kotlin.test.assertTrue
 

@@ -3,6 +3,7 @@ package tests.asserting
 import mcfilelib.generic.Launcher
 import mcfilelib.util.LauncherType
 import neatlin.div
+import neatlin.io.div
 import java.nio.file.Path
 import kotlin.system.measureTimeMillis
 import kotlin.test.assertTrue

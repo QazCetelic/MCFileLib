@@ -1,8 +1,8 @@
 package tests.asserting
 
 import mcfilelib.generic.Screenshot
-import neatlin.div
-import neatlin.toi8
+import neatlin.alternativeNumberTypeNames.toi8
+import neatlin.io.div
 import java.nio.file.Path
 import kotlin.system.measureTimeMillis
 import kotlin.test.assertTrue

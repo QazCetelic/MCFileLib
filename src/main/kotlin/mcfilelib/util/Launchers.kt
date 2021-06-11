@@ -2,10 +2,10 @@ package mcfilelib.util
 
 import mcfilelib.generic.Launcher
 import mcfilelib.util.LauncherType.*
-import neatlin.div
-import neatlin.exists
 import neatlin.fillList
-import neatlin.toPath
+import neatlin.io.div
+import neatlin.io.exists
+import neatlin.io.toPath
 import java.nio.file.Path
 
 object Launchers {

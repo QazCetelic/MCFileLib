@@ -3,8 +3,8 @@ package mcfilelib.generic
 import com.google.gson.JsonObject
 import mcfilelib.util.ifKey
 import mcfilelib.util.loadJson
-import neatlin.file.div
-import neatlin.getEntryAsAWTImage
+import neatlin.io.div
+import neatlin.io.zipfile.getEntryAsAWTImage
 import java.awt.image.BufferedImage
 import java.io.File
 import java.util.zip.ZipFile

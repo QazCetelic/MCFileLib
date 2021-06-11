@@ -2,10 +2,10 @@ package mcfilelib.generic
 
 import mcfilelib.util.file_entry.assets.ContentGroupEntry
 import mcfilelib.util.fromFormatToRange
-import neatlin.div
-import neatlin.file.Hash
-import neatlin.file.hash
 import neatlin.fillMap
+import neatlin.hash.Hash
+import neatlin.hash.invoke
+import neatlin.io.div
 import java.awt.image.BufferedImage
 import java.nio.file.Path
 
@@ -56,7 +56,7 @@ abstract class Pack(val path: Path, isResourcePack: Boolean) {
     /**
      * Gets the SHA-256 hash of the pack
      */
-    fun generateHash() = path.toFile().hash(Hash.SHA256)
+    fun generateHash() = Hash.SHA256(path.toFile())
 
     /**
      * Exports the metadata so it can be used for other purposes

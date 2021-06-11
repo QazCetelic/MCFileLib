@@ -5,10 +5,10 @@ import mcfilelib.json.ModVersion
 import mcfilelib.util.ModDependency
 import mcfilelib.util.ModType
 import mcfilelib.util.loadModMetadata
-import neatlin.file.Hash
-import neatlin.file.hash
-import neatlin.file.isEmpty
-import neatlin.toPath
+import neatlin.hash.Hash
+import neatlin.hash.invoke
+import neatlin.io.isEmpty
+import neatlin.io.toPath
 import java.nio.file.Files
 import java.nio.file.Path
 
@@ -79,11 +79,11 @@ class Mod(path: Path) {
 
         // Checks if file is valid
         when {
-            !modFile.exists() -> throw Exception("File doesn't exist")
+            !modFile.exists() -> throw Exception("$modFile doesn't exist")
             // Checks if it's actually in a mod file format (".jar")
             !(modFile.extension == "jar" || modFile.name.endsWith(".jar.disabled")) -> throw Exception("Not a jar")
             // Checks if the zip file isn't empty
-            modFile.isEmpty() -> throw Exception("Mod is empty")
+            modFile.isEmpty() -> throw Exception("$modFile is empty")
         }
 
         loadModMetadata(modFile).let { 
@@ -112,7 +112,7 @@ class Mod(path: Path) {
     /**
      * Gets the SHA-256 hash of the mod
      */
-    fun generateHash() = path.toFile().hash(Hash.SHA256)
+    fun generateHash() = Hash.SHA256(path.toFile())
 
     fun toModMetadata() = ModMetadata(
         id,

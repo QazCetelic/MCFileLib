@@ -1,11 +1,18 @@
 package mcfilelib.util
 
+import currentOS
+import linux_types.Linux
 import mcfilelib.generic.Launcher
 import mcfilelib.util.LauncherType.*
 import neatlin.fillList
+import neatlin.io.Locations
 import neatlin.io.div
 import neatlin.io.exists
 import neatlin.io.toPath
+import windows_types.Windows
+import windows_types.personal.Windows10
+import windows_types.personal.Windows7
+import windows_types.personal.Windows8
 import java.nio.file.Path
 
 object Launchers {
@@ -49,18 +56,18 @@ fun Path.toLauncherType(): LauncherType {
     return UNKNOWN
 }
 
-fun LauncherType.toPath(): Path? = when (os) {
-    // TODO This isn't done yet, I need to know the paths that are used on other OS'
-    OS.LINUX -> {
-        val userHome = System.getProperty("user.home").toPath()
-        when (this) {
-            VANILLA -> (userHome/".minecraft")
-            MULTIMC -> (userHome/".local"/"share"/"multimc")
-            TECHNIC -> (userHome/".technic")
-            GDLAUNCHER -> (userHome/".config"/"GDLauncher")
-            GDLAUNCHER_NEXT -> (userHome/".config"/"gdlauncher_next")
-            else -> null
-        }
+// TODO This isn't done yet, I need to know the paths that are used on other OS'
+fun LauncherType.toPath(): Path? = when (val os = currentOS()) {
+    is Linux -> when (this) {
+        VANILLA -> (Locations.HOME/".minecraft")
+        MULTIMC -> (Locations.HOME/".local"/"share"/"multimc")
+        TECHNIC -> (Locations.HOME/".technic")
+        GDLAUNCHER -> (Locations.HOME/".config"/"GDLauncher")
+        GDLAUNCHER_NEXT -> (Locations.HOME/".config"/"gdlauncher_next")
+        else -> null
+    }
+    is Windows -> {
+        TODO("Windows paths are not added yet")
     }
     else -> TODO("Not implemented")
 }

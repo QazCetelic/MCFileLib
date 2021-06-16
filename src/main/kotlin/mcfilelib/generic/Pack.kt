@@ -31,14 +31,14 @@ abstract class Pack(val path: Path, isResourcePack: Boolean) {
         if (file.extension == "zip") {
             // Gives up
             modSupport          = null
-            contentGroupEntries = mapOf()
+            contentGroupEntries = mapOf() // TODO add support for zips
         }
         else {
             val files = (path/"assets").toFile().listFiles()
             if (files != null) {
                 contentGroupEntries = fillMap {
                     files.forEach { file ->
-                        set(file.name, ContentGroupEntry(file.toPath()))
+                        set(file.name, ContentGroupEntry(packPath = path, file.toPath()))
                     }
                 }
                 modSupport = contentGroupEntries.values.any { !it.vanilla || it.includesOptifine }

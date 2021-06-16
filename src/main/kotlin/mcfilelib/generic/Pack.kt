@@ -7,7 +7,10 @@ import neatlin.hash.Hash
 import neatlin.hash.invoke
 import neatlin.io.div
 import java.awt.image.BufferedImage
+import java.lang.Exception
 import java.nio.file.Path
+import java.util.zip.ZipEntry
+import java.util.zip.ZipFile
 
 abstract class Pack(val path: Path, isResourcePack: Boolean) {
     val name: String
@@ -19,34 +22,65 @@ abstract class Pack(val path: Path, isResourcePack: Boolean) {
     val contentGroupEntries: Map<String, ContentGroupEntry>
 
     init {
-        val file = path.toFile()
-        name = file.nameWithoutExtension
+        val packFile = path.toFile()
+        name = packFile.nameWithoutExtension
 
-        PackMetadata(file).let {
+        PackMetadata(packFile).let {
             format      = it.format
             description = it.description
             icon        = it.icon
         }
 
-        if (file.extension == "zip") {
-            // Gives up
-            modSupport          = null
-            contentGroupEntries = mapOf() // TODO add support for zips
+        if (packFile.extension == "zip") {
+            val zipFile = ZipFile(packFile)
+            val zipEntries = zipFile.entries().toList()
+
+            // e.g "[minecraft, realms]"
+            val contentGroupEntryNames = mutableListOf<String>()
+            for (zipEntry in zipFile.entries()) {
+                val pathParts = "$zipEntry".split("/")
+                if (pathParts.size == 3) {
+                    contentGroupEntryNames += pathParts[1]
+                }
+            }
+
+            // Grouped by content group
+            // e.g "…minecraft=[assets/minecraft/, assets/minecraft/blockstates/, assets/minecraft/blockstates/acacia_trapdoor.json, …"
+            val grouped: Map<String, List<ZipEntry>> = zipEntries.groupBy {
+                for (groupName in contentGroupEntryNames) {
+                    if ("$it".startsWith("assets/$groupName/")) return@groupBy groupName
+                }
+            }   .filter { it.key != Unit }
+                .mapKeys { it.key as String }
+                // Filters for files, and thus removes directories.
+                .mapValues { it.value.filterNot { it.isDirectory } }
+
+            val foundContentGroups = mutableMapOf<String, ContentGroupEntry>()
+            for (group in grouped.entries) {
+                foundContentGroups[group.key] = ContentGroupEntry(group.value, zipFile, entryName = group.key)
+            }
+            contentGroupEntries = foundContentGroups
+            modSupport = contentGroupEntries.all { it.value.vanilla && !it.value.includesOptifine }
         }
         else {
             val files = (path/"assets").toFile().listFiles()
-            if (files != null) {
-                contentGroupEntries = fillMap {
-                    files.forEach { file ->
-                        set(file.name, ContentGroupEntry(packPath = path, file.toPath()))
-                    }
+
+            var foundContentGroups = mutableMapOf<String, ContentGroupEntry>()
+            var foundModSupport: Boolean? = false
+            try {
+                for (file in files) {
+                    foundContentGroups[file.name] = ContentGroupEntry(entryPath = file.toPath(), packPath = path)
                 }
-                modSupport = contentGroupEntries.values.any { !it.vanilla || it.includesOptifine }
+                foundModSupport = foundContentGroups.values.any { !it.vanilla || it.includesOptifine }
             }
-            else {
+            catch (e: Exception) {
                 // Gives up
-                modSupport          = null
-                contentGroupEntries = mapOf()
+                foundContentGroups = mapOf<String, ContentGroupEntry>().toMutableMap()
+                foundModSupport = null
+            }
+            finally {
+                contentGroupEntries = foundContentGroups
+                modSupport = foundModSupport
             }
         }
     }

@@ -8,11 +8,7 @@ import neatlin.fillList
 import neatlin.io.Locations
 import neatlin.io.div
 import neatlin.io.exists
-import neatlin.io.toPath
 import windows_types.Windows
-import windows_types.personal.Windows10
-import windows_types.personal.Windows7
-import windows_types.personal.Windows8
 import java.nio.file.Path
 
 object Launchers {

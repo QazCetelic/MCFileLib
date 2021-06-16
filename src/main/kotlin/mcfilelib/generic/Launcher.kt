@@ -3,7 +3,6 @@ package mcfilelib.generic
 import mcfilelib.util.LauncherType
 import mcfilelib.util.LauncherType.UNKNOWN
 import mcfilelib.util.toLauncherType
-import neatlin.div
 import neatlin.fillList
 import neatlin.io.div
 import java.nio.file.Path

@@ -1,10 +1,13 @@
 package mcfilelib.util.file_entry.assets.blockstate
 
-import kotlinx.serialization.json.*
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.jsonObject
 
 class BlockStateVariant {
-    val name: Map<String, String>?
-    val models: Set<BlockStateModel>
+    var name: MutableMap<String, String>?
+    val models: MutableSet<BlockStateModel>
 
     constructor(jsonElement: JsonElement, key: String) {
         name =
@@ -25,7 +28,7 @@ class BlockStateVariant {
         models = foundModels
     }
 
-    private fun keyToMap(string: String): Map<String, String> {
+    private fun keyToMap(string: String): MutableMap<String, String> {
         val map = mutableMapOf<String, String>()
         if ("," in string) {
             val parts = string.split(",").filter { it != "" }
@@ -40,13 +43,12 @@ class BlockStateVariant {
     }
 
     fun nameToString(): String {
-        if (name == null) return ""
-
-        val pairStrings = mutableListOf<String>()
-        for (entry in name.entries) {
-            pairStrings += "${entry.key}=${entry.value}"
+        return if (name == null) ""
+        else {
+            val pairStrings = mutableListOf<String>()
+            name?.entries?.forEach { pairStrings += "${it.key}=${it.value}" }
+            pairStrings.joinToString(separator = ",")
         }
-        return pairStrings.joinToString(separator = ",")
     }
 
     override fun toString(): String = buildString {

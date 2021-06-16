@@ -3,7 +3,6 @@ package mcfilelib.generic
 import mcfilelib.util.*
 import mcfilelib.util.LauncherType.*
 import mcfilelib.util.file_entry.config.ConfigDirectory
-import neatlin.div
 import neatlin.fillList
 import neatlin.fillMap
 import neatlin.io.div

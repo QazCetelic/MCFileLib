@@ -7,14 +7,18 @@ import mcfilelib.generic.ResourcePack
 import mcfilelib.util.Launchers
 import mcfilelib.util.file_entry.assets.blockstate.BlockStateCondition
 import neatlin.io.toPath
+import java.util.zip.ZipFile
 
 //This is used for testing stuff
 fun main() {
     val resourcePack = ResourcePack("/home/qaz/Projects/Programming/MCFileLib/src/test/kotlin/resources/resourcepacks/Faithfull x32".toPath())
     for (contentGroupEntry in resourcePack.contentGroupEntries.values) {
-        for (blockState in contentGroupEntry.blockstates.values) {
-            println(blockState.path)
-            println(blockState)
+        val blockstates = contentGroupEntry.blockstates
+        if ("potted_brown_mushroom" in blockstates) {
+            println(blockstates["potted_brown_mushroom"])
+        }
+        if ("spruce_trapdoor" in blockstates) {
+            println(blockstates["spruce_trapdoor"])
         }
     }
 

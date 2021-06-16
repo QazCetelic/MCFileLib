@@ -1,7 +1,10 @@
 package mcfilelib.util.file_entry.assets.blockstate
 
 import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.*
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
 import java.nio.file.Path
 
 /**
@@ -9,17 +12,13 @@ import java.nio.file.Path
  * Item frames are treated as blocks and use "map=false" for a map-less item frame, and "map=true" for item frames with maps.
  */
 class BlockState {
-    val path: Path
+    val path: Path?
 
-    val variants: Set<BlockStateVariant> //Map<Map<String, String>?, List<BlockStateModel>> // "when" entry
-    val multipart: List<BlockStateMultipartEntry>           // "apply" entry
+    val variants: MutableList<BlockStateVariant> //Map<Map<String, String>?, List<BlockStateModel>> // "when" entry
+    val multipart: MutableList<BlockStateMultipartEntry>           // "apply" entry
 
-    constructor(path: Path) {
-        this.path = path
-        val jsonString: String = path.toFile().readText()
-        val root = Json.decodeFromString<JsonElement>(jsonString).jsonObject
-
-        val foundVariants = mutableSetOf<BlockStateVariant>()
+    private fun processRootObject(root: JsonObject): Pair<MutableList<BlockStateVariant>, MutableList<BlockStateMultipartEntry>> {
+        val foundVariants = mutableListOf<BlockStateVariant>()
         if ("variants" in root) {
             val variants = root["variants"]!!.jsonObject
             for (entry in variants.entries) {
@@ -35,56 +34,59 @@ class BlockState {
             }
         }
 
-        variants = foundVariants
-        multipart = foundMultiparts
+        return Pair(foundVariants, foundMultiparts)
+    }
+
+    constructor(path: Path) {
+        this.path = path
+        val jsonString: String = path.toFile().readText()
+        val root = Json.decodeFromString<JsonObject>(jsonString)
+        with(processRootObject(root)) {
+            variants = first
+            multipart = second
+        }
+    }
+
+    constructor(jsonString: String) {
+        path = null
+        val root = Json.decodeFromString<JsonObject>(jsonString)
+        with(processRootObject(root)) {
+            variants = first
+            multipart = second
+        }
     }
 
     private fun variantsToString(): String = buildString {
         append("\n    \"variants\": {")
-        for (variant in variants) {
-            append("\n${variant.toString().prependIndent("        ")}")
-        }
-        // Drops comma
+        append(variants.joinToString(separator = ",") { "\n${"$it".prependIndent("        ")}" })
         append("\n    }")
     }
 
     private fun multiPartToString(): String = buildString {
-        fun partStart() {
-            append("\n        {   \"when\": { ")
-        }
-        fun partEnd(last: Boolean = false) {
-            append("\n        }")
-            if (!last) append(",")
-        }
-        fun partApply(blockStateModel: BlockStateModel) {
-            append("\n            \"apply\": $blockStateModel")
-        }
-        fun condition(condition: BlockStateCondition, last: Boolean = false) {
-            append("\n                $condition")
-            if (!last) append(",")
-        }
+        val partStart:                                      String  = "\n        {   \"when\": { "
+        fun partEnd(last: Boolean = false):                 String  = "\n        }${if (!last) "," else ""}"
+        fun partApply(blockStateModel: BlockStateModel):    String  = "\n            \"apply\": $blockStateModel"
+        fun condition(condition: BlockStateCondition):      String  = "\n                $condition"
+
         fun partMultiple(conditions: List<BlockStateCondition>, blockStateModel: BlockStateModel, last: Boolean = false) {
-            partStart()
+            append(partStart)
             append(" \"OR\": [")
-            for (i in conditions.indices) {
-                condition(conditions[i], (conditions.lastIndex == i))
-            }
+            append(conditions.joinToString(separator = ",") { condition(it) })
             append("\n            ]},")
-            partApply(blockStateModel)
-            partEnd(last)
+            append(partApply(blockStateModel))
+            append(partEnd(last))
         }
         fun partSingle(condition: BlockStateCondition, blockStateModel: BlockStateModel, last: Boolean = false) {
-            partStart()
-            condition(condition, last = true)
+            append(partStart)
+            append(condition(condition))
             append("\n            }")
-            partApply(blockStateModel)
-            partEnd(last)
+            append(partApply(blockStateModel))
+            append(partEnd(last))
         }
 
         append("\n    \"multipart\": [")
         for (i in multipart.indices) {
             val isLast = (multipart.lastIndex == i)
-
             if (multipart[i].conditions.size != 1) partMultiple(multipart[i].conditions, multipart[i].model, isLast)
             else partSingle(multipart[i].conditions.first(), multipart[i].model, isLast)
         }
